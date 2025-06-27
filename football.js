@@ -25,7 +25,8 @@ const player1 = {
     left: false,
     right: false,
     jump: false,
-    onGround: true
+    onGround: true,
+    inclinaison: 0
 };
 const player2 = {
     x: canvas2.width - 60 - PLAYER_WIDTH,
@@ -36,7 +37,8 @@ const player2 = {
     left: false,
     right: false,
     jump: false,
-    onGround: true
+    onGround: true,
+    inclinaison: 0
 };
 
 // Ballon
@@ -47,17 +49,23 @@ const ball = {
     vy: 0
 };
 
+// Gestion tactile avancée
+let touchSide = null; // 'left' ou 'right'
+let touchIncline = 0; // -1 ou 1
+
 function resetPositions() {
     player1.x = 60;
     player1.y = GROUND_Y - PLAYER_HEIGHT;
     player1.vx = 0;
     player1.vy = 0;
     player1.onGround = true;
+    player1.inclinaison = 0;
     player2.x = canvas2.width - 60 - PLAYER_WIDTH;
     player2.y = GROUND_Y - PLAYER_HEIGHT;
     player2.vx = 0;
     player2.vy = 0;
     player2.onGround = true;
+    player2.inclinaison = 0;
     ball.x = canvas2.width / 2;
     ball.y = GROUND_Y - BALL_RADIUS;
     ball.vx = BALL_SPEED * (Math.random() > 0.5 ? 1 : -1);
@@ -102,6 +110,13 @@ function updatePlayers() {
         player2.y = GROUND_Y - PLAYER_HEIGHT;
         player2.vy = 0;
         player2.onGround = true;
+    }
+    // Ajout pour mobile : si le joueur saute et a une inclinaison, il avance/recul
+    if (player1.jump && player1.onGround && player1.inclinaison !== 0) {
+        player1.vx = 3 * player1.inclinaison;
+    }
+    if (player2.jump && player2.onGround && player2.inclinaison !== 0) {
+        player2.vx = 3 * player2.inclinaison;
     }
 }
 
@@ -271,15 +286,20 @@ function gameLoop2() {
 }
 
 // Modifie la gestion du saut pour taper dans le ballon si proche
-function tryKickBall(player, direction) {
-    // direction: -1 pour gauche, 1 pour droite
+function tryKickBall(player, direction, isMobile) {
     let dx = (player.x + PLAYER_WIDTH / 2) - ball.x;
     let dy = (player.y + PLAYER_HEIGHT / 2) - ball.y;
     let dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < PLAYER_WIDTH / 2 + BALL_RADIUS + 8) {
-        // Impulsion plus forte vers le haut et sur le côté
-        ball.vx = 6 * direction;
-        ball.vy = -8;
+        if (isMobile && player.inclinaison !== 0) {
+            // Impulsion dans la direction de l'inclinaison
+            ball.vx = 6 * player.inclinaison;
+            ball.vy = -8;
+        } else {
+            // Impulsion classique
+            ball.vx = 6 * direction;
+            ball.vy = -8;
+        }
     }
 }
 
@@ -289,13 +309,13 @@ window.addEventListener('keydown', e => {
         case 'a':
         case 'z':
             player1.jump = true;
-            if (player1.onGround) tryKickBall(player1, 1);
+            if (player1.onGround) tryKickBall(player1, 1, false);
             break;
         case 'q': player1.left = true; break;
         case 'd': player1.right = true; break;
         case 'arrowup':
             player2.jump = true;
-            if (player2.onGround) tryKickBall(player2, -1);
+            if (player2.onGround) tryKickBall(player2, -1, false);
             break;
         case 'arrowleft': player2.left = true; break;
         case 'arrowright': player2.right = true; break;
@@ -318,16 +338,33 @@ canvas2.addEventListener('touchstart', function(e) {
     const rect = canvas2.getBoundingClientRect();
     const x = e.touches[0].clientX - rect.left;
     if (x < canvas2.width / 2) {
-        player1.jump = true;
-        if (player1.onGround) tryKickBall(player1, 1);
+        touchSide = 'left';
+        player1.inclinaison = (x < canvas2.width / 4) ? -1 : 1;
+        if (player1.inclinaison === 1) {
+            player1.jump = true;
+            if (player1.onGround) tryKickBall(player1, 1, true);
+        } else {
+            player1.jump = true;
+            if (player1.onGround) tryKickBall(player1, -1, true);
+        }
     } else {
-        player2.jump = true;
-        if (player2.onGround) tryKickBall(player2, -1);
+        touchSide = 'right';
+        player2.inclinaison = (x > 3 * canvas2.width / 4) ? 1 : -1;
+        if (player2.inclinaison === 1) {
+            player2.jump = true;
+            if (player2.onGround) tryKickBall(player2, -1, true);
+        } else {
+            player2.jump = true;
+            if (player2.onGround) tryKickBall(player2, 1, true);
+        }
     }
 });
 canvas2.addEventListener('touchend', function(e) {
     player1.jump = false;
     player2.jump = false;
+    player1.inclinaison = 0;
+    player2.inclinaison = 0;
+    touchSide = null;
 });
 
 // Initialisation
