@@ -152,14 +152,14 @@ function updateScore2() {
 }
 
 function drawPlayers() {
-    // Joueur 1
-    drawBonhomme(player1.x + PLAYER_WIDTH / 2, player1.y + PLAYER_HEIGHT, player1.color);
-    // Joueur 2
-    drawBonhomme(player2.x + PLAYER_WIDTH / 2, player2.y + PLAYER_HEIGHT, player2.color);
+    // Joueur 1 : barbe, pas de cheveux
+    drawBonhomme(player1.x + PLAYER_WIDTH / 2, player1.y + PLAYER_HEIGHT, player1.color, true, false);
+    // Joueur 2 : cheveux + barrette, pas de barbe
+    drawBonhomme(player2.x + PLAYER_WIDTH / 2, player2.y + PLAYER_HEIGHT, player2.color, false, true);
 }
 
-function drawBonhomme(x, y, color) {
-    // Corps
+// cheveuxBarrette = true => cheveux + barrette, barbe = true => barbe
+function drawBonhomme(x, y, color, barbe, cheveuxBarrette) {
     ctx2.save();
     ctx2.strokeStyle = color;
     ctx2.lineWidth = 3;
@@ -169,6 +169,46 @@ function drawBonhomme(x, y, color) {
     ctx2.fillStyle = '#ffe0b2';
     ctx2.fill();
     ctx2.stroke();
+    // Yeux
+    ctx2.beginPath();
+    ctx2.fillStyle = '#222';
+    ctx2.arc(x - 4, y - 34, 1.5, 0, 2 * Math.PI);
+    ctx2.arc(x + 4, y - 34, 1.5, 0, 2 * Math.PI);
+    ctx2.fill();
+    // Bouche
+    ctx2.beginPath();
+    ctx2.strokeStyle = '#b05a19';
+    ctx2.lineWidth = 1.5;
+    ctx2.arc(x, y - 28, 4, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx2.stroke();
+    // Barbe (plus fournie)
+    if (barbe) {
+        ctx2.beginPath();
+        ctx2.strokeStyle = '#7b4a1e';
+        ctx2.lineWidth = 3;
+        ctx2.arc(x, y - 25, 7, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx2.stroke();
+        ctx2.beginPath();
+        ctx2.arc(x - 4, y - 26, 2.5, 0.2 * Math.PI, 1.2 * Math.PI);
+        ctx2.arc(x + 4, y - 26, 2.5, 1.8 * Math.PI, 0.8 * Math.PI, true);
+        ctx2.stroke();
+    }
+    // Cheveux + barrette
+    if (cheveuxBarrette) {
+        // Cheveux (arc sur le haut de la tête)
+        ctx2.beginPath();
+        ctx2.strokeStyle = '#222';
+        ctx2.lineWidth = 3;
+        ctx2.arc(x, y - 36, 8, Math.PI, 2 * Math.PI);
+        ctx2.stroke();
+        // Barrette (petit rectangle bleu clair)
+        ctx2.save();
+        ctx2.fillStyle = '#40c4ff';
+        ctx2.fillRect(x - 2, y - 44, 4, 7);
+        ctx2.restore();
+    }
+    ctx2.strokeStyle = color;
+    ctx2.lineWidth = 3;
     // Corps
     ctx2.beginPath();
     ctx2.moveTo(x, y - 22);
@@ -202,7 +242,7 @@ function drawBall() {
 }
 
 function drawGround() {
-    ctx2.fillStyle = '#444';
+    ctx2.fillStyle = '#3cb043'; // Vert gazon
     ctx2.fillRect(0, GROUND_Y, canvas2.width, 30);
     // Ligne centrale
     ctx2.strokeStyle = '#fff';
@@ -215,7 +255,9 @@ function drawGround() {
 }
 
 function drawGame2() {
-    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+    // Arrière-plan bleu clair
+    ctx2.fillStyle = '#b3e0ff';
+    ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
     drawGround();
     drawPlayers();
     drawBall();
