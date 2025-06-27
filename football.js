@@ -53,6 +53,12 @@ const ball = {
 let touchSide = null; // 'left' ou 'right'
 let touchIncline = 0; // -1 ou 1
 
+// Ajout d'une variable de version
+const VERSION = 'v1.0';
+
+// Oscillation automatique de l'inclinaison
+let oscillationAngle = 0;
+
 function resetPositions() {
     player1.x = 60;
     player1.y = GROUND_Y - PLAYER_HEIGHT;
@@ -262,6 +268,12 @@ function drawGround() {
     // Plus de ligne centrale
 }
 
+function updateOscillation() {
+    oscillationAngle += 0.04;
+    player1.inclinaison = Math.sin(oscillationAngle) > 0 ? 1 : -1;
+    player2.inclinaison = Math.cos(oscillationAngle) > 0 ? 1 : -1;
+}
+
 function drawGame2() {
     // Arrière-plan bleu clair
     ctx2.fillStyle = '#b3e0ff';
@@ -269,9 +281,18 @@ function drawGame2() {
     drawGround();
     drawPlayers();
     drawBall();
+    // Numéro de version en bas à droite
+    ctx2.save();
+    ctx2.font = 'bold 14px Arial';
+    ctx2.fillStyle = '#222';
+    ctx2.globalAlpha = 0.5;
+    ctx2.textAlign = 'right';
+    ctx2.fillText(VERSION, canvas2.width - 8, canvas2.height - 8);
+    ctx2.restore();
 }
 
 function gameLoop2() {
+    updateOscillation();
     updatePlayers();
     updateBall();
     drawGame2();
