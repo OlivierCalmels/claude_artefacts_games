@@ -73,13 +73,13 @@ function resetPositions() {
 }
 
 function updatePlayers() {
-    // Joueur 1 (ZQSD)
+    // Joueur 1 (ZQSD ou mobile)
     if (player1.left) player1.vx = -PLAYER_SPEED;
     else if (player1.right) player1.vx = PLAYER_SPEED;
-    else player1.vx = 0;
+    else if (!(player1.jump && player1.inclinaison !== 0)) player1.vx = 0;
     player1.x += player1.vx;
     if (player1.x < 0) player1.x = 0;
-    if (player1.x > canvas2.width / 2 - PLAYER_WIDTH) player1.x = canvas2.width / 2 - PLAYER_WIDTH;
+    if (player1.x > canvas2.width - PLAYER_WIDTH) player1.x = canvas2.width - PLAYER_WIDTH;
     // Saut
     if (player1.jump && player1.onGround) {
         player1.vy = JUMP_STRENGTH;
@@ -92,12 +92,12 @@ function updatePlayers() {
         player1.vy = 0;
         player1.onGround = true;
     }
-    // Joueur 2 (flèches)
+    // Joueur 2 (flèches ou mobile)
     if (player2.left) player2.vx = -PLAYER_SPEED;
     else if (player2.right) player2.vx = PLAYER_SPEED;
-    else player2.vx = 0;
+    else if (!(player2.jump && player2.inclinaison !== 0)) player2.vx = 0;
     player2.x += player2.vx;
-    if (player2.x < canvas2.width / 2) player2.x = canvas2.width / 2;
+    if (player2.x < 0) player2.x = 0;
     if (player2.x > canvas2.width - PLAYER_WIDTH) player2.x = canvas2.width - PLAYER_WIDTH;
     // Saut
     if (player2.jump && player2.onGround) {
@@ -259,14 +259,7 @@ function drawBall() {
 function drawGround() {
     ctx2.fillStyle = '#3cb043'; // Vert gazon
     ctx2.fillRect(0, GROUND_Y, canvas2.width, 30);
-    // Ligne centrale
-    ctx2.strokeStyle = '#fff';
-    ctx2.setLineDash([8, 8]);
-    ctx2.beginPath();
-    ctx2.moveTo(canvas2.width / 2, 0);
-    ctx2.lineTo(canvas2.width / 2, GROUND_Y);
-    ctx2.stroke();
-    ctx2.setLineDash([]);
+    // Plus de ligne centrale
 }
 
 function drawGame2() {
