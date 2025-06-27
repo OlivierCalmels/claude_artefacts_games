@@ -153,11 +153,42 @@ function updateScore2() {
 
 function drawPlayers() {
     // Joueur 1
-    ctx2.fillStyle = player1.color;
-    ctx2.fillRect(player1.x, player1.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+    drawBonhomme(player1.x + PLAYER_WIDTH / 2, player1.y + PLAYER_HEIGHT, player1.color);
     // Joueur 2
-    ctx2.fillStyle = player2.color;
-    ctx2.fillRect(player2.x, player2.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+    drawBonhomme(player2.x + PLAYER_WIDTH / 2, player2.y + PLAYER_HEIGHT, player2.color);
+}
+
+function drawBonhomme(x, y, color) {
+    // Corps
+    ctx2.save();
+    ctx2.strokeStyle = color;
+    ctx2.lineWidth = 3;
+    // Tête
+    ctx2.beginPath();
+    ctx2.arc(x, y - 32, 10, 0, 2 * Math.PI);
+    ctx2.fillStyle = '#ffe0b2';
+    ctx2.fill();
+    ctx2.stroke();
+    // Corps
+    ctx2.beginPath();
+    ctx2.moveTo(x, y - 22);
+    ctx2.lineTo(x, y - 2);
+    ctx2.stroke();
+    // Bras
+    ctx2.beginPath();
+    ctx2.moveTo(x, y - 18);
+    ctx2.lineTo(x - 12, y - 8);
+    ctx2.moveTo(x, y - 18);
+    ctx2.lineTo(x + 12, y - 8);
+    ctx2.stroke();
+    // Jambes
+    ctx2.beginPath();
+    ctx2.moveTo(x, y - 2);
+    ctx2.lineTo(x - 8, y + 16);
+    ctx2.moveTo(x, y - 2);
+    ctx2.lineTo(x + 8, y + 16);
+    ctx2.stroke();
+    ctx2.restore();
 }
 
 function drawBall() {
