@@ -174,14 +174,21 @@ function updateScore2() {
 
 function drawPlayers() {
     // Joueur 1 : barbe, pas de cheveux
-    drawBonhomme(player1.x + PLAYER_WIDTH / 2, player1.y + PLAYER_HEIGHT, player1.color, true, false);
+    drawBonhomme(player1.x + PLAYER_WIDTH / 2, player1.y + PLAYER_HEIGHT, player1.color, true, false, player1.inclinaison);
     // Joueur 2 : cheveux + barrette, pas de barbe
-    drawBonhomme(player2.x + PLAYER_WIDTH / 2, player2.y + PLAYER_HEIGHT, player2.color, false, true);
+    drawBonhomme(player2.x + PLAYER_WIDTH / 2, player2.y + PLAYER_HEIGHT, player2.color, false, true, player2.inclinaison);
 }
 
 // cheveuxBarrette = true => cheveux + barrette, barbe = true => barbe
-function drawBonhomme(x, y, color, barbe, cheveuxBarrette) {
+function drawBonhomme(x, y, color, barbe, cheveuxBarrette, inclinaison) {
     ctx2.save();
+    // Inclinaison visuelle (rotation)
+    let angle = 0;
+    if (inclinaison === 1) angle = Math.PI / 8;
+    else if (inclinaison === -1) angle = -Math.PI / 8;
+    ctx2.translate(x, y);
+    ctx2.rotate(angle);
+    ctx2.translate(-x, -y);
     ctx2.strokeStyle = color;
     ctx2.lineWidth = 3;
     // Tête
