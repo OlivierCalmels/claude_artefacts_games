@@ -286,15 +286,16 @@ function tryKickBall(player, direction) {
 // Contrôles clavier
 window.addEventListener('keydown', e => {
     switch (e.key.toLowerCase()) {
+        case 'a':
         case 'z':
             player1.jump = true;
-            if (player1.onGround) tryKickBall(player1, 1); // tape à droite
+            if (player1.onGround) tryKickBall(player1, 1);
             break;
         case 'q': player1.left = true; break;
         case 'd': player1.right = true; break;
         case 'arrowup':
             player2.jump = true;
-            if (player2.onGround) tryKickBall(player2, -1); // tape à gauche
+            if (player2.onGround) tryKickBall(player2, -1);
             break;
         case 'arrowleft': player2.left = true; break;
         case 'arrowright': player2.right = true; break;
@@ -302,6 +303,7 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e => {
     switch (e.key.toLowerCase()) {
+        case 'a':
         case 'z': player1.jump = false; break;
         case 'q': player1.left = false; break;
         case 'd': player1.right = false; break;
@@ -309,6 +311,23 @@ window.addEventListener('keyup', e => {
         case 'arrowleft': player2.left = false; break;
         case 'arrowright': player2.right = false; break;
     }
+});
+
+// Contrôles tactiles (mobile)
+canvas2.addEventListener('touchstart', function(e) {
+    const rect = canvas2.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    if (x < canvas2.width / 2) {
+        player1.jump = true;
+        if (player1.onGround) tryKickBall(player1, 1);
+    } else {
+        player2.jump = true;
+        if (player2.onGround) tryKickBall(player2, -1);
+    }
+});
+canvas2.addEventListener('touchend', function(e) {
+    player1.jump = false;
+    player2.jump = false;
 });
 
 // Initialisation
