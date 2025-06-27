@@ -177,6 +177,13 @@ function drawPlayers() {
     drawBonhomme(player1.x + PLAYER_WIDTH / 2, player1.y + PLAYER_HEIGHT, player1.color, true, false, player1.inclinaison);
     // Joueur 2 : cheveux + barrette, pas de barbe
     drawBonhomme(player2.x + PLAYER_WIDTH / 2, player2.y + PLAYER_HEIGHT, player2.color, false, true, player2.inclinaison);
+    // Affiche le prénom 'Claire' sous le joueur rouge
+    ctx2.save();
+    ctx2.font = 'bold 14px Arial';
+    ctx2.fillStyle = '#e53935';
+    ctx2.textAlign = 'center';
+    ctx2.fillText('Claire', player2.x + PLAYER_WIDTH / 2, player2.y + PLAYER_HEIGHT + 24);
+    ctx2.restore();
 }
 
 // cheveuxBarrette = true => cheveux + barrette, barbe = true => barbe
