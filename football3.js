@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', function() {
 // --- Paramètres du jeu avec Matter.js ---
-const canvas2 = document.getElementById('jeu2Canvas');
+const canvas2 = document.getElementById('jeu4Canvas');
 const { Engine, Render, World, Bodies, Body, Composite, Vector, Constraint } = Matter;
 
 // Création du moteur physique

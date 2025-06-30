@@ -1,35 +1,5 @@
 // Tab switching
-function switchTab(tabIndex) {
-    const tabs = document.querySelectorAll('.tab');
-    const games = document.querySelectorAll('.game-container');
-    
-    tabs.forEach(tab => tab.classList.remove('active'));
-    games.forEach(game => game.classList.remove('active'));
-    
-    tabs[tabIndex].classList.add('active');
-    games[tabIndex].classList.add('active');
-    
-    // Mise à jour de l'URL sans recharger la page
-    const jeu = tabIndex === 0 ? 'pong' : 'football';
-    const url = new URL(window.location);
-    url.searchParams.set('jeu', jeu);
-    window.history.replaceState({}, '', url);
-
-    if (tabIndex === 0) {
-        resizeCanvas();
-    }
-}
-
-// Sélection de l'onglet au chargement selon l'URL
-window.addEventListener('DOMContentLoaded', function() {
-    const params = new URLSearchParams(window.location.search);
-    const jeu = params.get('jeu');
-    if (jeu === 'football') {
-        switchTab(1);
-    } else {
-        switchTab(0);
-    }
-});
+// (déplacé dans tab.js)
 
 // Pong Game
 const canvas = document.getElementById('pongCanvas');
