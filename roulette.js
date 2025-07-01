@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', function() {
     const radius = Math.min(width, height) / 2 - 20;
 
     // Liste des acronymes (modifiable)
-    const acronyms = ['CHSCT', 'CSE', 'SSCT', 'PAPRIPACT', 'BDESE'];
+    const acronyms = ['CHSCT', 'CSE', 'SSCT', 'PAPRIPACT'];
     const colors = [
         '#ff5252', '#ffd600', '#43a047', '#1976d2',
         '#ff4081', '#00bcd4', '#ff9800', '#8bc34a'
@@ -30,6 +30,23 @@ window.addEventListener('DOMContentLoaded', function() {
         resultDiv.style.textAlign = 'center';
         resultDiv.style.margin = '18px 0 0 0';
         canvas.parentNode.insertBefore(resultDiv, canvas.nextSibling);
+    }
+
+    // Ajout d'un élément pour debug
+    let debugDiv = document.getElementById('rouletteDebug');
+    if (!debugDiv) {
+        debugDiv = document.createElement('div');
+        debugDiv.id = 'rouletteDebug';
+        debugDiv.style.fontFamily = 'monospace';
+        debugDiv.style.fontSize = '1rem';
+        debugDiv.style.textAlign = 'center';
+        debugDiv.style.margin = '8px 0 0 0';
+        canvas.parentNode.insertBefore(debugDiv, resultDiv.nextSibling);
+    }
+
+    // Fonction modulo robuste pour index positif
+    function mod(a, n) {
+        return ((a % n) + n) % n;
     }
 
     function drawWheel() {
@@ -79,14 +96,30 @@ window.addEventListener('DOMContentLoaded', function() {
 
     function animate() {
         let currentAcronym = '';
-        // Calcul de l'acronyme sous la flèche à chaque frame
+        // Calcul précis de l'acronyme sous la flèche (alignement parfait)
         const n = acronyms.length;
         const arc = 2 * Math.PI / n;
-        let a = (angle - Math.PI/2) % (2 * Math.PI);
-        if (a < 0) a += 2 * Math.PI;
-        let idx = Math.floor(a / arc) % n;
+        let pointerAngle = -Math.PI / 2;
+        let relative = (pointerAngle - angle + 2 * Math.PI) % (2 * Math.PI);
+        let idx = mod(Math.floor(relative / arc), n);
         currentAcronym = acronyms[idx];
         resultDiv.textContent = currentAcronym;
+        // Affichage debug
+        let debugText = '';
+        debugText += `angle roue: ${(angle).toFixed(2)} rad (${(angle*180/Math.PI).toFixed(1)}°)<br/>`;
+        debugText += `angle flèche: ${(pointerAngle).toFixed(2)} rad (${(pointerAngle*180/Math.PI).toFixed(1)}°)<br/>`;
+        debugText += `angle relatif: ${(relative).toFixed(2)} rad (${(relative*180/Math.PI).toFixed(1)}°)<br/>`;
+        debugText += `arc: ${(arc).toFixed(2)} rad (${(arc*180/Math.PI).toFixed(1)}°)<br/>`;
+        debugText += `index calculé: ${idx}<br/>`;
+        debugText += 'Centres secteurs :<br/>';
+        for (let i = 0; i < n; i++) {
+            let center = (angle + (i + 0.5) * arc) % (2 * Math.PI);
+            if (center < 0) center += 2 * Math.PI;
+            debugText += `#${i}: ${(center).toFixed(2)} rad (${(center*180/Math.PI).toFixed(1)}°)`;
+            if (i === idx) debugText += ' &larr; sélectionné';
+            debugText += '<br/>';
+        }
+        debugDiv.innerHTML = debugText;
         if (spinning) {
             angle += spinVelocity;
             spinVelocity *= 0.985;
