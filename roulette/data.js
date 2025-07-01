@@ -1,7 +1,7 @@
 // Fichier de données pour le jeu de la roulette
 
 // Liste des questions pour la roulette
-export const questions = [
+window.rouletteQuestions = [
   {
     acronyme: 'CHSCT',
     answer: 'Comité d’Hygiène, de Sécurité et des Conditions de Travail',
@@ -59,3 +59,5 @@ export const questions = [
 ];
 
 // Ajoutez ici vos données, constantes, ou listes d'acronymes, etc. 
+// DUREP
+// SPST

@@ -168,7 +168,18 @@ window.addEventListener('DOMContentLoaded', function() {
     animate();
 });
 
-// Ajout d'une modale personnalisée pour afficher le résultat
+// Utiliser la variable globale window.rouletteQuestions
+const questions = window.rouletteQuestions;
+
+// Fonction utilitaire pour mélanger un tableau
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 function showResultModal(acronym) {
     let modal = document.getElementById('rouletteModal');
     if (!modal) {
@@ -180,10 +191,10 @@ function showResultModal(acronym) {
                 <div class="roulette-modal-title">Question</div>
                 <div class="roulette-modal-question" id="rouletteModalQuestion"></div>
                 <div class="roulette-modal-choices">
-                    <button class="roulette-modal-choice">Option 1</button>
-                    <button class="roulette-modal-choice">Option 2</button>
-                    <button class="roulette-modal-choice">Option 3</button>
-                    <button class="roulette-modal-choice">Option 4</button>
+                    <button class="roulette-modal-choice" id="choice0"></button>
+                    <button class="roulette-modal-choice" id="choice1"></button>
+                    <button class="roulette-modal-choice" id="choice2"></button>
+                    <button class="roulette-modal-choice" id="choice3"></button>
                 </div>
                 <button class="roulette-modal-close">Fermer</button>
             </div>
@@ -192,45 +203,41 @@ function showResultModal(acronym) {
         // Style CSS injecté
         const style = document.createElement('style');
         style.textContent = `
-            #rouletteModal {
-                position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh;
-                display: flex; align-items: center; justify-content: center;
-            }
-            .roulette-modal-backdrop {
-                position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
-                background: rgba(30,40,60,0.35); backdrop-filter: blur(2px);
-            }
-            .roulette-modal-content {
-                position: relative; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(30,60,120,0.18);
-                padding: 36px 32px 24px 32px; min-width: 260px; max-width: 90vw; text-align: center;
-                z-index: 1; animation: popin 0.25s;
-            }
-            .roulette-modal-title {
-                font-family: 'Montserrat', Arial, sans-serif; font-size: 1.5rem; font-weight: bold; color: #1976d2; margin-bottom: 12px;
-            }
-            .roulette-modal-question {
-                font-family: 'Montserrat', Arial, sans-serif; font-size: 1.2rem; font-weight: 500; color: #222; margin-bottom: 18px;
-            }
-            .roulette-modal-choices {
-                display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;
-            }
-            .roulette-modal-choice {
-                background: #f7fafd; color: #1976d2; border: 2px solid #1976d2; border-radius: 18px; padding: 10px 0; font-size: 1.1rem;
-                font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s, color 0.2s;
-            }
+            #rouletteModal { position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+            .roulette-modal-backdrop { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(30,40,60,0.35); backdrop-filter: blur(2px); }
+            .roulette-modal-content { position: relative; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(30,60,120,0.18); padding: 36px 32px 24px 32px; min-width: 260px; max-width: 90vw; text-align: center; z-index: 1; animation: popin 0.25s; }
+            .roulette-modal-title { font-family: 'Montserrat', Arial, sans-serif; font-size: 1.5rem; font-weight: bold; color: #1976d2; margin-bottom: 12px; }
+            .roulette-modal-question { font-family: 'Montserrat', Arial, sans-serif; font-size: 1.2rem; font-weight: 500; color: #222; margin-bottom: 18px; }
+            .roulette-modal-choices { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+            .roulette-modal-choice { background: #f7fafd; color: #1976d2; border: 2px solid #1976d2; border-radius: 18px; padding: 10px 0; font-size: 1.1rem; font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s, color 0.2s; }
             .roulette-modal-choice:hover { background: #1976d2; color: #fff; }
-            .roulette-modal-close {
-                background: #1976d2; color: #fff; border: none; border-radius: 25px; padding: 10px 32px; font-size: 1.1rem;
-                font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s;
-            }
+            .roulette-modal-close { background: #1976d2; color: #fff; border: none; border-radius: 25px; padding: 10px 32px; font-size: 1.1rem; font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s; }
             .roulette-modal-close:hover { background: #1251a3; }
             @keyframes popin { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         `;
         document.head.appendChild(style);
-        // Fermeture par bouton ou clic sur le fond
         modal.querySelector('.roulette-modal-close').onclick = () => { modal.style.display = 'none'; };
         modal.querySelector('.roulette-modal-backdrop').onclick = () => { modal.style.display = 'none'; };
     }
-    document.getElementById('rouletteModalQuestion').textContent = `Que signifie ${acronym} ?`;
+    // Récupérer les questions à ce moment précis
+    const questions = window.rouletteQuestions;
+    // Générer la question et les choix dynamiquement
+    const q = questions.find(q => q.acronyme === acronym);
+    if (!q) {
+        document.getElementById('rouletteModalQuestion').textContent = `Aucune question trouvée pour ${acronym}`;
+        [0,1,2,3].forEach(i => {
+            document.getElementById('choice'+i).textContent = '';
+            document.getElementById('choice'+i).disabled = true;
+        });
+    } else {
+        document.getElementById('rouletteModalQuestion').textContent = `Que signifie ${acronym} ?`;
+        // Mélanger les réponses
+        const allAnswers = shuffle([q.answer, ...q.wrongAnswers]);
+        allAnswers.forEach((ans, i) => {
+            const btn = document.getElementById('choice'+i);
+            btn.textContent = ans;
+            btn.disabled = false;
+        });
+    }
     modal.style.display = 'flex';
 } 
