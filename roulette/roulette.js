@@ -196,6 +196,7 @@ function showResultModal(acronym) {
                     <button class="roulette-modal-choice" id="choice2"></button>
                     <button class="roulette-modal-choice" id="choice3"></button>
                 </div>
+                <div class="roulette-modal-feedback" id="rouletteModalFeedback" style="min-height:32px;margin-bottom:12px;"></div>
                 <button class="roulette-modal-close">Fermer</button>
             </div>
         `;
@@ -211,6 +212,10 @@ function showResultModal(acronym) {
             .roulette-modal-choices { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
             .roulette-modal-choice { background: #f7fafd; color: #1976d2; border: 2px solid #1976d2; border-radius: 18px; padding: 10px 0; font-size: 1.1rem; font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s, color 0.2s; }
             .roulette-modal-choice:hover { background: #1976d2; color: #fff; }
+            .roulette-modal-choice.good { background: #43a047 !important; color: #fff !important; border-color: #43a047 !important; }
+            .roulette-modal-choice.bad { background: #e53935 !important; color: #fff !important; border-color: #e53935 !important; }
+            .roulette-modal-feedback { font-family: 'Montserrat', Arial, sans-serif; font-size: 1.1rem; font-weight: 600; color: #1976d2; min-height: 32px; margin-bottom: 12px; }
+            .roulette-modal-feedback.bad { color: #e53935; }
             .roulette-modal-close { background: #1976d2; color: #fff; border: none; border-radius: 25px; padding: 10px 32px; font-size: 1.1rem; font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s; }
             .roulette-modal-close:hover { background: #1251a3; }
             @keyframes popin { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -223,12 +228,14 @@ function showResultModal(acronym) {
     const questions = window.rouletteQuestions;
     // Générer la question et les choix dynamiquement
     const q = questions.find(q => q.acronyme === acronym);
+    const feedbackDiv = document.getElementById('rouletteModalFeedback');
     if (!q) {
         document.getElementById('rouletteModalQuestion').textContent = `Aucune question trouvée pour ${acronym}`;
         [0,1,2,3].forEach(i => {
             document.getElementById('choice'+i).textContent = '';
             document.getElementById('choice'+i).disabled = true;
         });
+        feedbackDiv.textContent = '';
     } else {
         document.getElementById('rouletteModalQuestion').textContent = `Que signifie ${acronym} ?`;
         // Mélanger les réponses
@@ -237,7 +244,25 @@ function showResultModal(acronym) {
             const btn = document.getElementById('choice'+i);
             btn.textContent = ans;
             btn.disabled = false;
+            btn.classList.remove('good', 'bad');
+            btn.onclick = () => {
+                // Désactiver tous les boutons
+                for (let j = 0; j < 4; j++) {
+                    document.getElementById('choice'+j).disabled = true;
+                }
+                if (ans === q.answer) {
+                    btn.classList.add('good');
+                    feedbackDiv.classList.remove('bad');
+                    feedbackDiv.textContent = `Félicitation, tu as trouvé la bonne réponse. ${acronym} signifie bien : ${q.answer}`;
+                } else {
+                    btn.classList.add('bad');
+                    feedbackDiv.classList.add('bad');
+                    feedbackDiv.textContent = `Tu es mauvais Jack. ${acronym} signifie en fait : ${q.answer}`;
+                }
+            };
         });
+        feedbackDiv.textContent = '';
+        feedbackDiv.classList.remove('bad');
     }
     modal.style.display = 'flex';
 } 
