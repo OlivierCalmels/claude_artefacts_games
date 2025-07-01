@@ -39,7 +39,9 @@ window.addEventListener('DOMContentLoaded', function() {
     const radius = Math.min(width, height) / 2 - 20;
 
     // Liste des acronymes (modifiable)
-    const acronyms = ['CHSCT', 'CSE', 'SSCT', 'PAPRIPACT', 'BDESE', "CARSAT"];
+
+    // const acronyms = ['CHSCT', 'CSE', 'SSCT', 'PAPRIPACT', 'BDESE', "CARSAT"];
+    const acronyms = window.rouletteQuestions.map(q => q.acronyme);
     const colors = generateColorPalette(acronyms.length);
     // const colors = [
     //     '#ff5252', '#ffd600', '#43a047', '#1976d2',

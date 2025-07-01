@@ -55,9 +55,70 @@ window.rouletteQuestions = [
       'Commission d’Analyse des Risques et de la Sécurité au Travail',
       'Caisse d’Allocation et de Retraite des Salariés et Travailleurs'
     ]
+  },
+  {
+    acronyme: 'DUREP',
+    answer: 'Document Unique de Réévaluation des Expositions Professionnelles',
+    wrongAnswers: [
+      'Dossier Unifié de Répartition des Employés Permanents',
+      'Déclaration Universelle des Risques et Expositions Professionnelles',
+      'Document Unifié de Répartition des Équipements de Protection'
+    ]
+  },
+  {
+    acronyme: 'SPST',
+    answer: 'Service de Prévention et de Santé au Travail',
+    wrongAnswers: [
+      'Société de Protection et de Sécurité du Travail',
+      'Service Public de Santé et de Travail',
+      'Section de Prévention et de Suivi des Travailleurs'
+    ]
+  },
+  {
+    acronyme: 'AT/MP',
+    answer: 'Accident du Travail / Maladie Professionnelle',
+    wrongAnswers: [
+      'Aide Temporaire / Mesure Préventive',
+      'Assurance Travail / Mutuelle Prévoyance',
+      'Action Territoriale / Mission Prévention'
+    ]
+  },
+  {
+    acronyme: 'QVT',
+    answer: 'Qualité de Vie au Travail',
+    wrongAnswers: [
+      'Qualification et Valorisation du Travail',
+      'Questionnaire de Validation des Tâches',
+      'Quota de Vacances et Temps libre'
+    ]
+  },
+  {
+    acronyme: 'CPAM',
+    answer: 'Caisse Primaire d’Assurance Maladie',
+    wrongAnswers: [
+      'Centre de Prévention et d’Assistance Médicale',
+      'Commission de Prévoyance et d’Assurance Maladie',
+      'Caisse de Prévoyance des Agents Municipaux'
+    ]
+  },
+  {
+    acronyme: 'CRA',
+    answer: 'Commission de Recours Amiable',
+    wrongAnswers: [
+      'Centre de Règlement des Accidents',
+      'Comité de Répartition des Allocations',
+      'Commission de Révision Administrative'
+    ]
+  },
+  {
+    acronyme: 'DUER',
+    answer: 'Document Unique d’Évaluation des Risques',
+    wrongAnswers: [
+      'Dossier Unifié des Études de Risques',
+      'Déclaration Universelle des Expositions et Risques',
+      'Document Unifié d’Examen des Risques'
+    ]
   }
 ];
 
 // Ajoutez ici vos données, constantes, ou listes d'acronymes, etc. 
-// DUREP
-// SPST

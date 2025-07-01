@@ -1,14 +1,8 @@
 // Tab switching
 function switchTab(tabIndex) {
-    const tabs = document.querySelectorAll('.tab');
     const games = document.querySelectorAll('.game-container');
-    
-    tabs.forEach(tab => tab.classList.remove('active'));
     games.forEach(game => game.classList.remove('active'));
-    
-    tabs[tabIndex].classList.add('active');
     games[tabIndex].classList.add('active');
-    
     // Mise à jour de l'URL sans recharger la page
     let jeu;
     switch(tabIndex) {
@@ -23,7 +17,6 @@ function switchTab(tabIndex) {
     const url = new URL(window.location);
     url.searchParams.set('jeu', jeu);
     window.history.replaceState({}, '', url);
-
     if (tabIndex === 1 && typeof resizeCanvas === 'function') {
         resizeCanvas();
     }

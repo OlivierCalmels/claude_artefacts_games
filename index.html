@@ -221,11 +221,6 @@
     <div class="container">
         <div class="tabs">
             <button class="tab active" ontouchstart="switchTab(0)" onclick="switchTab(0)">🏠 Accueil</button>
-            <button class="tab" ontouchstart="switchTab(1)" onclick="switchTab(1)">🏓 Pong</button>
-            <button class="tab" ontouchstart="switchTab(2)" onclick="switchTab(2)">⚽ Football</button>
-            <button class="tab" ontouchstart="switchTab(3)" onclick="switchTab(3)">⚽ Football 2</button>
-            <button class="tab" ontouchstart="switchTab(4)" onclick="switchTab(4)">⚽ Football 3</button>
-            <button class="tab" ontouchstart="switchTab(5)" onclick="switchTab(5)">�� Roulette</button>
         </div>
         <div class="tab-content">
             <!-- Accueil -->
@@ -239,6 +234,14 @@
                         <div class="card-title">PONG</div>
                         <button class="card-btn" onclick="switchTab(1)">Jouer</button>
                     </div>
+                    <div class="card80s roulette">
+                        <div class="card-img">
+                            <!-- SVG Roulette -->
+                            <svg width="80" height="60" viewBox="0 0 80 60"><circle cx="40" cy="30" r="22" fill="#fff" stroke="#222" stroke-width="2"/><path d="M40 8 A22 22 0 0 1 62 30" fill="#ffd600"/><path d="M62 30 A22 22 0 0 1 40 52" fill="#43a047"/><path d="M40 52 A22 22 0 0 1 18 30" fill="#1976d2"/><path d="M18 30 A22 22 0 0 1 40 8" fill="#ff5252"/><polygon points="40,2 44,14 36,14" fill="#e53935"/></svg>
+                        </div>
+                        <div class="card-title">ROULETTE</div>
+                        <button class="card-btn" onclick="switchTab(5)">Jouer</button>
+                    </div>
                     <div class="card80s football">
                         <div class="card-img">
                             <!-- SVG Ballon années 80 -->
@@ -246,6 +249,22 @@
                         </div>
                         <div class="card-title">FOOTBALL</div>
                         <button class="card-btn" onclick="switchTab(2)">Jouer</button>
+                    </div>
+                    <div class="card80s football">
+                        <div class="card-img">
+                            <!-- SVG Ballon années 80 bis -->
+                            <svg width="80" height="60" viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="22" ry="22" fill="#fff" stroke="#222" stroke-width="2"/><polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222"/><polygon points="40,42 46,36 43,28 37,28 34,36" fill="#ff00cc"/><polygon points="28,30 34,24 37,32 37,38 31,36" fill="#00eaff"/><polygon points="52,30 46,24 43,32 43,38 49,36" fill="#ffea00"/></svg>
+                        </div>
+                        <div class="card-title">FOOTBALL 2</div>
+                        <button class="card-btn" onclick="switchTab(3)">Jouer</button>
+                    </div>
+                    <div class="card80s football">
+                        <div class="card-img">
+                            <!-- SVG Ballon années 80 ter -->
+                            <svg width="80" height="60" viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="22" ry="22" fill="#fff" stroke="#222" stroke-width="2"/><polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222"/><polygon points="40,42 46,36 43,28 37,28 34,36" fill="#ff00cc"/><polygon points="28,30 34,24 37,32 37,38 31,36" fill="#00eaff"/><polygon points="52,30 46,24 43,32 43,38 49,36" fill="#ffea00"/></svg>
+                        </div>
+                        <div class="card-title">FOOTBALL 3</div>
+                        <button class="card-btn" onclick="switchTab(4)">Jouer</button>
                     </div>
                 </div>
             </div>
@@ -275,9 +294,9 @@
                 </div>
             </div>
             <!-- Football 2 Game -->
-            <div class="game-container" id="game2">
-                <div class="score" id="score2">
-                    <span id="scoreJ1">0</span> - <span id="scoreJ2">0</span>
+            <div class="game-container" id="game3">
+                <div class="score" id="score3">
+                    <span id="scoreJ1_2">0</span> - <span id="scoreJ2_2">0</span>
                 </div>
                 <canvas id="jeu3Canvas" width="400" height="300"></canvas>
                 <div class="instructions">
@@ -285,9 +304,9 @@
                 </div>
             </div>
             <!-- Football 3 Game -->
-            <div class="game-container" id="game3">
-                <div class="score" id="score3">
-                    <span id="scoreJ1_2">0</span> - <span id="scoreJ2_2">0</span>
+            <div class="game-container" id="game4">
+                <div class="score" id="score4">
+                    <span id="scoreJ1_3">0</span> - <span id="scoreJ2_3">0</span>
                 </div>
                 <canvas id="jeu4Canvas" width="400" height="300"></canvas>
                 <div class="instructions">
@@ -295,7 +314,7 @@
                 </div>
             </div>
             <!-- Roulette Game -->
-            <div class="game-container" id="game4">
+            <div class="game-container" id="game5">
                 <canvas id="rouletteCanvas" width="400" height="400"></canvas>
                 <div class="instructions">
                     🎯 Touchez la roue pour la faire tourner !
