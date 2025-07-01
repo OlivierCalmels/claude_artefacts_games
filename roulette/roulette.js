@@ -169,7 +169,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 // Ajout d'une modale personnalisée pour afficher le résultat
-function showResultModal(result) {
+function showResultModal(acronym) {
     let modal = document.getElementById('rouletteModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -177,9 +177,15 @@ function showResultModal(result) {
         modal.innerHTML = `
             <div class="roulette-modal-backdrop"></div>
             <div class="roulette-modal-content">
-                <div class="roulette-modal-title">Résultat</div>
-                <div class="roulette-modal-result" id="rouletteModalResult"></div>
-                <button class="roulette-modal-close">OK</button>
+                <div class="roulette-modal-title">Question</div>
+                <div class="roulette-modal-question" id="rouletteModalQuestion"></div>
+                <div class="roulette-modal-choices">
+                    <button class="roulette-modal-choice">Option 1</button>
+                    <button class="roulette-modal-choice">Option 2</button>
+                    <button class="roulette-modal-choice">Option 3</button>
+                    <button class="roulette-modal-choice">Option 4</button>
+                </div>
+                <button class="roulette-modal-close">Fermer</button>
             </div>
         `;
         document.body.appendChild(modal);
@@ -202,9 +208,17 @@ function showResultModal(result) {
             .roulette-modal-title {
                 font-family: 'Montserrat', Arial, sans-serif; font-size: 1.5rem; font-weight: bold; color: #1976d2; margin-bottom: 12px;
             }
-            .roulette-modal-result {
-                font-family: 'Montserrat', Arial, sans-serif; font-size: 2.2rem; font-weight: bold; color: #e53935; margin-bottom: 18px;
+            .roulette-modal-question {
+                font-family: 'Montserrat', Arial, sans-serif; font-size: 1.2rem; font-weight: 500; color: #222; margin-bottom: 18px;
             }
+            .roulette-modal-choices {
+                display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px;
+            }
+            .roulette-modal-choice {
+                background: #f7fafd; color: #1976d2; border: 2px solid #1976d2; border-radius: 18px; padding: 10px 0; font-size: 1.1rem;
+                font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s, color 0.2s;
+            }
+            .roulette-modal-choice:hover { background: #1976d2; color: #fff; }
             .roulette-modal-close {
                 background: #1976d2; color: #fff; border: none; border-radius: 25px; padding: 10px 32px; font-size: 1.1rem;
                 font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s;
@@ -217,6 +231,6 @@ function showResultModal(result) {
         modal.querySelector('.roulette-modal-close').onclick = () => { modal.style.display = 'none'; };
         modal.querySelector('.roulette-modal-backdrop').onclick = () => { modal.style.display = 'none'; };
     }
-    document.getElementById('rouletteModalResult').textContent = result;
+    document.getElementById('rouletteModalQuestion').textContent = `Que signifie ${acronym} ?`;
     modal.style.display = 'flex';
 } 
