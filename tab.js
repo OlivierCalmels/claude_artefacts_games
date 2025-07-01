@@ -17,6 +17,7 @@ function switchTab(tabIndex) {
         case 2: jeu = 'football'; break;
         case 3: jeu = 'football2'; break;
         case 4: jeu = 'football3'; break;
+        case 5: jeu = 'roulette'; break;
         default: jeu = 'home';
     }
     const url = new URL(window.location);
@@ -38,6 +39,7 @@ window.addEventListener('DOMContentLoaded', function() {
         case 'football': tabIndex = 2; break;
         case 'football2': tabIndex = 3; break;
         case 'football3': tabIndex = 4; break;
+        case 'roulette': tabIndex = 5; break;
         default: tabIndex = 0;
     }
     switchTab(tabIndex);

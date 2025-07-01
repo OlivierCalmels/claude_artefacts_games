@@ -225,6 +225,7 @@
             <button class="tab" ontouchstart="switchTab(2)" onclick="switchTab(2)">⚽ Football</button>
             <button class="tab" ontouchstart="switchTab(3)" onclick="switchTab(3)">⚽ Football 2</button>
             <button class="tab" ontouchstart="switchTab(4)" onclick="switchTab(4)">⚽ Football 3</button>
+            <button class="tab" ontouchstart="switchTab(5)" onclick="switchTab(5)">�� Roulette</button>
         </div>
         <div class="tab-content">
             <!-- Accueil -->
@@ -293,6 +294,13 @@
                     🕹️ Joueur 1 : ZQSD &nbsp; | &nbsp; Joueur 2 : Flèches directionnelles
                 </div>
             </div>
+            <!-- Roulette Game -->
+            <div class="game-container" id="game4">
+                <canvas id="rouletteCanvas" width="400" height="400"></canvas>
+                <div class="instructions">
+                    🎯 Touchez la roue pour la faire tourner !
+                </div>
+            </div>
         </div>
     </div>
     <script src="tab.js"></script>
@@ -300,5 +308,6 @@
     <script src="football.js"></script>
     <script src="football2.js"></script>
     <script src="football3.js"></script>
+    <script src="roulette.js"></script>
 </body>
 </html>
