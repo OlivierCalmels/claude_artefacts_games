@@ -142,7 +142,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 spinning = false;
                 selectedIndex = idx;
                 setTimeout(() => {
-                    alert('Résultat : ' + acronyms[selectedIndex]);
+                    showResultModal(acronyms[selectedIndex]);
                 }, 400);
             }
         }
@@ -166,4 +166,57 @@ window.addEventListener('DOMContentLoaded', function() {
 
     drawWheel();
     animate();
-}); 
+});
+
+// Ajout d'une modale personnalisée pour afficher le résultat
+function showResultModal(result) {
+    let modal = document.getElementById('rouletteModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'rouletteModal';
+        modal.innerHTML = `
+            <div class="roulette-modal-backdrop"></div>
+            <div class="roulette-modal-content">
+                <div class="roulette-modal-title">Résultat</div>
+                <div class="roulette-modal-result" id="rouletteModalResult"></div>
+                <button class="roulette-modal-close">OK</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        // Style CSS injecté
+        const style = document.createElement('style');
+        style.textContent = `
+            #rouletteModal {
+                position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh;
+                display: flex; align-items: center; justify-content: center;
+            }
+            .roulette-modal-backdrop {
+                position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
+                background: rgba(30,40,60,0.35); backdrop-filter: blur(2px);
+            }
+            .roulette-modal-content {
+                position: relative; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(30,60,120,0.18);
+                padding: 36px 32px 24px 32px; min-width: 260px; max-width: 90vw; text-align: center;
+                z-index: 1; animation: popin 0.25s;
+            }
+            .roulette-modal-title {
+                font-family: 'Montserrat', Arial, sans-serif; font-size: 1.5rem; font-weight: bold; color: #1976d2; margin-bottom: 12px;
+            }
+            .roulette-modal-result {
+                font-family: 'Montserrat', Arial, sans-serif; font-size: 2.2rem; font-weight: bold; color: #e53935; margin-bottom: 18px;
+            }
+            .roulette-modal-close {
+                background: #1976d2; color: #fff; border: none; border-radius: 25px; padding: 10px 32px; font-size: 1.1rem;
+                font-family: 'Montserrat', Arial, sans-serif; font-weight: 700; cursor: pointer; transition: background 0.2s;
+            }
+            .roulette-modal-close:hover { background: #1251a3; }
+            @keyframes popin { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        `;
+        document.head.appendChild(style);
+        // Fermeture par bouton ou clic sur le fond
+        modal.querySelector('.roulette-modal-close').onclick = () => { modal.style.display = 'none'; };
+        modal.querySelector('.roulette-modal-backdrop').onclick = () => { modal.style.display = 'none'; };
+    }
+    document.getElementById('rouletteModalResult').textContent = result;
+    modal.style.display = 'flex';
+} 
