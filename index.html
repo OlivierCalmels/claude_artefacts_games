@@ -140,6 +140,19 @@
             .score {
                 font-size: 1.3rem;
             }
+            .cards80s {
+                flex-direction: column;
+                gap: 16px;
+                margin: 24px 0 16px 0;
+                align-items: center;
+            }
+            .card80s {
+                min-width: 0;
+                max-width: 98vw;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 24px 8px 18px 8px;
+            }
         }
         .cards80s {
             display: flex;
@@ -173,8 +186,20 @@
             box-shadow: 0 16px 48px rgba(30,60,120,0.22);
             z-index: 2;
         }
+        .card-img svg {
+            width: 100%;
+            height: auto;
+            max-width: 80px;
+            display: block;
+            margin: 0 auto;
+        }
         .card-img {
-            margin-bottom: 18px;
+            width: 100%;
+            max-width: 90px;
+            margin: 0 auto 12px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .card-title {
             font-family: 'Montserrat', Arial, sans-serif;
