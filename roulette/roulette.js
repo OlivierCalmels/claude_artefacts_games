@@ -31,6 +31,16 @@ function hslToHex(h, s, l) {
 window.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('rouletteCanvas');
     if (!canvas) return;
+
+    // Adapter la taille du canvas à l'affichage réel (responsive)
+    function resizeCanvas() {
+        const size = Math.min(window.innerWidth * 0.9, 400); // max 400px
+        canvas.width = size;
+        canvas.height = size;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;

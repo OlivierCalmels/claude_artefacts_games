@@ -122,3 +122,4 @@ window.rouletteQuestions = [
 ];
 
 // Ajoutez ici vos données, constantes, ou listes d'acronymes, etc. 
+// DGI: Danger grave et imminent
