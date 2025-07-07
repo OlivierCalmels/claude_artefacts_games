@@ -118,8 +118,18 @@ window.rouletteQuestions = [
       'Déclaration Universelle des Expositions et Risques',
       'Document Unifié d’Examen des Risques'
     ]
+  },
+  {
+    acronyme: 'DGI',
+    answer: 'Danger grave et imminent',
+    wrongAnswers: [
+      'Déclaration Générale d’Incident',
+      'Document de Gestion Interne',
+      'Directive Gouvernementale Immédiate'
+    ]
   }
 ];
 
 // Ajoutez ici vos données, constantes, ou listes d'acronymes, etc. 
-// DGI: Danger grave et imminent
+// NTIC : Nouvelles Technologies de l'Information et de la Communication
+// HSSCT 

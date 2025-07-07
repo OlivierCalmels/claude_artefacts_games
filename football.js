@@ -66,7 +66,7 @@ Composite.add(player1_composite, [body1, leg1_left, leg1_right, joint_left, join
 */
 
 // Joueurs (corps physiques uniques avec rendu personnalisé)
-const player1 = Bodies.rectangle(60, GROUND_Y - PLAYER_HEIGHT/2, PLAYER_WIDTH, PLAYER_HEIGHT, {
+const player1 = Bodies.rectangle(60, GROUND_Y - PLAYER_HEIGHT/2, PLAYER_WIDTH, 1, {
     render: { 
         fillStyle: '#2196f3',
         sprite: {
@@ -79,7 +79,7 @@ const player1 = Bodies.rectangle(60, GROUND_Y - PLAYER_HEIGHT/2, PLAYER_WIDTH, P
     restitution: 0.1
 });
 
-const player2 = Bodies.rectangle(340, GROUND_Y - PLAYER_HEIGHT/2, PLAYER_WIDTH, PLAYER_HEIGHT, {
+const player2 = Bodies.rectangle(340, GROUND_Y - PLAYER_HEIGHT/2, PLAYER_WIDTH, 1, {
     render: { 
         fillStyle: '#e53935',
         sprite: {
@@ -361,29 +361,26 @@ function drawHexagon(ctx, x, y, radius) {
 function drawPlayer(ctx, player, color, hasBeard, hasHair) {
     const x = player.position.x;
     const y = player.position.y;
-    const isRed = color === '#e53935';
-    const number = isRed ? '26' : '30';
+    // Affichage du joueur 1 uniquement, sans dépendance au ballon
     const shirtColor = color;
-    const shortColor = isRed ? '#e57373' : '#1976d2';
+    const shortColor = '#1976d2';
     const sockColor = '#fffde7';
     const shoeColor = '#37474f';
-    // Variables d'animation de jambe spécifiques à chaque joueur
-    const legAngle = isRed ? player2LegAngle : player1LegAngle;
-    const legSide = isRed ? player2LegSide : player1LegSide;
+    // Jambes droites, statiques
+    const legAngle = 0;
+    const legSide = 'right';
     ctx.save();
     ctx.translate(x, y); // (x, y) = position des pieds
-    ctx.rotate(player.angle);
-    // Jambes (partent de (0,0) vers le haut)
+    ctx.rotate(0); // Pas d'inclinaison
+    // Jambes (gauche et droite, droites)
     ctx.save();
     ctx.lineCap = 'round';
     ctx.strokeStyle = sockColor;
     ctx.lineWidth = 8;
-    const ballDirection = (ball.position.x < player.position.x) ? 1 : -1;
-    const animatedLegAngle = legAngle * ballDirection;
     // Jambe gauche
     ctx.save();
-    ctx.translate(-7, 0); // pieds gauche
-    ctx.rotate(legSide === 'left' ? animatedLegAngle : 0);
+    ctx.translate(-7, 0);
+    ctx.rotate(0);
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(0, -LEG_LENGTH);
@@ -391,33 +388,25 @@ function drawPlayer(ctx, player, color, hasBeard, hasHair) {
     ctx.restore();
     // Jambe droite
     ctx.save();
-    ctx.translate(7, 0); // pieds droit
-    ctx.rotate(legSide === 'right' ? animatedLegAngle : 0);
+    ctx.translate(7, 0);
+    ctx.rotate(0);
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.lineTo(0, -LEG_LENGTH);
     ctx.stroke();
     ctx.restore();
     ctx.restore();
-    // Chaussures (crampons)
+    // Chaussures
     ctx.save();
     ctx.fillStyle = shoeColor;
     ctx.beginPath();
-    ctx.ellipse(-7, -4, 8, 5, 0.1, 0, 2 * Math.PI);
-    ctx.ellipse(7, -4, 8, 5, -0.1, 0, 2 * Math.PI);
+    ctx.ellipse(-7, 4, 8, 5, 0.1, 0, 2 * Math.PI);
+    ctx.ellipse(7, 4, 8, 5, -0.1, 0, 2 * Math.PI);
     ctx.fill();
-    // Crampons
-    ctx.fillStyle = '#222';
-    for (let i = -1; i <= 1; i++) {
-        ctx.beginPath();
-        ctx.arc(-7 + i*3, 1, 1.2, 0, 2 * Math.PI);
-        ctx.arc(7 + i*3, 1, 1.2, 0, 2 * Math.PI);
-        ctx.fill();
-    }
     ctx.restore();
     // Décaler tout le haut du joueur au-dessus des pieds
     ctx.translate(0, -LEG_LENGTH);
-    // Ombre sous le joueur (optionnel, sinon à déplacer ailleurs)
+    // Ombre sous le joueur
     ctx.save();
     ctx.globalAlpha = 0.2;
     ctx.fillStyle = '#222';
@@ -439,7 +428,7 @@ function drawPlayer(ctx, player, color, hasBeard, hasHair) {
     ctx.font = 'bold 13px Arial';
     ctx.fillStyle = '#fbc02d';
     ctx.textAlign = 'center';
-    ctx.fillText(number, 0, -2);
+    ctx.fillText('30', 0, -2);
     ctx.restore();
     // Bras
     ctx.save();
@@ -465,25 +454,24 @@ function drawPlayer(ctx, player, color, hasBeard, hasHair) {
     ctx.save();
     ctx.fillStyle = '#ffe0b2';
     ctx.beginPath();
-    ctx.ellipse(0, -PLAYER_TOTAL_HEIGHT/2 - 7 + LEG_LENGTH, 11, 14, 0, 0, 2 * Math.PI);
+    ctx.ellipse(0, -PLAYER_TOTAL_HEIGHT + LEG_LENGTH, 11, 14, 0, 0, 2 * Math.PI);
     ctx.fill();
     ctx.restore();
-    // Cheveux (dessinés pour les deux joueurs)
+    // Cheveux
     ctx.save();
     ctx.fillStyle = '#4e342e';
     ctx.beginPath();
-    ctx.ellipse(0, -PLAYER_TOTAL_HEIGHT/2 - 8 + LEG_LENGTH, 10, 6, -0.2, Math.PI, 2 * Math.PI);
+    ctx.ellipse(0, -PLAYER_TOTAL_HEIGHT - 8 + LEG_LENGTH, 10, 6, -0.2, Math.PI, 2 * Math.PI);
     ctx.fill();
     ctx.beginPath();
-    ctx.ellipse(-4, -PLAYER_TOTAL_HEIGHT/2 - 3 + LEG_LENGTH, 4, 2, 0, 0, 2 * Math.PI);
     ctx.fill();
     ctx.restore();
     // Yeux
     ctx.save();
     ctx.fillStyle = '#222';
     ctx.beginPath();
-    ctx.arc(-4, -PLAYER_TOTAL_HEIGHT/2 - 2 + LEG_LENGTH, 1.3, 0, 2 * Math.PI);
-    ctx.arc(4, -PLAYER_TOTAL_HEIGHT/2 - 2 + LEG_LENGTH, 1.3, 0, 2 * Math.PI);
+    ctx.arc(-4, -PLAYER_TOTAL_HEIGHT - 2 + LEG_LENGTH, 1.3, 0, 2 * Math.PI);
+    ctx.arc(4, -PLAYER_TOTAL_HEIGHT - 2 + LEG_LENGTH, 1.3, 0, 2 * Math.PI);
     ctx.fill();
     ctx.restore();
     // Bouche
@@ -491,18 +479,9 @@ function drawPlayer(ctx, player, color, hasBeard, hasHair) {
     ctx.strokeStyle = '#b05a19';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.arc(0, -PLAYER_TOTAL_HEIGHT/2 + 3 + LEG_LENGTH, 4, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.arc(0, -PLAYER_TOTAL_HEIGHT + 3 + LEG_LENGTH, 4, 0.15 * Math.PI, 0.85 * Math.PI);
     ctx.stroke();
     ctx.restore();
-    // Nom "Claire" sous le joueur 2
-    if (isRed) {
-        ctx.save();
-        ctx.font = 'bold 14px Arial';
-        ctx.fillStyle = '#e53935';
-        ctx.textAlign = 'center';
-        ctx.fillText('Claire', 0, 40);
-        ctx.restore();
-    }
     ctx.restore();
 }
 
