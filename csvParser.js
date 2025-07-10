@@ -27,20 +27,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!input || !container) return;
 
+    // Fonction pour parser et afficher le CSV
+    function parseAndRender(text, filename) {
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        if (lines.length === 0) return;
+        headers = lines[0].split(',');
+        rows = lines.slice(1).map(row => row.split(','));
+        currentCol = 0;
+        renderTable();
+        status.textContent = filename ? `✅ Fichier chargé : ${filename}` : '✅ CSV chargé depuis le navigateur';
+        container.style.display = '';
+    }
+
+    // Chargement depuis localStorage au démarrage
+    const savedCSV = localStorage.getItem('cse_csv_data');
+    if (savedCSV) {
+        parseAndRender(savedCSV, null);
+    }
+
     input.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function(evt) {
             const text = evt.target.result;
-            const lines = text.split(/\r?\n/).filter(Boolean);
-            if (lines.length === 0) return;
-            headers = lines[0].split(',');
-            rows = lines.slice(1).map(row => row.split(','));
-            currentCol = 0;
-            renderTable();
-            status.textContent = `✅ Fichier chargé : ${file.name}`;
-            container.style.display = '';
+            // Stockage dans le localStorage
+            localStorage.setItem('cse_csv_data', text);
+            parseAndRender(text, file.name);
         };
         reader.readAsText(file);
     });
