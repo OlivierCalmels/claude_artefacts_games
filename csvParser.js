@@ -106,16 +106,17 @@ document.addEventListener('DOMContentLoaded', function() {
         );
         if (isExplication && currentCol > 0) {
             const prevHeader = headers[currentCol-1] || '';
-            // Regroupe intelligemment les deux headers
+            // Regroupe intelligemment les deux headers, mais affiche les deux questions
             if (prevHeader.toLowerCase().includes('note')) {
-                displayHeader = 'Note + Explication';
+                displayHeader = 'Note : ' + prevHeader + '\nExplication : ' + headers[currentCol];
             } else if (prevHeader.toLowerCase().includes('réponse')) {
-                displayHeader = 'Réponse + Explication';
+                displayHeader = 'Réponse : ' + prevHeader + '\nExplication : ' + headers[currentCol];
             } else {
-                displayHeader = prevHeader + ' + ' + headers[currentCol];
+                displayHeader = prevHeader + ' \u2794 ' + headers[currentCol];
             }
         }
-        headerLabel.textContent = displayHeader;
+        // Affichage multi-ligne pour le header
+        headerLabel.innerHTML = displayHeader.replace(/\n/g, '<br>');
         headerLabel.style.fontWeight = 'bold';
         headerLabel.style.fontSize = '1rem';
         headerLabel.style.flex = '1';
@@ -135,10 +136,25 @@ document.addEventListener('DOMContentLoaded', function() {
         list.style.lineHeight = '1.4';
         list.style.textAlign = 'left';
         list.style.padding = '0 8px';
+        // On saute l'affichage de la colonne principale si la suivante est une explication
+        const isExplicationNext = headers[currentCol+1] && (
+            headers[currentCol+1].toLowerCase().includes('peux-tu expliquer ta note') ||
+            headers[currentCol+1].toLowerCase().includes('peux-tu expliquer ta réponse')
+        );
+        if (isExplicationNext) {
+            const info = document.createElement('div');
+            info.textContent = 'Les résultats sont regroupés sur la page suivante.';
+            info.style.opacity = '0.7';
+            info.style.textAlign = 'center';
+            info.style.margin = '32px 0';
+            list.appendChild(info);
+            container.appendChild(list);
+            return;
+        }
         filled.forEach(({val, idx, prev}) => {
             const item = document.createElement('div');
             if (isExplication && currentCol > 0) {
-                item.textContent = `${idx+1}. Appréciation: ${prev} - Explication: ${val}`;
+                item.innerHTML = `${idx+1}. Appréciation: ${prev}<br>Explication: ${val}`;
             } else {
                 item.textContent = `${idx+1}. ${val}`;
             }
