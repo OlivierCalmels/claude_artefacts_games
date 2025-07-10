@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('csvInput');
+    const tsvInput = document.getElementById('tsvInput');
     const status = document.getElementById('csvStatus');
     let container = document.getElementById('csvTableContainer');
     if (!container) {
@@ -27,22 +28,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!input || !container) return;
 
-    // Fonction pour parser et afficher le CSV
-    function parseAndRender(text, filename) {
-        const lines = text.split(/\r?\n/).filter(Boolean);
+    // Fonction pour parser et afficher le CSV/TSV
+    function parseAndRender(text, filename, type) {
+        let lines = text.split(/\r?\n/).filter(Boolean);
         if (lines.length === 0) return;
-        headers = lines[0].split(',');
-        rows = lines.slice(1).map(row => row.split(','));
+        let sep = (type === 'tsv') ? '\t' : ',';
+        headers = lines[0].split(sep);
+        rows = lines.slice(1).map(row => row.split(sep));
         currentCol = 0;
         renderTable();
-        status.textContent = filename ? `✅ Fichier chargé : ${filename}` : '✅ CSV chargé depuis le navigateur';
+        status.textContent = filename ? `✅ Fichier chargé : ${filename}` : '✅ Fichier chargé depuis le navigateur';
         container.style.display = '';
     }
 
     // Chargement depuis localStorage au démarrage
     const savedCSV = localStorage.getItem('cse_csv_data');
+    const savedType = localStorage.getItem('cse_csv_type') || 'csv';
     if (savedCSV) {
-        parseAndRender(savedCSV, null);
+        parseAndRender(savedCSV, null, savedType);
     }
 
     input.addEventListener('change', function(e) {
@@ -53,10 +56,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const text = evt.target.result;
             // Stockage dans le localStorage
             localStorage.setItem('cse_csv_data', text);
-            parseAndRender(text, file.name);
+            localStorage.setItem('cse_csv_type', 'csv');
+            parseAndRender(text, file.name, 'csv');
         };
         reader.readAsText(file);
     });
+
+    if (tsvInput) {
+        tsvInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const text = evt.target.result;
+                // Stockage dans le localStorage
+                localStorage.setItem('cse_csv_data', text);
+                localStorage.setItem('cse_csv_type', 'tsv');
+                parseAndRender(text, file.name, 'tsv');
+            };
+            reader.readAsText(file);
+        });
+    }
 
     function renderTable() {
         container.innerHTML = '';
