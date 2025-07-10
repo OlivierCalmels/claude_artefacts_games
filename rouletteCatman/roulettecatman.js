@@ -1,40 +1,11 @@
-// Génère une palette de 'n' couleurs harmonieuses en HEX
-function generateColorPalette(n) {
-  const colors = [];
-  const saturation = 70; // % pour garder une belle saturation
-  const lightness = 50;  // % pour une bonne visibilité
-
-  for (let i = 0; i < n; i++) {
-    const hue = Math.round((360 / n) * i); // Espacement régulier
-    colors.push(hslToHex(hue, saturation, lightness));
-  }
-
-  return colors;
-}
-
-// Convertit HSL en HEX
-function hslToHex(h, s, l) {
-  s /= 100;
-  l /= 100;
-
-  const k = n => (n + h / 30) % 12;
-  const a = s * Math.min(l, 1 - l);
-  const f = n =>
-    Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))));
-
-  return `#${[f(0), f(8), f(4)].map(x => x.toString(16).padStart(2, '0')).join('')}`;
-}
-
-// // Exemple d'utilisation
-// const palette = generateColorPalette(5);
+// Fichier principal pour la roulette Catman
 
 window.addEventListener('DOMContentLoaded', function() {
-    const canvas = document.getElementById('rouletteCanvas');
+    const canvas = document.getElementById('rouletteCatmanCanvas');
     if (!canvas) return;
 
-    // Adapter la taille du canvas à l'affichage réel (responsive)
     function resizeCanvas() {
-        const size = Math.min(window.innerWidth * 0.9, 400); // max 400px
+        const size = Math.min(window.innerWidth * 0.9, 400);
         canvas.width = size;
         canvas.height = size;
     }
@@ -49,24 +20,17 @@ window.addEventListener('DOMContentLoaded', function() {
     const radius = Math.min(width, height) / 2 - 20;
 
     // Liste des acronymes (modifiable)
-
-    // const acronyms = ['CHSCT', 'CSE', 'SSCT', 'PAPRIPACT', 'BDESE', "CARSAT"];
-    const acronyms = (window.rouletteQuestions || []).map(q => q.acronyme);
+    const acronyms = (window.rouletteCatmanQuestions || []).map(q => q.acronyme);
     const colors = generateColorPalette(acronyms.length);
-    // const colors = [
-    //     '#ff5252', '#ffd600', '#43a047', '#1976d2',
-    //     '#ff4081', '#00bcd4', '#ff9800', '#8bc34a'
-    // ];
     let angle = 0;
     let spinning = false;
     let spinVelocity = 0;
     let selectedIndex = null;
 
-    // Ajout d'un élément pour afficher le résultat en continu
-    let resultDiv = document.getElementById('rouletteResult');
+    let resultDiv = document.getElementById('rouletteCatmanResult');
     if (!resultDiv) {
         resultDiv = document.createElement('div');
-        resultDiv.id = 'rouletteResult';
+        resultDiv.id = 'rouletteCatmanResult';
         resultDiv.style.fontFamily = 'Montserrat, Arial, sans-serif';
         resultDiv.style.fontWeight = 'bold';
         resultDiv.style.fontSize = '2rem';
@@ -75,19 +39,6 @@ window.addEventListener('DOMContentLoaded', function() {
         canvas.parentNode.insertBefore(resultDiv, canvas.nextSibling);
     }
 
-    // Ajout d'un élément pour debug
-    let debugDiv = document.getElementById('rouletteDebug');
-    if (!debugDiv) {
-        debugDiv = document.createElement('div');
-        debugDiv.id = 'rouletteDebug';
-        debugDiv.style.fontFamily = 'monospace';
-        debugDiv.style.fontSize = '1rem';
-        debugDiv.style.textAlign = 'center';
-        debugDiv.style.margin = '8px 0 0 0';
-        canvas.parentNode.insertBefore(debugDiv, resultDiv.nextSibling);
-    }
-
-    // Fonction modulo robuste pour index positif
     function mod(a, n) {
         return ((a % n) + n) % n;
     }
@@ -106,7 +57,6 @@ window.addEventListener('DOMContentLoaded', function() {
             ctx.fill();
             ctx.restore();
 
-            // Texte de l'acronyme
             ctx.save();
             ctx.translate(centerX, centerY);
             ctx.rotate(angle + (i + 0.5) * arc);
@@ -120,7 +70,6 @@ window.addEventListener('DOMContentLoaded', function() {
             ctx.fillText(acronyms[i], radius * 0.7, 0);
             ctx.restore();
         }
-        // Flèche
         ctx.save();
         ctx.translate(centerX, centerY - radius - 10);
         ctx.beginPath();
@@ -139,7 +88,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
     function animate() {
         let currentAcronym = '';
-        // Calcul précis de l'acronyme sous la flèche (alignement parfait)
         const n = acronyms.length;
         const arc = 2 * Math.PI / n;
         let pointerAngle = -Math.PI / 2;
@@ -154,7 +102,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 spinning = false;
                 selectedIndex = idx;
                 setTimeout(() => {
-                    showResultModal(acronyms[selectedIndex]);
+                    showCatmanResultModal(acronyms[selectedIndex]);
                 }, 400);
             }
         }
@@ -180,10 +128,24 @@ window.addEventListener('DOMContentLoaded', function() {
     animate();
 });
 
-// Utiliser la variable globale window.rouletteQuestions
-const questions = window.rouletteQuestions || [];
+function generateColorPalette(n) {
+    const colors = [];
+    for (let i = 0; i < n; i++) {
+        colors.push(hslToHex((i * 360) / n, 80, 50));
+    }
+    return colors;
+}
 
-// Fonction utilitaire pour mélanger un tableau
+function hslToHex(h, s, l) {
+    s /= 100;
+    l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n =>
+        Math.round(255 * (l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)))));
+    return `#${[f(0), f(8), f(4)].map(x => x.toString(16).padStart(2, '0')).join('')}`;
+}
+
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -192,31 +154,30 @@ function shuffle(array) {
     return array;
 }
 
-function showResultModal(acronym) {
-    let modal = document.getElementById('rouletteModal');
+function showCatmanResultModal(acronym) {
+    let modal = document.getElementById('rouletteCatmanModal');
     if (!modal) {
         modal = document.createElement('div');
-        modal.id = 'rouletteModal';
+        modal.id = 'rouletteCatmanModal';
         modal.innerHTML = `
             <div class="roulette-modal-backdrop"></div>
             <div class="roulette-modal-content">
                 <div class="roulette-modal-title">Question</div>
-                <div class="roulette-modal-question" id="rouletteModalQuestion"></div>
+                <div class="roulette-modal-question" id="rouletteCatmanModalQuestion"></div>
                 <div class="roulette-modal-choices">
-                    <button class="roulette-modal-choice" id="choice0"></button>
-                    <button class="roulette-modal-choice" id="choice1"></button>
-                    <button class="roulette-modal-choice" id="choice2"></button>
-                    <button class="roulette-modal-choice" id="choice3"></button>
+                    <button class="roulette-modal-choice" id="catmanChoice0"></button>
+                    <button class="roulette-modal-choice" id="catmanChoice1"></button>
+                    <button class="roulette-modal-choice" id="catmanChoice2"></button>
+                    <button class="roulette-modal-choice" id="catmanChoice3"></button>
                 </div>
-                <div class="roulette-modal-feedback" id="rouletteModalFeedback" style="min-height:32px;margin-bottom:12px;"></div>
+                <div class="roulette-modal-feedback" id="rouletteCatmanModalFeedback" style="min-height:32px;margin-bottom:12px;"></div>
                 <button class="roulette-modal-close">Fermer</button>
             </div>
         `;
         document.body.appendChild(modal);
-        // Style CSS injecté
         const style = document.createElement('style');
         style.textContent = `
-            #rouletteModal { position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+            #rouletteCatmanModal { position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
             .roulette-modal-backdrop { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(30,40,60,0.35); backdrop-filter: blur(2px); }
             .roulette-modal-content { position: relative; background: #fff; border-radius: 18px; box-shadow: 0 8px 32px rgba(30,60,120,0.18); padding: 36px 32px 24px 32px; min-width: 260px; max-width: 90vw; text-align: center; z-index: 1; animation: popin 0.25s; }
             .roulette-modal-title { font-family: 'Montserrat', Arial, sans-serif; font-size: 1.5rem; font-weight: bold; color: #1976d2; margin-bottom: 12px; }
@@ -236,45 +197,40 @@ function showResultModal(acronym) {
         modal.querySelector('.roulette-modal-close').onclick = () => { modal.style.display = 'none'; };
         modal.querySelector('.roulette-modal-backdrop').onclick = () => { modal.style.display = 'none'; };
     }
-    // Récupérer les questions à ce moment précis
-    const questions = window.rouletteQuestions || [];
-    // Générer la question et les choix dynamiquement
+    const questions = window.rouletteCatmanQuestions || [];
     const q = questions.find(q => q.acronyme === acronym);
-    const feedbackDiv = document.getElementById('rouletteModalFeedback');
+    const feedbackDiv = document.getElementById('rouletteCatmanModalFeedback');
     if (!q) {
-        document.getElementById('rouletteModalQuestion').textContent = `Aucune question trouvée pour ${acronym}`;
+        document.getElementById('rouletteCatmanModalQuestion').textContent = `Aucune question trouvée pour ${acronym}`;
         [0,1,2,3].forEach(i => {
-            document.getElementById('choice'+i).textContent = '';
-            document.getElementById('choice'+i).disabled = true;
+            document.getElementById('catmanChoice'+i).textContent = '';
+            document.getElementById('catmanChoice'+i).disabled = true;
         });
         feedbackDiv.textContent = '';
-    } else {
-        document.getElementById('rouletteModalQuestion').textContent = `Que signifie ${acronym} ?`;
-        // Mélanger les réponses
-        const allAnswers = shuffle([q.answer, ...q.wrongAnswers]);
-        allAnswers.forEach((ans, i) => {
-            const btn = document.getElementById('choice'+i);
-            btn.textContent = ans;
-            btn.disabled = false;
-            btn.classList.remove('good', 'bad');
-            btn.onclick = () => {
-                // Désactiver tous les boutons
-                for (let j = 0; j < 4; j++) {
-                    document.getElementById('choice'+j).disabled = true;
-                }
-                if (ans === q.answer) {
-                    btn.classList.add('good');
-                    feedbackDiv.classList.remove('bad');
-                    feedbackDiv.textContent = `Félicitation, tu as trouvé la bonne réponse. ${acronym} signifie bien : ${q.answer}`;
-                } else {
-                    btn.classList.add('bad');
-                    feedbackDiv.classList.add('bad');
-                    feedbackDiv.textContent = `Tu es mauvais Jack. ${acronym} signifie en fait : ${q.answer}`;
-                }
-            };
-        });
-        feedbackDiv.textContent = '';
-        feedbackDiv.classList.remove('bad');
     }
+    document.getElementById('rouletteCatmanModalQuestion').textContent = `Que signifie ${acronym} ?`;
+    const allAnswers = shuffle([q.answer, ...q.wrongAnswers]);
+    allAnswers.forEach((ans, i) => {
+        const btn = document.getElementById('catmanChoice'+i);
+        btn.textContent = ans;
+        btn.disabled = false;
+        btn.classList.remove('good', 'bad');
+        btn.onclick = () => {
+            for (let j = 0; j < 4; j++) {
+                document.getElementById('catmanChoice'+j).disabled = true;
+            }
+            if (ans === q.answer) {
+                btn.classList.add('good');
+                feedbackDiv.classList.remove('bad');
+                feedbackDiv.textContent = `Félicitation, tu as trouvé la bonne réponse. ${acronym} signifie bien : ${q.answer}`;
+            } else {
+                btn.classList.add('bad');
+                feedbackDiv.classList.add('bad');
+                feedbackDiv.textContent = `Tu es mauvais Jack. ${acronym} signifie en fait : ${q.answer}`;
+            }
+        };
+    });
+    feedbackDiv.textContent = '';
+    feedbackDiv.classList.remove('bad');
     modal.style.display = 'flex';
 } 
