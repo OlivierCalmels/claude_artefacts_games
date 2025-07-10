@@ -168,5 +168,62 @@ document.addEventListener('DOMContentLoaded', function() {
             list.appendChild(empty);
         }
         container.appendChild(list);
+        // Ajout du graphique si notes chiffrées ou colonne d'explication
+        let chartContainer = document.getElementById('barChartCSE');
+        if (!chartContainer) {
+            chartContainer = document.createElement('canvas');
+            chartContainer.id = 'barChartCSE';
+            chartContainer.style.width = '100%';
+            chartContainer.style.maxWidth = '100%';
+            chartContainer.style.margin = '24px auto 0 auto';
+            chartContainer.height = 320;
+            chartContainer.style.height = '320px';
+            container.appendChild(chartContainer);
+        } else {
+            // On le déplace sous la liste
+            container.appendChild(chartContainer);
+            chartContainer.style.width = '100%';
+            chartContainer.style.maxWidth = '100%';
+            chartContainer.height = 320;
+            chartContainer.style.height = '320px';
+        }
+        // Détection des notes chiffrées (colonne courante OU colonne précédente si explication)
+        let notes = [];
+        if (isExplication && currentCol > 0) {
+            notes = filled.map(obj => obj.prev).filter(v => /^\d+(\.\d+)?$/.test(v));
+        } else {
+            notes = filled.map(obj => obj.val).filter(v => /^\d+(\.\d+)?$/.test(v));
+        }
+        if (notes.length === filled.length && notes.length > 0) {
+            // Distribution des notes
+            const counts = {};
+            notes.forEach(n => { counts[n] = (counts[n]||0)+1; });
+            const labels = Object.keys(counts).sort((a,b)=>parseFloat(a)-parseFloat(b));
+            const data = labels.map(l => counts[l]);
+            // Affichage Chart.js
+            if (window.barChartCSEInstance) window.barChartCSEInstance.destroy();
+            window.barChartCSEInstance = new Chart(chartContainer, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Nombre de réponses',
+                        data,
+                        backgroundColor: '#1976d2',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { title: { display: true, text: 'Note' } }, y: { beginAtZero: true, title: { display: true, text: 'Nombre' } } }
+                }
+            });
+        } else {
+            if (window.barChartCSEInstance) {
+                window.barChartCSEInstance.destroy();
+                window.barChartCSEInstance = null;
+            }
+            chartContainer.style.display = 'none';
+        }
     }
 }); 
