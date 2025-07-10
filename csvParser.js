@@ -99,7 +99,23 @@ document.addEventListener('DOMContentLoaded', function() {
         rightBtn.disabled = currentCol === headers.length-1;
         rightBtn.onclick = () => { currentCol++; renderTable(); };
         const headerLabel = document.createElement('div');
-        headerLabel.textContent = headers[currentCol] || '';
+        let displayHeader = headers[currentCol] || '';
+        const isExplication = headers[currentCol] && (
+            headers[currentCol].toLowerCase().includes('peux-tu expliquer ta note') ||
+            headers[currentCol].toLowerCase().includes('peux-tu expliquer ta réponse')
+        );
+        if (isExplication && currentCol > 0) {
+            const prevHeader = headers[currentCol-1] || '';
+            // Regroupe intelligemment les deux headers
+            if (prevHeader.toLowerCase().includes('note')) {
+                displayHeader = 'Note + Explication';
+            } else if (prevHeader.toLowerCase().includes('réponse')) {
+                displayHeader = 'Réponse + Explication';
+            } else {
+                displayHeader = prevHeader + ' + ' + headers[currentCol];
+            }
+        }
+        headerLabel.textContent = displayHeader;
         headerLabel.style.fontWeight = 'bold';
         headerLabel.style.fontSize = '1rem';
         headerLabel.style.flex = '1';
@@ -110,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         container.appendChild(nav);
         // Réponses non vides
         const filled = rows
-            .map((row, i) => ({val: row[currentCol] ? row[currentCol].trim() : '', idx: i}))
+            .map((row, i) => ({val: row[currentCol] ? row[currentCol].trim() : '', idx: i, prev: row[currentCol-1] ? row[currentCol-1].trim() : ''}))
             .filter(obj => obj.val !== '');
         const list = document.createElement('div');
         list.style.maxHeight = '320px';
@@ -119,9 +135,13 @@ document.addEventListener('DOMContentLoaded', function() {
         list.style.lineHeight = '1.4';
         list.style.textAlign = 'left';
         list.style.padding = '0 8px';
-        filled.forEach(({val, idx}) => {
+        filled.forEach(({val, idx, prev}) => {
             const item = document.createElement('div');
-            item.textContent = `${idx+1}. ${val}`;
+            if (isExplication && currentCol > 0) {
+                item.textContent = `${idx+1}. Appréciation: ${prev} - Explication: ${val}`;
+            } else {
+                item.textContent = `${idx+1}. ${val}`;
+            }
             item.style.marginBottom = '6px';
             list.appendChild(item);
         });
