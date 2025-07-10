@@ -28,14 +28,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!input || !container) return;
 
+    // Fonction pour mettre à jour l'URL avec la colonne courante
+    function updateColInUrl(colIdx) {
+        const url = new URL(window.location);
+        url.searchParams.set('col', colIdx);
+        window.history.replaceState({}, '', url);
+    }
+
     // Fonction pour parser et afficher le CSV/TSV
-    function parseAndRender(text, filename, type) {
+    function parseAndRender(text, filename, type, colIdx) {
         let lines = text.split(/\r?\n/).filter(Boolean);
         if (lines.length === 0) return;
         let sep = (type === 'tsv') ? '\t' : ',';
         headers = lines[0].split(sep);
         rows = lines.slice(1).map(row => row.split(sep));
-        currentCol = 0;
+        currentCol = (typeof colIdx === 'number' && colIdx >= 0 && colIdx < headers.length) ? colIdx : 0;
         renderTable();
         status.textContent = filename ? `✅ Fichier chargé : ${filename}` : '✅ Fichier chargé depuis le navigateur';
         container.style.display = '';
@@ -44,8 +51,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Chargement depuis localStorage au démarrage
     const savedCSV = localStorage.getItem('cse_csv_data');
     const savedType = localStorage.getItem('cse_csv_type') || 'csv';
+    // Lecture du paramètre col dans l'URL
+    let colFromUrl = 0;
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('col')) {
+        const idx = parseInt(params.get('col'), 10);
+        if (!isNaN(idx) && idx >= 0) colFromUrl = idx;
+    }
     if (savedCSV) {
-        parseAndRender(savedCSV, null, savedType);
+        parseAndRender(savedCSV, null, savedType, colFromUrl);
     }
 
     input.addEventListener('change', function(e) {
@@ -57,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Stockage dans le localStorage
             localStorage.setItem('cse_csv_data', text);
             localStorage.setItem('cse_csv_type', 'csv');
-            parseAndRender(text, file.name, 'csv');
+            parseAndRender(text, file.name, 'csv', colFromUrl);
         };
         reader.readAsText(file);
     });
@@ -72,13 +86,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Stockage dans le localStorage
                 localStorage.setItem('cse_csv_data', text);
                 localStorage.setItem('cse_csv_type', 'tsv');
-                parseAndRender(text, file.name, 'tsv');
+                parseAndRender(text, file.name, 'tsv', colFromUrl);
             };
             reader.readAsText(file);
         });
     }
 
-    function renderTable() {
+    function renderTable(skipAutoAdvance) {
+        updateColInUrl(currentCol);
         container.innerHTML = '';
         // Header navigation
         const nav = document.createElement('div');
@@ -91,13 +106,41 @@ document.addEventListener('DOMContentLoaded', function() {
         leftBtn.style.fontSize = '1.2rem';
         leftBtn.style.marginRight = '12px';
         leftBtn.disabled = currentCol === 0;
-        leftBtn.onclick = () => { currentCol--; renderTable(); };
+        leftBtn.onclick = () => {
+            let newCol = currentCol - 1;
+            // Boucle pour sauter toutes les colonnes masquées (celles dont la suivante est une explication)
+            while (newCol >= 0 && headers[newCol+1] && (
+                headers[newCol+1].toLowerCase().includes('peux-tu expliquer ta note') ||
+                headers[newCol+1].toLowerCase().includes('peux-tu expliquer ta réponse')
+            )) {
+                newCol--;
+            }
+            if (newCol >= 0) {
+                currentCol = newCol;
+                updateColInUrl(currentCol);
+                renderTable(true);
+            }
+        };
         const rightBtn = document.createElement('button');
         rightBtn.textContent = '▶';
         rightBtn.style.fontSize = '1.2rem';
         rightBtn.style.marginLeft = '12px';
         rightBtn.disabled = currentCol === headers.length-1;
-        rightBtn.onclick = () => { currentCol++; renderTable(); };
+        rightBtn.onclick = () => {
+            let newCol = currentCol + 1;
+            // Boucle pour sauter toutes les colonnes masquées (celles dont la suivante est une explication)
+            while (newCol < headers.length-1 && headers[newCol+1] && (
+                headers[newCol+1].toLowerCase().includes('peux-tu expliquer ta note') ||
+                headers[newCol+1].toLowerCase().includes('peux-tu expliquer ta réponse')
+            )) {
+                newCol++;
+            }
+            if (newCol < headers.length) {
+                currentCol = newCol;
+                updateColInUrl(currentCol);
+                renderTable(true);
+            }
+        };
         const headerLabel = document.createElement('div');
         let displayHeader = headers[currentCol] || '';
         const isExplication = headers[currentCol] && (
@@ -141,14 +184,11 @@ document.addEventListener('DOMContentLoaded', function() {
             headers[currentCol+1].toLowerCase().includes('peux-tu expliquer ta note') ||
             headers[currentCol+1].toLowerCase().includes('peux-tu expliquer ta réponse')
         );
-        if (isExplicationNext) {
-            const info = document.createElement('div');
-            info.textContent = 'Les résultats sont regroupés sur la page suivante.';
-            info.style.opacity = '0.7';
-            info.style.textAlign = 'center';
-            info.style.margin = '32px 0';
-            list.appendChild(info);
-            container.appendChild(list);
+        if (isExplicationNext && !skipAutoAdvance) {
+            // Avance automatiquement à la colonne d'explication
+            currentCol++;
+            updateColInUrl(currentCol);
+            renderTable();
             return;
         }
         filled.forEach(({val, idx, prev}) => {
