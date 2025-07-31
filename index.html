@@ -155,13 +155,15 @@
             box-shadow: 0 8px 32px rgba(30,60,120,0.18);
             padding: 32px 24px 24px 24px;
             min-width: 200px;
-            max-width: 240px;
+            max-width: 340px;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             transition: transform 0.2s, box-shadow 0.2s;
             border: 3px solid #fff;
             position: relative;
+            margin: 0 auto 24px auto;
         }
         .card80s.pong {
             background: linear-gradient(135deg, #00eaff 0%, #ff00cc 100%);
@@ -223,9 +225,9 @@
             }
             .card80s {
                 min-width: 0;
-                width: 100%;
-                max-width: 340px;
-                margin: 0 auto;
+                width: 98%;
+                max-width: 98%;
+                margin: auto auto;
             }
         }
         .csv-btns-row {
@@ -274,6 +276,7 @@
                         <div class="card-title">PONG</div>
                         <button class="card-btn" onclick="switchTab(1)">Jouer</button>
                     </div>
+                    <a href="chessCom/index.html" style="display:block; margin:20px auto; text-align:center; font-size:1.2em;">Accéder au Dashboard Chess.com</a>
                     <div class="card80s roulette">
                         <div class="card-img">
                             <!-- SVG Roulette -->
