@@ -1,5 +1,6 @@
 export const userList = [
   "hikaru",
+  "blitzstream",
   "fabianocaruana",
   "magnuscarlsen",
   "alireza",
@@ -7,5 +8,4 @@ export const userList = [
   "elharicot",
   "bzhgrammaton",
   "jchprn",
-  "blitzstream",
 ];
