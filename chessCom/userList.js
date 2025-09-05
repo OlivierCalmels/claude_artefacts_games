@@ -7,4 +7,5 @@ export const userList = [
   "elharicot",
   "bzhgrammaton",
   "jchprn",
+  "Blitzstream",
 ];
