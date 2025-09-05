@@ -185,7 +185,7 @@ async function fetchAllData(username) {
     fetch(`https://api.chess.com/pub/player/${username}/is-online`)
       .then(res => res.json())
       .then(data => {
-        debugger
+        // debugger
         if(data.code === 0 ) return 
         const onlineStatusDiv = document.createElement('div');
         onlineStatusDiv.innerHTML = `Status : <strong>${data ? 'En ligne' : 'Hors ligne'}</strong>
@@ -247,15 +247,20 @@ async function fetchAllData(username) {
       let gamesHTML = '<table><tr><th>Date</th><th>Résultat</th><th>Opposant</th></tr>';
 
       recentGames.forEach(game => {
+        
         const date = new Date(game.end_time * 1000).toLocaleString();
         const isWhite = game.white.username === username;
         const result = isWhite ? game.white.result : game.black.result;
         const opponent = isWhite ? game.black.username : game.white.username;
-
+        
+        if (result==="TimeOut") console.log({isWhite, game, result, opponent});
+        
         let resText = '';
         if (result === 'win') resText = 'Victoire';
         else if (result === 'loss') resText = 'Défaite';
         else if (result === 'draw') resText = 'Nulle';
+        else if (result === 'resigned') resText = 'Abandon';
+        else if (result === 'timeout') resText = 'TimeOut';
 
         gamesHTML += `
         <tr>
