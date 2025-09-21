@@ -249,25 +249,22 @@
                 <div class="time-group start">
                     <h3>🕐 Heure de début</h3>
                     <div class="time-inputs-row">
-                        <input type="number" id="startHour" class="time-input" min="0" max="23" placeholder="HH">
+                        <input type="number" id="startHour" class="time-input" min="0" max="23" placeholder="HH" value="16">
                         <span class="time-separator">:</span>
-                        <input type="number" id="startMin" class="time-input" min="0" max="59" placeholder="MM">
+                        <input type="number" id="startMin" class="time-input" min="0" max="59" placeholder="MM" value="30">
                     </div>
                 </div>
                 
                 <div class="time-group end">
                     <h3>🕕 Heure de fin</h3>
                     <div class="time-inputs-row">
-                        <input type="number" id="endHour" class="time-input" min="0" max="23" placeholder="HH">
+                        <input type="number" id="endHour" class="time-input" min="0" max="23" placeholder="HH" value="19">
                         <span class="time-separator">:</span>
-                        <input type="number" id="endMin" class="time-input" min="0" max="59" placeholder="MM">
+                        <input type="number" id="endMin" class="time-input" min="0" max="59" placeholder="MM" value="30">
                     </div>
                 </div>
             </div>
             
-            <button class="calculate-btn" onclick="calculateTimeDifference()">
-                🕐 Calculer la différence
-            </button>
             
             <div id="errorMessage" class="error-message"></div>
             
@@ -331,6 +328,9 @@
         
         // Auto-calculate when inputs change
         document.addEventListener('DOMContentLoaded', function() {
+            // Calculate with default values on page load
+            calculateTimeDifference();
+            
             const inputs = ['startHour', 'startMin', 'endHour', 'endMin'];
             inputs.forEach(id => {
                 document.getElementById(id).addEventListener('input', function() {
