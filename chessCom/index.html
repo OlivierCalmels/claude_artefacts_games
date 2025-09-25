@@ -324,30 +324,43 @@
       }
 
       .result-badge {
-        padding: 0.25rem 0.75rem;
+        padding: 0.4rem 0.9rem;
         border-radius: 12px;
         font-size: 0.8rem;
-        font-weight: 500;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+      }
+
+      .result-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .result-badge.victory {
-        background: rgba(48, 209, 88, 0.2);
-        color: var(--accent-green);
-        border: 1px solid rgba(48, 209, 88, 0.3);
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: 1px solid #047857;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       }
 
       .result-badge.defeat {
-        background: rgba(255, 59, 48, 0.2);
-        color: var(--accent-red);
-        border: 1px solid rgba(255, 59, 48, 0.3);
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: 1px solid #b91c1c;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       }
 
       .result-badge.draw {
-        background: rgba(255, 149, 0, 0.2);
-        color: var(--accent-orange);
-        border: 1px solid rgba(255, 149, 0, 0.3);
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        border: 1px solid #b45309;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       }
 
       .glass-button {
@@ -565,6 +578,235 @@
         display: block;
         animation: fadeInUp 0.6s ease-out;
       }
+
+      /* Game type tabs */
+      .game-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .game-tab {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .game-tab::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .game-tab:hover::before {
+        left: 100%;
+      }
+
+      .game-tab:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .game-tab.active {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+        box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .game-tab.active::before {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .game-tabs {
+          gap: 0.25rem;
+          justify-content: flex-start;
+          overflow-x: auto;
+          padding-bottom: 0.5rem;
+        }
+
+        .game-tab {
+          padding: 0.5rem 1rem;
+          font-size: 0.8rem;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .game-tabs {
+          gap: 0.2rem;
+        }
+
+        .game-tab {
+          padding: 0.4rem 0.8rem;
+          font-size: 0.75rem;
+        }
+      }
+
+      /* Game types section */
+      .game-types-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .game-type-item {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        min-width: 120px;
+        text-align: center;
+        box-shadow: var(--glass-shadow);
+      }
+
+      .game-type-item::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .game-type-item:hover::before {
+        left: 100%;
+      }
+
+      .game-type-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .game-type-item.bullet {
+        background: linear-gradient(
+          135deg,
+          rgba(239, 68, 68, 0.2),
+          rgba(220, 38, 38, 0.1)
+        );
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+      }
+
+      .game-type-item.blitz {
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.2),
+          rgba(37, 99, 235, 0.1)
+        );
+        border-color: rgba(59, 130, 246, 0.3);
+        color: #93c5fd;
+      }
+
+      .game-type-item.rapid {
+        background: linear-gradient(
+          135deg,
+          rgba(16, 185, 129, 0.2),
+          rgba(5, 150, 105, 0.1)
+        );
+        border-color: rgba(16, 185, 129, 0.3);
+        color: #6ee7b7;
+      }
+
+      .game-type-item.daily {
+        background: linear-gradient(
+          135deg,
+          rgba(168, 85, 247, 0.2),
+          rgba(147, 51, 234, 0.1)
+        );
+        border-color: rgba(168, 85, 247, 0.3);
+        color: #c4b5fd;
+      }
+
+      .game-type-item.chess960 {
+        background: linear-gradient(
+          135deg,
+          rgba(245, 158, 11, 0.2),
+          rgba(217, 119, 6, 0.1)
+        );
+        border-color: rgba(245, 158, 11, 0.3);
+        color: #fcd34d;
+      }
+
+      .game-type-item.other {
+        background: linear-gradient(
+          135deg,
+          rgba(107, 114, 128, 0.2),
+          rgba(75, 85, 99, 0.1)
+        );
+        border-color: rgba(107, 114, 128, 0.3);
+        color: #d1d5db;
+      }
+
+      @media (max-width: 768px) {
+        .game-types-list {
+          gap: 0.75rem;
+        }
+
+        .game-type-item {
+          padding: 0.75rem 1rem;
+          font-size: 0.8rem;
+          min-width: 100px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .game-types-list {
+          gap: 0.5rem;
+        }
+
+        .game-type-item {
+          padding: 0.6rem 0.8rem;
+          font-size: 0.75rem;
+          min-width: 80px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -599,8 +841,20 @@
 
       <section id="gamesSection" class="glass-card">
         <h2>Dernières parties</h2>
+        <div id="gameTabs" class="game-tabs" style="display: none">
+          <div class="game-tab active" data-type="all">Tout</div>
+          <div class="game-tab" data-type="bullet">Bullet</div>
+          <div class="game-tab" data-type="blitz">Blitz</div>
+          <div class="game-tab" data-type="rapid">Rapid</div>
+          <div class="game-tab" data-type="daily">Daily</div>
+        </div>
         <div id="games"></div>
         <div id="pagination" class="pagination" style="display: none"></div>
+      </section>
+
+      <section id="gameTypesSection" class="glass-card">
+        <h2>Types de parties jouées</h2>
+        <div id="gameTypes"></div>
       </section>
     </div>
     <script>
@@ -623,15 +877,18 @@
       const statusSection = document.getElementById("statusSection");
       const statsSection = document.getElementById("statsSection");
       const gamesSection = document.getElementById("gamesSection");
+      const gameTypesSection = document.getElementById("gameTypesSection");
       const paginationDiv = document.getElementById("pagination");
 
-      // Variables de pagination
+      // Variables de pagination et filtrage
       let allGames = [];
+      let filteredGames = [];
       let currentPage = 1;
       const gamesPerPage = 5;
       let currentUsername = "";
+      let currentGameType = "all";
 
-      // Fonction pour récupérer les 50 dernières parties
+      // Fonction pour récupérer les 200 dernières parties
       async function fetchGamesWithPagination(username) {
         currentUsername = username;
         try {
@@ -641,8 +898,8 @@
           const archivesData = await archivesRes.json();
 
           if (archivesData.archives.length > 0) {
-            // Récupérer les 3 derniers mois d'archives pour avoir plus de parties
-            const recentArchives = archivesData.archives.slice(-3);
+            // Récupérer les 6 derniers mois d'archives pour avoir plus de parties (200 dernières)
+            const recentArchives = archivesData.archives.slice(-6);
             allGames = [];
 
             // Récupérer les parties de chaque archive
@@ -652,39 +909,112 @@
               allGames = allGames.concat(gamesData.games);
             }
 
-            // Trier par date de fin (plus récentes en premier) et prendre les 50 dernières
+            // Trier par date de fin (plus récentes en premier) et prendre les 200 dernières
             allGames = allGames
               .filter((game) => game.end_time) // Filtrer les parties sans date de fin
               .sort((a, b) => b.end_time - a.end_time)
-              .slice(0, 50);
+              // .slice(0, 200);
 
             if (allGames.length > 0) {
+              // Afficher les onglets
+              document.getElementById("gameTabs").style.display = "flex";
+              // Réactiver l'onglet "Tout" par défaut
+              document.querySelectorAll(".game-tab").forEach((tab) => {
+                tab.classList.remove("active");
+              });
+              document
+                .querySelector('.game-tab[data-type="all"]')
+                .classList.add("active");
+              // Filtrer les parties selon le type sélectionné
+              filterGamesByType("all");
               displayGamesPage();
               setupPagination();
               gamesSection.classList.add("show");
+              // Afficher les types de parties
+              displayGameTypes();
             } else {
               document.getElementById("games").innerHTML =
                 "<p>Aucune partie trouvée.</p>";
               gamesSection.classList.add("show");
+              // Afficher les types de parties même si aucune partie
+              displayGameTypes();
             }
           } else {
             document.getElementById("games").innerHTML =
               "<p>Aucune partie trouvée.</p>";
             gamesSection.classList.add("show");
+            // Afficher les types de parties même si aucune partie
+            displayGameTypes();
           }
         } catch (error) {
           console.error("Erreur lors de la récupération des parties:", error);
           document.getElementById("games").innerHTML =
             "<p>Erreur lors du chargement des parties.</p>";
           gamesSection.classList.add("show");
+          // Afficher les types de parties même en cas d'erreur
+          displayGameTypes();
         }
+      }
+
+      // Fonction pour afficher les types de parties jouées
+      function displayGameTypes() {
+        if (allGames.length === 0) {
+          document.getElementById("gameTypes").innerHTML =
+            "<p>Aucune partie trouvée.</p>";
+          return;
+        }
+
+        // Extraire tous les types de parties uniques
+        const uniqueGameTypes = [
+          ...new Set(allGames.map((game) => game.time_class)),
+        ];
+
+        // Trier les types par durée (du plus court au plus long)
+        const typeOrder = ["bullet", "blitz", "rapid", "daily", "chess960"];
+        const sortedTypes = uniqueGameTypes.sort((a, b) => {
+          const aIndex = typeOrder.indexOf(a);
+          const bIndex = typeOrder.indexOf(b);
+          if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+          if (aIndex === -1) return 1;
+          if (bIndex === -1) return -1;
+          return aIndex - bIndex;
+        });
+
+        let gameTypesHTML = '<div class="game-types-list">';
+
+        sortedTypes.forEach((type) => {
+          const className =
+            type === "chess960"
+              ? "chess960"
+              : ["bullet", "blitz", "rapid", "daily"].includes(type)
+              ? type
+              : "other";
+          gameTypesHTML += `<div class="game-type-item ${className}">${type}</div>`;
+        });
+
+        gameTypesHTML += "</div>";
+        document.getElementById("gameTypes").innerHTML = gameTypesHTML;
+        gameTypesSection.classList.add("show");
+      }
+
+      // Fonction pour filtrer les parties par type
+      function filterGamesByType(gameType) {
+        currentGameType = gameType;
+        if (gameType === "all") {
+          filteredGames = [...allGames];
+        } else {
+          filteredGames = allGames.filter(
+            (game) => game.time_class === gameType
+          );
+        }
+        currentPage = 1; // Reset à la première page
       }
 
       // Fonction pour afficher une page de parties
       function displayGamesPage() {
         const startIndex = (currentPage - 1) * gamesPerPage;
         const endIndex = startIndex + gamesPerPage;
-        const gamesToShow = allGames.slice(startIndex, endIndex);
+        const gamesToShow = filteredGames.slice(startIndex, endIndex);
 
         let gamesHTML =
           "<table class='glass-table'><tr><th>Date</th><th>Type de partie</th><th>Résultat</th><th>Opposant</th><th>Voir</th></tr>";
@@ -739,7 +1069,7 @@
 
       // Fonction pour configurer la pagination
       function setupPagination() {
-        const totalPages = Math.ceil(allGames.length / gamesPerPage);
+        const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
 
         if (totalPages <= 1) {
           paginationDiv.style.display = "none";
@@ -832,7 +1162,7 @@
         // Information sur la pagination
         const info = document.createElement("span");
         info.className = "pagination-info";
-        info.textContent = `Page ${currentPage} sur ${totalPages} (${allGames.length} parties au total)`;
+        info.textContent = `Page ${currentPage} sur ${totalPages} (${filteredGames.length} parties au total)`;
         paginationDiv.appendChild(info);
       }
 
@@ -843,6 +1173,27 @@
           option.textContent = user;
           select.appendChild(option);
         });
+
+        // Gestionnaires d'événements pour les onglets
+        const gameTabs = document.getElementById("gameTabs");
+        gameTabs.addEventListener("click", (e) => {
+          if (e.target.classList.contains("game-tab")) {
+            // Retirer la classe active de tous les onglets
+            gameTabs.querySelectorAll(".game-tab").forEach((tab) => {
+              tab.classList.remove("active");
+            });
+
+            // Ajouter la classe active à l'onglet cliqué
+            e.target.classList.add("active");
+
+            // Filtrer les parties
+            const gameType = e.target.getAttribute("data-type");
+            filterGamesByType(gameType);
+            displayGamesPage();
+            setupPagination();
+          }
+        });
+
         fetchAllData(select.value);
       }
 
@@ -856,14 +1207,19 @@
         statusSection.classList.remove("show");
         statsSection.classList.remove("show");
         gamesSection.classList.remove("show");
+        gameTypesSection.classList.remove("show");
 
         document.getElementById("profile").innerHTML = "";
         document.getElementById("status").innerHTML = "";
         document.getElementById("stats").innerHTML = "";
         document.getElementById("games").innerHTML = "";
+        document.getElementById("gameTypes").innerHTML = "";
+        document.getElementById("gameTabs").style.display = "none";
         paginationDiv.style.display = "none";
         allGames = [];
+        filteredGames = [];
         currentPage = 1;
+        currentGameType = "all";
 
         try {
           // Profil
