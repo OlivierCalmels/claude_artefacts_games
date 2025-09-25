@@ -89,6 +89,46 @@
         border-radius: 50%;
         margin-left: 10px;
       }
+      
+      /* Pagination styles */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+        gap: 10px;
+      }
+      
+      .pagination button {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        background: #fff;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      
+      .pagination button:hover {
+        background: #f5f5f5;
+      }
+      
+      .pagination button:disabled {
+        background: #f9f9f9;
+        color: #ccc;
+        cursor: not-allowed;
+      }
+      
+      .pagination .current-page {
+        background: #2980b9;
+        color: white;
+        border-color: #2980b9;
+      }
+      
+      .pagination-info {
+        margin: 0 15px;
+        font-size: 14px;
+        color: #666;
+      }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
@@ -121,6 +161,7 @@
       <section id="gamesSection">
         <h2>Dernières parties</h2>
         <div id="games"></div>
+        <div id="pagination" class="pagination" style="display: none;"></div>
       </section>
     </div>
     <script>
@@ -143,6 +184,213 @@
       const statusSection = document.getElementById("statusSection");
       const statsSection = document.getElementById("statsSection");
       const gamesSection = document.getElementById("gamesSection");
+      const paginationDiv = document.getElementById("pagination");
+      
+      // Variables de pagination
+      let allGames = [];
+      let currentPage = 1;
+      const gamesPerPage = 5;
+      let currentUsername = "";
+
+      // Fonction pour récupérer les 50 dernières parties
+      async function fetchGamesWithPagination(username) {
+        currentUsername = username;
+        try {
+          const archivesRes = await fetch(
+            `https://api.chess.com/pub/player/${username}/games/archives`
+          );
+          const archivesData = await archivesRes.json();
+
+          if (archivesData.archives.length > 0) {
+            // Récupérer les 3 derniers mois d'archives pour avoir plus de parties
+            const recentArchives = archivesData.archives.slice(-3);
+            allGames = [];
+
+            // Récupérer les parties de chaque archive
+            for (const archiveUrl of recentArchives) {
+              const gamesRes = await fetch(archiveUrl);
+              const gamesData = await gamesRes.json();
+              allGames = allGames.concat(gamesData.games);
+            }
+
+            // Trier par date de fin (plus récentes en premier) et prendre les 50 dernières
+            allGames = allGames
+              .filter(game => game.end_time) // Filtrer les parties sans date de fin
+              .sort((a, b) => b.end_time - a.end_time)
+              .slice(0, 50);
+
+            if (allGames.length > 0) {
+              displayGamesPage();
+              setupPagination();
+              gamesSection.style.display = "block";
+            } else {
+              document.getElementById("games").innerHTML = "<p>Aucune partie trouvée.</p>";
+              gamesSection.style.display = "block";
+            }
+          } else {
+            document.getElementById("games").innerHTML = "<p>Aucune partie trouvée.</p>";
+            gamesSection.style.display = "block";
+          }
+        } catch (error) {
+          console.error("Erreur lors de la récupération des parties:", error);
+          document.getElementById("games").innerHTML = "<p>Erreur lors du chargement des parties.</p>";
+          gamesSection.style.display = "block";
+        }
+      }
+
+      // Fonction pour afficher une page de parties
+      function displayGamesPage() {
+        const startIndex = (currentPage - 1) * gamesPerPage;
+        const endIndex = startIndex + gamesPerPage;
+        const gamesToShow = allGames.slice(startIndex, endIndex);
+
+        let gamesHTML = "<table><tr><th>Date</th><th>Type de partie</th><th>Résultat</th><th>Opposant</th><th>Voir</th></tr>";
+
+        gamesToShow.forEach((game) => {
+          const date = new Date(game.end_time * 1000).toLocaleString();
+          const isWhite = game.white.username.toLowerCase() === currentUsername.toLowerCase();
+          const result = isWhite ? game.white.result : game.black.result;
+          const opponent = isWhite ? game.black.username : game.white.username;
+          const time_class = game.time_class;
+          const time_control = game.time_control / 60;
+          const url = game.url;
+
+          let resText = "";
+          let resClass = "";
+          if (result === "win") {
+            resText = "Victoire";
+            resClass = "bg-green-100";
+          } else if (result === "draw") {
+            resText = "Nulle";
+            resClass = "bg-orange-100";
+          } else if (result === "resigned") {
+            resText = "Défaite (Abandon)";
+            resClass = "bg-red-100";
+          } else if (result === "timeout") {
+            resText = "Défaite (TimeOut)";
+            resClass = "bg-red-100";
+          } else if (result === "checkmated") {
+            resText = "Défaite (Echec et mat)";
+            resClass = "bg-red-100";
+          } else if (result === "abandoned") {
+            resText = "Défaite (Abandon)";
+            resClass = "bg-red-100";
+          } else {
+            resText = "Défaite";
+            resClass = "bg-red-100";
+          }
+
+          gamesHTML += `
+            <tr>
+              <td>${date}</td>
+              <td>${time_class} (${time_control} min)</td>
+              <td class='${resClass}'>${resText}</td>
+              <td>${opponent}</td>
+              <td><a href="${url}" target="_blank">Voir</a></td>
+            </tr>`;
+        });
+        gamesHTML += "</table>";
+        document.getElementById("games").innerHTML = gamesHTML;
+      }
+
+      // Fonction pour configurer la pagination
+      function setupPagination() {
+        const totalPages = Math.ceil(allGames.length / gamesPerPage);
+        
+        if (totalPages <= 1) {
+          paginationDiv.style.display = "none";
+          return;
+        }
+
+        paginationDiv.style.display = "flex";
+        paginationDiv.innerHTML = "";
+
+        // Bouton Précédent
+        const prevButton = document.createElement("button");
+        prevButton.textContent = "« Précédent";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+          if (currentPage > 1) {
+            currentPage--;
+            displayGamesPage();
+            setupPagination();
+          }
+        };
+        paginationDiv.appendChild(prevButton);
+
+        // Numéros de pages
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+          const firstButton = document.createElement("button");
+          firstButton.textContent = "1";
+          firstButton.onclick = () => {
+            currentPage = 1;
+            displayGamesPage();
+            setupPagination();
+          };
+          paginationDiv.appendChild(firstButton);
+          
+          if (startPage > 2) {
+            const ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            ellipsis.className = "pagination-info";
+            paginationDiv.appendChild(ellipsis);
+          }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+          const pageButton = document.createElement("button");
+          pageButton.textContent = i;
+          if (i === currentPage) {
+            pageButton.className = "current-page";
+          }
+          pageButton.onclick = () => {
+            currentPage = i;
+            displayGamesPage();
+            setupPagination();
+          };
+          paginationDiv.appendChild(pageButton);
+        }
+
+        if (endPage < totalPages) {
+          if (endPage < totalPages - 1) {
+            const ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            ellipsis.className = "pagination-info";
+            paginationDiv.appendChild(ellipsis);
+          }
+          
+          const lastButton = document.createElement("button");
+          lastButton.textContent = totalPages;
+          lastButton.onclick = () => {
+            currentPage = totalPages;
+            displayGamesPage();
+            setupPagination();
+          };
+          paginationDiv.appendChild(lastButton);
+        }
+
+        // Bouton Suivant
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Suivant »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            displayGamesPage();
+            setupPagination();
+          }
+        };
+        paginationDiv.appendChild(nextButton);
+
+        // Information sur la pagination
+        const info = document.createElement("span");
+        info.className = "pagination-info";
+        info.textContent = `Page ${currentPage} sur ${totalPages} (${allGames.length} parties au total)`;
+        paginationDiv.appendChild(info);
+      }
 
       function init() {
         userList.forEach((user) => {
@@ -169,6 +417,9 @@
         document.getElementById("status").innerHTML = "";
         document.getElementById("stats").innerHTML = "";
         document.getElementById("games").innerHTML = "";
+        paginationDiv.style.display = "none";
+        allGames = [];
+        currentPage = 1;
 
         try {
           // Profil
@@ -257,80 +508,8 @@
           document.getElementById("stats").innerHTML = statsHTML;
           statsSection.style.display = "block";
 
-          // Dernières parties
-          const archivesRes = await fetch(
-            `https://api.chess.com/pub/player/${username}/games/archives`
-          );
-          const archivesData = await archivesRes.json();
-
-          if (archivesData.archives.length > 0) {
-            const lastArchiveUrl =
-              archivesData.archives[archivesData.archives.length - 1];
-            const gamesRes = await fetch(lastArchiveUrl);
-            const gamesData = await gamesRes.json();
-
-            const recentGames = gamesData.games.slice(-15).reverse();
-
-            let gamesHTML =
-              "<table><tr><th>Date</th><th>Type de partie</th><th>Résultat</th><th>Opposant</th><th>Voir</th></tr>";
-
-            recentGames.forEach((game) => {
-              const date = new Date(game.end_time * 1000).toLocaleString();
-              const isWhite = game.white.username.toLowerCase() === username;
-              const result = isWhite ? game.white.result : game.black.result;
-              const opponent = isWhite
-                ? game.black.username
-                : game.white.username;
-              const time_class = game.time_class;
-              const time_control = game.time_control / 60;
-              const url = game.url;
-
-              console.log({ username, isWhite, game, opponent });
-
-              if (result === "TimeOut")
-                console.log({ isWhite, game, result, opponent });
-
-              let resText = "";
-              let resClass = "";
-              if (result === "win") {
-                resText = "Victoire";
-                resClass = "bg-green-100";
-              }
-              // else if (result === 'loss') resText = 'Défaite';
-              else if (result === "draw") {
-                resText = "Nulle";
-                resClass = "bg-orange-100";
-              } else if (result === "resigned") {
-                resText = "Défaite (Abandon)";
-                resClass = "bg-red-100";
-              } else if (result === "timeout") {
-                resText = "Défaite (TimeOut)";
-                resClass = "bg-red-100";
-              } else if (result === "checkmated") {
-                resText = "Défaite (Echec et mat)";
-                resClass = "bg-red-100";
-              } else if (result === "abandoned") {
-                resText = "Défaite (Abandon)";
-                resClass = "bg-red-100";
-              }
-
-              gamesHTML += `
-        <tr>
-          <td>${date}</td>
-          <td>${time_class} (${time_control} min)</td>
-          <td class='${resClass}'' >${resText}</td>
-          <td>${opponent}</td>
-          <td><a href="${url}" target="_blank">Voir</a></td>
-        </tr>`;
-            });
-            gamesHTML += "</table>";
-            document.getElementById("games").innerHTML = gamesHTML;
-            gamesSection.style.display = "block";
-          } else {
-            document.getElementById("games").innerHTML =
-              "<p>Aucune partie trouvée.</p>";
-            gamesSection.style.display = "block";
-          }
+          // Dernières parties avec pagination
+          await fetchGamesWithPagination(username);
         } catch (e) {
           alert("Erreur lors du chargement : " + e.message);
         } finally {
