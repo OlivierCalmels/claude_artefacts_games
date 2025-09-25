@@ -4,164 +4,603 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Chess.com</title>
-    <!-- Google Fonts -->
+    <!-- Google Fonts - SF Pro Display alternative -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
-      body {
-        font-family: "Roboto", sans-serif;
-        background-color: #f0f4f8;
+      :root {
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        --text-primary: rgba(255, 255, 255, 0.9);
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --accent-blue: #007aff;
+        --accent-green: #30d158;
+        --accent-orange: #ff9500;
+        --accent-red: #ff3b30;
+        --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-glass: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.1),
+          rgba(255, 255, 255, 0.05)
+        );
+      }
+
+      * {
         margin: 0;
-        padding: 20px;
-        color: #333;
+        padding: 0;
+        box-sizing: border-box;
       }
-      h1 {
-        text-align: center;
-        margin-bottom: 20px;
-        color: #2c3e50;
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: var(--gradient-bg);
+        min-height: 100vh;
+        color: var(--text-primary);
+        overflow-x: hidden;
+        position: relative;
       }
-      #container {
-        max-width: 1000px;
-        margin: auto;
-      }
-      #players {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-bottom: 30px;
-      }
-      select {
-        padding: 10px 15px;
-        font-size: 1rem;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        cursor: pointer;
-      }
-      section {
-        background: #fff;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-        display: none;
-      }
-      h2 {
-        margin-top: 0;
-        color: #34495e;
-        border-bottom: 2px solid #ecf0f1;
-        padding-bottom: 10px;
-      }
-      table {
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 80%,
+            rgba(120, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 40%,
+            rgba(120, 219, 255, 0.2) 0%,
+            transparent 50%
+          );
+        z-index: -1;
+        animation: backgroundShift 20s ease-in-out infinite;
       }
-      th,
-      td {
-        padding: 12px;
-        border: 1px solid #ddd;
-        text-align: center;
-      }
-      th {
-        background-color: #ecf0f1;
-        font-weight: 600;
-      }
-      @media (max-width: 600px) {
-        body {
-          padding: 10px;
+
+      @keyframes backgroundShift {
+        0%,
+        100% {
+          transform: translateX(0) translateY(0);
+        }
+        25% {
+          transform: translateX(-10px) translateY(-5px);
+        }
+        50% {
+          transform: translateX(5px) translateY(-10px);
+        }
+        75% {
+          transform: translateX(-5px) translateY(5px);
         }
       }
-      #loader {
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header {
         text-align: center;
-        padding: 20px;
-        font-size: 1.2em;
-        display: none;
-        color: #2980b9;
+        margin-bottom: 3rem;
+        animation: fadeInDown 0.8s ease-out;
       }
-      /* Online indicator */
-      #onlineIndicator {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
+
+      .header h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .player-selector {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+      }
+
+      .player-selector label {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .glass-select {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--glass-shadow);
+        min-width: 200px;
+      }
+
+      .glass-select:focus {
+        outline: none;
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .glass-select option {
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+      }
+
+      .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .glass-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+      }
+
+      .glass-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .glass-card h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+      }
+
+      .glass-card h2::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-blue), transparent);
+        border-radius: 1px;
+      }
+
+      .profile-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .profile-avatar {
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
-        margin-left: 10px;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        object-fit: cover;
       }
-      
-      /* Pagination styles */
+
+      .profile-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .profile-info {
+        flex: 1;
+        min-width: 250px;
+      }
+
+      .profile-info h3 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .profile-info p {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+      }
+
+      .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--gradient-glass);
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        margin-top: 1rem;
+      }
+
+      .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      .status-dot.online {
+        background: var(--accent-green);
+      }
+
+      .status-dot.offline {
+        background: var(--accent-red);
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .glass-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: var(--glass-bg);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--glass-shadow);
+      }
+
+      .glass-table th {
+        background: var(--gradient-glass);
+        color: var(--text-primary);
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--glass-border);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .glass-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+      }
+
+      .glass-table tr:hover td {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .glass-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .result-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .result-badge.victory {
+        background: rgba(48, 209, 88, 0.2);
+        color: var(--accent-green);
+        border: 1px solid rgba(48, 209, 88, 0.3);
+      }
+
+      .result-badge.defeat {
+        background: rgba(255, 59, 48, 0.2);
+        color: var(--accent-red);
+        border: 1px solid rgba(255, 59, 48, 0.3);
+      }
+
+      .result-badge.draw {
+        background: rgba(255, 149, 0, 0.2);
+        color: var(--accent-orange);
+        border: 1px solid rgba(255, 149, 0, 0.3);
+      }
+
+      .glass-button {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 0.5rem 1rem;
+        color: var(--accent-blue);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-block;
+        font-size: 0.9rem;
+      }
+
+      .glass-button:hover {
+        background: rgba(0, 122, 255, 0.1);
+        border-color: var(--accent-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 122, 255, 0.2);
+      }
+
       .pagination {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 20px 0;
-        gap: 10px;
+        gap: 0.5rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
       }
-      
+
       .pagination button {
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        background: #fff;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        color: var(--text-primary);
         cursor: pointer;
-        border-radius: 4px;
-        font-size: 14px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        min-width: 44px;
       }
-      
-      .pagination button:hover {
-        background: #f5f5f5;
+
+      .pagination button:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       }
-      
+
       .pagination button:disabled {
-        background: #f9f9f9;
-        color: #ccc;
+        opacity: 0.5;
         cursor: not-allowed;
       }
-      
+
       .pagination .current-page {
-        background: #2980b9;
+        background: var(--accent-blue);
         color: white;
-        border-color: #2980b9;
+        border-color: var(--accent-blue);
+        box-shadow: 0 4px 20px rgba(0, 122, 255, 0.3);
       }
-      
+
       .pagination-info {
-        margin: 0 15px;
-        font-size: 14px;
-        color: #666;
+        margin: 0 1rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .loader {
+        text-align: center;
+        padding: 3rem;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        display: none;
+      }
+
+      .loader::after {
+        content: "";
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--glass-border);
+        border-top: 2px solid var(--accent-blue);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 1rem;
+        }
+
+        .header h1 {
+          font-size: 2.5rem;
+        }
+
+        .player-selector {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .glass-select {
+          min-width: 100%;
+          max-width: 300px;
+        }
+
+        .profile-content {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .profile-avatar {
+          width: 100px;
+          height: 100px;
+        }
+
+        .glass-card {
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .glass-table {
+          font-size: 0.9rem;
+        }
+
+        .glass-table th,
+        .glass-table td {
+          padding: 0.75rem 0.5rem;
+        }
+
+        .pagination {
+          gap: 0.25rem;
+        }
+
+        .pagination button {
+          padding: 0.5rem 0.75rem;
+          font-size: 0.9rem;
+        }
+
+        .pagination-info {
+          font-size: 0.8rem;
+          margin: 0 0.5rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 0.5rem;
+        }
+
+        .glass-card {
+          padding: 1rem;
+          border-radius: 16px;
+        }
+
+        .glass-table th,
+        .glass-table td {
+          padding: 0.5rem 0.25rem;
+          font-size: 0.8rem;
+        }
+
+        .profile-avatar {
+          width: 80px;
+          height: 80px;
+        }
+
+        .pagination button {
+          padding: 0.4rem 0.6rem;
+          font-size: 0.8rem;
+          min-width: 36px;
+        }
+      }
+
+      /* Hide sections initially */
+      section {
+        display: none;
+      }
+
+      section.show {
+        display: block;
+        animation: fadeInUp 0.6s ease-out;
       }
     </style>
-    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
-    <h1>Dashboard Chess.com</h1>
-    <div id="container">
-      <!-- Sélection -->
-      <div style="text-align: center; margin-bottom: 20px">
-        <label for="playerSelect"
-          ><strong>Sélectionner un joueur : </strong></label
-        >
-        <select id="playerSelect"></select>
+    <div class="container">
+      <div class="header">
+        <h1>Dashboard Chess.com</h1>
       </div>
+
+      <div class="player-selector">
+        <label for="playerSelect">Sélectionner un joueur :</label>
+        <select id="playerSelect" class="glass-select"></select>
+      </div>
+
       <!-- Loader -->
-      <div id="loader">Chargement des données...</div>
+      <div id="loader" class="loader">Chargement des données...</div>
 
       <!-- Sections -->
-      <section id="profileSection">
+      <section id="profileSection" class="glass-card">
         <h2>Profil</h2>
         <div id="profile"></div>
       </section>
-      <section id="statusSection" style="margin-bottom: 20px">
+
+      <section id="statusSection" class="glass-card">
         <h2>Status</h2>
         <div id="status"></div>
       </section>
-      <section id="statsSection">
+
+      <section id="statsSection" class="glass-card">
         <h2>Statistiques</h2>
         <div id="stats"></div>
       </section>
-      <section id="gamesSection">
+
+      <section id="gamesSection" class="glass-card">
         <h2>Dernières parties</h2>
         <div id="games"></div>
-        <div id="pagination" class="pagination" style="display: none;"></div>
+        <div id="pagination" class="pagination" style="display: none"></div>
       </section>
     </div>
     <script>
@@ -175,7 +614,7 @@
         "bzhgrammaton",
         "jchprn",
         "blitzstream",
-        "lowki93"
+        "lowki93",
       ];
 
       const select = document.getElementById("playerSelect");
@@ -185,7 +624,7 @@
       const statsSection = document.getElementById("statsSection");
       const gamesSection = document.getElementById("gamesSection");
       const paginationDiv = document.getElementById("pagination");
-      
+
       // Variables de pagination
       let allGames = [];
       let currentPage = 1;
@@ -215,26 +654,29 @@
 
             // Trier par date de fin (plus récentes en premier) et prendre les 50 dernières
             allGames = allGames
-              .filter(game => game.end_time) // Filtrer les parties sans date de fin
+              .filter((game) => game.end_time) // Filtrer les parties sans date de fin
               .sort((a, b) => b.end_time - a.end_time)
               .slice(0, 50);
 
             if (allGames.length > 0) {
               displayGamesPage();
               setupPagination();
-              gamesSection.style.display = "block";
+              gamesSection.classList.add("show");
             } else {
-              document.getElementById("games").innerHTML = "<p>Aucune partie trouvée.</p>";
-              gamesSection.style.display = "block";
+              document.getElementById("games").innerHTML =
+                "<p>Aucune partie trouvée.</p>";
+              gamesSection.classList.add("show");
             }
           } else {
-            document.getElementById("games").innerHTML = "<p>Aucune partie trouvée.</p>";
-            gamesSection.style.display = "block";
+            document.getElementById("games").innerHTML =
+              "<p>Aucune partie trouvée.</p>";
+            gamesSection.classList.add("show");
           }
         } catch (error) {
           console.error("Erreur lors de la récupération des parties:", error);
-          document.getElementById("games").innerHTML = "<p>Erreur lors du chargement des parties.</p>";
-          gamesSection.style.display = "block";
+          document.getElementById("games").innerHTML =
+            "<p>Erreur lors du chargement des parties.</p>";
+          gamesSection.classList.add("show");
         }
       }
 
@@ -244,11 +686,13 @@
         const endIndex = startIndex + gamesPerPage;
         const gamesToShow = allGames.slice(startIndex, endIndex);
 
-        let gamesHTML = "<table><tr><th>Date</th><th>Type de partie</th><th>Résultat</th><th>Opposant</th><th>Voir</th></tr>";
+        let gamesHTML =
+          "<table class='glass-table'><tr><th>Date</th><th>Type de partie</th><th>Résultat</th><th>Opposant</th><th>Voir</th></tr>";
 
         gamesToShow.forEach((game) => {
           const date = new Date(game.end_time * 1000).toLocaleString();
-          const isWhite = game.white.username.toLowerCase() === currentUsername.toLowerCase();
+          const isWhite =
+            game.white.username.toLowerCase() === currentUsername.toLowerCase();
           const result = isWhite ? game.white.result : game.black.result;
           const opponent = isWhite ? game.black.username : game.white.username;
           const time_class = game.time_class;
@@ -259,34 +703,34 @@
           let resClass = "";
           if (result === "win") {
             resText = "Victoire";
-            resClass = "bg-green-100";
+            resClass = "result-badge victory";
           } else if (result === "draw") {
             resText = "Nulle";
-            resClass = "bg-orange-100";
+            resClass = "result-badge draw";
           } else if (result === "resigned") {
             resText = "Défaite (Abandon)";
-            resClass = "bg-red-100";
+            resClass = "result-badge defeat";
           } else if (result === "timeout") {
             resText = "Défaite (TimeOut)";
-            resClass = "bg-red-100";
+            resClass = "result-badge defeat";
           } else if (result === "checkmated") {
             resText = "Défaite (Echec et mat)";
-            resClass = "bg-red-100";
+            resClass = "result-badge defeat";
           } else if (result === "abandoned") {
             resText = "Défaite (Abandon)";
-            resClass = "bg-red-100";
+            resClass = "result-badge defeat";
           } else {
             resText = "Défaite";
-            resClass = "bg-red-100";
+            resClass = "result-badge defeat";
           }
 
           gamesHTML += `
             <tr>
-              <td>${date}</td>
+              <td><strong>${date}</strong></td>
               <td>${time_class} (${time_control} min)</td>
-              <td class='${resClass}'>${resText}</td>
-              <td>${opponent}</td>
-              <td><a href="${url}" target="_blank">Voir</a></td>
+              <td><span class='${resClass}'>${resText}</span></td>
+              <td><strong>${opponent}</strong></td>
+              <td><a href="${url}" target="_blank" class="glass-button">Voir</a></td>
             </tr>`;
         });
         gamesHTML += "</table>";
@@ -296,7 +740,7 @@
       // Fonction pour configurer la pagination
       function setupPagination() {
         const totalPages = Math.ceil(allGames.length / gamesPerPage);
-        
+
         if (totalPages <= 1) {
           paginationDiv.style.display = "none";
           return;
@@ -331,7 +775,7 @@
             setupPagination();
           };
           paginationDiv.appendChild(firstButton);
-          
+
           if (startPage > 2) {
             const ellipsis = document.createElement("span");
             ellipsis.textContent = "...";
@@ -361,7 +805,7 @@
             ellipsis.className = "pagination-info";
             paginationDiv.appendChild(ellipsis);
           }
-          
+
           const lastButton = document.createElement("button");
           lastButton.textContent = totalPages;
           lastButton.onclick = () => {
@@ -408,10 +852,10 @@
 
       async function fetchAllData(username) {
         showLoader(true);
-        profileSection.style.display = "none";
-        statusSection.style.display = "none";
-        statsSection.style.display = "none";
-        gamesSection.style.display = "none";
+        profileSection.classList.remove("show");
+        statusSection.classList.remove("show");
+        statsSection.classList.remove("show");
+        gamesSection.classList.remove("show");
 
         document.getElementById("profile").innerHTML = "";
         document.getElementById("status").innerHTML = "";
@@ -430,37 +874,39 @@
           const profileData = await profileRes.json();
 
           document.getElementById("profile").innerHTML = `
-      <div style="display:flex; align-items:center; gap:20px;">
-        <img src="${
-          profileData.avatar
-        }" alt="Avatar" style="width:100px; border-radius:50%;" />
-        <div>
+      <div class="profile-content">
+        <img src="${profileData.avatar}" alt="Avatar" class="profile-avatar" />
+        <div class="profile-info">
           <h3>${profileData.username}</h3>
-          <p>Nom : ${profileData.name || "N/A"}</p>
-          <p>Bio : ${profileData.bio || "N/A"}</p>
-          <p>Localisation : ${profileData.location || "N/A"}</p>
+          <p><strong>Nom :</strong> ${profileData.name || "N/A"}</p>
+          <p><strong>Bio :</strong> ${profileData.bio || "N/A"}</p>
+          <p><strong>Localisation :</strong> ${
+            profileData.location || "N/A"
+          }</p>
         </div>
       </div>
     `;
-          profileSection.style.display = "block";
+          profileSection.classList.add("show");
 
           // Status (Online/Offline)
           fetch(`https://api.chess.com/pub/player/${username}/is-online`)
             .then((res) => res.json())
             .then((data) => {
-              // debugger
               if (data.code === 0) return;
+              const isOnline = data;
               const onlineStatusDiv = document.createElement("div");
-              onlineStatusDiv.innerHTML = `Status : <strong>${
-                data ? "En ligne" : "Hors ligne"
-              }</strong>
-          <span id="onlineIndicator" style="background-color:${
-            data ? "green" : "red"
-          }"></span>`;
+              onlineStatusDiv.className = "status-indicator";
+              onlineStatusDiv.innerHTML = `
+                <span class="status-dot ${
+                  isOnline ? "online" : "offline"
+                }"></span>
+                <span><strong>${
+                  isOnline ? "En ligne" : "Hors ligne"
+                }</strong></span>
+              `;
               document.getElementById("status").innerHTML = "";
               document.getElementById("status").appendChild(onlineStatusDiv);
-              document.getElementById("status").parentElement.style.display =
-                "block";
+              statusSection.classList.add("show");
             });
 
           // Stats
@@ -470,7 +916,7 @@
           const statsData = await statsRes.json();
 
           let statsHTML =
-            "<table><tr><th>Mode</th><th>Win %</th><th>Rating</th><th>Meilleur</th></tr>";
+            "<table class='glass-table'><tr><th>Mode</th><th>Win %</th><th>Rating</th><th>Meilleur</th></tr>";
 
           for (const key in statsData) {
             const stat = statsData[key];
@@ -483,7 +929,7 @@
               const winPercent = ((wins / total) * 100).toFixed(2);
               const bestLink =
                 stat.best && stat.best.game
-                  ? `<a href="${stat.best.game}" target="_blank">Voir</a>`
+                  ? `<a href="${stat.best.game}" target="_blank" class="glass-button">Voir</a>`
                   : "N/A";
 
               // Mode name
@@ -497,16 +943,16 @@
 
               statsHTML += `
         <tr>
-          <td>${modeName}</td>
+          <td><strong>${modeName}</strong></td>
           <td>${winPercent}%</td>
-          <td>${stat.last.rating}</td>
+          <td><strong>${stat.last.rating}</strong></td>
           <td>${bestLink}</td>
         </tr>`;
             }
           }
           statsHTML += "</table>";
           document.getElementById("stats").innerHTML = statsHTML;
-          statsSection.style.display = "block";
+          statsSection.classList.add("show");
 
           // Dernières parties avec pagination
           await fetchGamesWithPagination(username);
