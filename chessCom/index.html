@@ -858,18 +858,23 @@
       </section>
     </div>
     <script>
-      const userList = [
-        "hikaru",
-        "fabianocaruana",
-        "magnuscarlsen",
-        "alireza",
-        "animeboy",
-        "elharicot",
-        "bzhgrammaton",
-        "jchprn",
-        "blitzstream",
-        "lowki93",
-      ];
+      // Mapping entre identifiants et noms personnalisés
+      const userMapping = {
+        elharicot: "El Haricot",
+        lolou941: "Lolou",
+        blitzstream: "Blitz Stream",
+        jchprn: "Jérôme",
+        bzhgrammaton: "Johann",
+        fabianocaruana: "Fabiano Caruana",
+        alireza: "Alireza Firouzja",
+        animeboy: "Anime Boy",
+        magnuscarlsen: "Magnus Carlsen",
+        hikaru: "Hikaru Nakamura",
+        lowki93: "PaulL",
+        glmt6: "Guillaume (Caroline)",
+      };
+
+      const userList = Object.keys(userMapping);
 
       const select = document.getElementById("playerSelect");
       const loader = document.getElementById("loader");
@@ -912,8 +917,8 @@
             // Trier par date de fin (plus récentes en premier) et prendre les 200 dernières
             allGames = allGames
               .filter((game) => game.end_time) // Filtrer les parties sans date de fin
-              .sort((a, b) => b.end_time - a.end_time)
-              // .slice(0, 200);
+              .sort((a, b) => b.end_time - a.end_time);
+            // .slice(0, 200);
 
             if (allGames.length > 0) {
               // Afficher les onglets
@@ -1170,7 +1175,7 @@
         userList.forEach((user) => {
           const option = document.createElement("option");
           option.value = user;
-          option.textContent = user;
+          option.textContent = userMapping[user] || user;
           select.appendChild(option);
         });
 
