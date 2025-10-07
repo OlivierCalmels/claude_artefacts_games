@@ -874,6 +874,63 @@
         margin-top: 1rem;
       }
 
+      /* Opponents section */
+      .opponent-item {
+        background: var(--gradient-glass);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+        min-width: 280px;
+        box-shadow: var(--glass-shadow);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .opponent-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .opponent-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .opponent-stats {
+        display: flex;
+        gap: 0.75rem;
+        font-size: 0.9rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .stat-win {
+        color: #6ee7b7;
+        font-weight: 600;
+      }
+
+      .stat-draw {
+        color: #fcd34d;
+        font-weight: 600;
+      }
+
+      .stat-loss {
+        color: #fca5a5;
+        font-weight: 600;
+      }
+
+      .stat-total {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin-left: auto;
+      }
+
       .game-type-item {
         background: var(--gradient-glass);
         backdrop-filter: blur(20px);
@@ -989,6 +1046,26 @@
           font-size: 0.8rem;
           min-width: 100px;
         }
+
+        .opponent-item {
+          min-width: 100%;
+          padding: 0.875rem 1rem;
+        }
+
+        .opponent-name {
+          font-size: 0.95rem;
+        }
+
+        .opponent-stats {
+          font-size: 0.85rem;
+          gap: 0.5rem;
+        }
+
+        .stat-total {
+          width: 100%;
+          margin-left: 0;
+          margin-top: 0.25rem;
+        }
       }
 
       @media (max-width: 480px) {
@@ -1000,6 +1077,23 @@
           padding: 0.6rem 0.8rem;
           font-size: 0.75rem;
           min-width: 80px;
+        }
+
+        .opponent-item {
+          padding: 0.75rem 0.875rem;
+        }
+
+        .opponent-name {
+          font-size: 0.9rem;
+        }
+
+        .opponent-stats {
+          font-size: 0.8rem;
+          gap: 0.4rem;
+        }
+
+        .stat-total {
+          font-size: 0.75rem;
         }
       }
     </style>
@@ -1050,6 +1144,11 @@
       <section id="gameTypesSection" class="glass-card">
         <h2>Types de parties jouées</h2>
         <div id="gameTypes"></div>
+      </section>
+
+      <section id="opponentsSection" class="glass-card">
+        <h2>50 derniers adversaires</h2>
+        <div id="opponents"></div>
       </section>
     </div>
     <script>
@@ -1114,6 +1213,7 @@
       const statsSection = document.getElementById("statsSection");
       const gamesSection = document.getElementById("gamesSection");
       const gameTypesSection = document.getElementById("gameTypesSection");
+      const opponentsSection = document.getElementById("opponentsSection");
       const paginationDiv = document.getElementById("pagination");
 
       // Variables de pagination et filtrage
@@ -1168,12 +1268,16 @@
               gamesSection.classList.add("show");
               // Afficher les types de parties
               displayGameTypes();
+              // Afficher les adversaires
+              displayOpponents();
             } else {
               document.getElementById("games").innerHTML =
                 "<p>Aucune partie trouvée.</p>";
               gamesSection.classList.add("show");
               // Afficher les types de parties même si aucune partie
               displayGameTypes();
+              // Afficher les adversaires même si aucune partie
+              displayOpponents();
             }
           } else {
             document.getElementById("games").innerHTML =
@@ -1181,6 +1285,8 @@
             gamesSection.classList.add("show");
             // Afficher les types de parties même si aucune partie
             displayGameTypes();
+            // Afficher les adversaires même si aucune partie
+            displayOpponents();
           }
         } catch (error) {
           console.error("Erreur lors de la récupération des parties:", error);
@@ -1189,6 +1295,8 @@
           gamesSection.classList.add("show");
           // Afficher les types de parties même en cas d'erreur
           displayGameTypes();
+          // Afficher les adversaires même en cas d'erreur
+          displayOpponents();
         }
       }
 
@@ -1231,6 +1339,88 @@
         gameTypesHTML += "</div>";
         document.getElementById("gameTypes").innerHTML = gameTypesHTML;
         gameTypesSection.classList.add("show");
+      }
+
+      // Fonction pour afficher les 50 derniers adversaires
+      function displayOpponents() {
+        if (allGames.length === 0) {
+          document.getElementById("opponents").innerHTML =
+            "<p>Aucune partie trouvée.</p>";
+          opponentsSection.classList.add("show");
+          return;
+        }
+
+        // Extraire les adversaires des 50 dernières parties
+        const opponentsList = [];
+        const opponentsMap = new Map(); // Pour compter les parties contre chaque adversaire
+
+        allGames.slice(0, 100).forEach((game) => {
+          const isWhite =
+            game.white.username.toLowerCase() === currentUsername.toLowerCase();
+          const opponentUsername = isWhite
+            ? game.black.username
+            : game.white.username;
+          const opponentResult = isWhite ? game.black.result : game.white.result;
+
+          // Compter les statistiques pour chaque adversaire
+          if (!opponentsMap.has(opponentUsername)) {
+            opponentsMap.set(opponentUsername, {
+              username: opponentUsername,
+              wins: 0,
+              losses: 0,
+              draws: 0,
+              total: 0,
+            });
+          }
+
+          const stats = opponentsMap.get(opponentUsername);
+          stats.total++;
+
+          // Déterminer le résultat pour le joueur courant
+          const currentPlayerResult = isWhite
+            ? game.white.result
+            : game.black.result;
+          if (currentPlayerResult === "win") {
+            stats.wins++;
+          } else if (
+            currentPlayerResult === "draw" ||
+            currentPlayerResult === "agreed" ||
+            currentPlayerResult === "repetition" ||
+            currentPlayerResult === "stalemate" ||
+            currentPlayerResult === "insufficient"
+          ) {
+            stats.draws++;
+          } else {
+            stats.losses++;
+          }
+        });
+
+        // Convertir la Map en tableau et trier par nombre de parties
+        const sortedOpponents = Array.from(opponentsMap.values()).sort(
+          (a, b) => b.total - a.total
+        );
+
+        // Créer le HTML
+        let opponentsHTML = '<div class="game-types-list">';
+
+        sortedOpponents.forEach((opponent) => {
+          const winRate = ((opponent.wins / opponent.total) * 100).toFixed(0);
+          opponentsHTML += `
+            <div class="opponent-item">
+              <div class="opponent-name"><strong>${opponent.username}</strong></div>
+              <div class="opponent-stats">
+                <span class="stat-win">${opponent.wins}V</span>
+                <span class="stat-draw">${opponent.draws}N</span>
+                <span class="stat-loss">${opponent.losses}D</span>
+                <span class="stat-total">(${opponent.total} parties - ${winRate}%)</span>
+              </div>
+            </div>
+          `;
+        });
+
+        opponentsHTML += "</div>";
+        document.getElementById("opponents").innerHTML = opponentsHTML;
+        opponentsSection.classList.add("show");
       }
 
       // Fonction pour filtrer les parties par type
@@ -1444,12 +1634,14 @@
         statsSection.classList.remove("show");
         gamesSection.classList.remove("show");
         gameTypesSection.classList.remove("show");
+        opponentsSection.classList.remove("show");
 
         document.getElementById("profile").innerHTML = "";
         document.getElementById("status").innerHTML = "";
         document.getElementById("stats").innerHTML = "";
         document.getElementById("games").innerHTML = "";
         document.getElementById("gameTypes").innerHTML = "";
+        document.getElementById("opponents").innerHTML = "";
         document.getElementById("gameTabs").style.display = "none";
         paginationDiv.style.display = "none";
         allGames = [];
