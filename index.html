@@ -840,6 +840,47 @@
           <div class="score">
             Génération : <span id="generationCounter">0</span>
           </div>
+          <div style="text-align: center; margin-bottom: 10px">
+            <label
+              for="gridSizeSelect"
+              style="font-weight: bold; margin-right: 10px"
+            >
+              Taille :
+            </label>
+            <select
+              id="gridSizeSelect"
+              class="control-btn"
+              style="padding: 8px 16px; cursor: pointer"
+              onchange="changeGridSize(parseInt(this.value))"
+            >
+              <option value="15" selected>15x15</option>
+              <option value="20">20x20</option>
+              <option value="30">30x30</option>
+              <option value="50">50x50</option>
+            </select>
+          </div>
+          <div style="text-align: center; margin-bottom: 10px">
+            <label
+              for="speedSelect"
+              style="font-weight: bold; margin-right: 10px"
+            >
+              Vitesse :
+            </label>
+            <select
+              id="speedSelect"
+              class="control-btn"
+              style="padding: 8px 16px; cursor: pointer"
+              onchange="changeAnimationSpeed(parseInt(this.value))"
+            >
+              <option value="25">Très rapide (25ms)</option>
+              <option value="50">Très rapide (50ms)</option>
+              <option value="100">Rapide (100ms)</option>
+              <option value="200" selected>Normal (200ms)</option>
+              <option value="400">Assez lent (400ms)</option>
+              <option value="800">Très lent (800ms)</option>
+              <option value="1000">Ultra lent (1s)</option>
+            </select>
+          </div>
           <canvas id="jeuDeLaVieCanvas" width="400" height="400"></canvas>
           <div class="instructions">
             🎮 Cliquez sur les cellules pour les activer/désactiver (même
@@ -869,66 +910,52 @@
               🎲 Aléatoire
             </button>
           </div>
-          <div class="instructions" style="margin-top: 20px; font-weight: bold">
-            📐 Formes prédéfinies :
-          </div>
-          <div class="controls" style="flex-wrap: wrap; margin-top: 10px">
-            <button
-              class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('glider')"
+          <div style="text-align: center; margin-top: 20px">
+            <label
+              for="patternSelect"
+              style="font-weight: bold; margin-right: 10px"
             >
-              ✈️ Planeur
-            </button>
-            <button
+              Formes prédéfinies :
+            </label>
+            <select
+              id="patternSelect"
               class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('gosperGliderGun')"
+              style="padding: 8px 16px; cursor: pointer"
+              onchange="if(this.value) { placePattern(this.value); }"
             >
-              🔫 Canon
-            </button>
-            <button
-              class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('pulsar')"
-            >
-              💫 Pulsar
-            </button>
-            <button
-              class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('lwss')"
-            >
-              🚀 Vaisseau
-            </button>
-            <button
-              class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('blinker')"
-            >
-              ⚡ Barre
-            </button>
-            <button
-              class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('beacon')"
-            >
-              🔦 Balise
-            </button>
-            <button
-              class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('toad')"
-            >
-              🐸 Crapaud
-            </button>
-            <button
-              class="control-btn"
-              style="font-size: 0.9rem; padding: 8px 16px"
-              onclick="placePattern('rPentomino')"
-            >
-              🌀 R-pentomino
-            </button>
+              <option value="">-- Choisir une forme --</option>
+              <optgroup label="🚀 Vaisseaux spatiaux">
+                <option value="glider">✈️ Planeur</option>
+                <option value="lwss">🚀 Vaisseau léger</option>
+                <option value="mwss">🛸 Vaisseau moyen</option>
+                <option value="hwss">🛰️ Vaisseau lourd</option>
+              </optgroup>
+              <optgroup label="🔫 Canons">
+                <option value="gosperGliderGun">🔫 Canon à planeurs</option>
+              </optgroup>
+              <optgroup label="⚡ Oscillateurs">
+                <option value="blinker">⚡ Barre clignotante</option>
+                <option value="toad">🐸 Crapaud</option>
+                <option value="beacon">🔦 Balise</option>
+                <option value="pulsar">💫 Pulsar</option>
+                <option value="pentadecathlon">🌟 Pentadecathlon</option>
+                <option value="galaxy">🌌 Galaxie</option>
+              </optgroup>
+              <optgroup label="🏠 Vies statiques">
+                <option value="block">⬛ Bloc</option>
+                <option value="beehive">🍯 Ruche</option>
+                <option value="loaf">🍞 Pain</option>
+                <option value="boat">⛵ Bateau</option>
+              </optgroup>
+              <optgroup label="🎲 Méthusélahs (chaotiques)">
+                <option value="rPentomino">🌀 R-pentomino</option>
+                <option value="diehard">💀 Diehard</option>
+                <option value="acorn">🌰 Gland</option>
+              </optgroup>
+              <optgroup label="🚂 Autres">
+                <option value="pufferTrain">🚂 Train à fumée</option>
+              </optgroup>
+            </select>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 // Jeu de la Vie de Conway - Namespace pour éviter les conflits
 (function () {
-  const GRID_SIZE = 30; // Taille totale de la grille
-  const VISIBLE_SIZE = 15; // Taille de la zone visible
+  let GRID_SIZE = 30; // Taille totale de la grille
+  let VISIBLE_SIZE = 15; // Taille de la zone visible
   let canvas = null;
   let ctx = null;
   let CELL_SIZE = 20;
@@ -13,6 +13,7 @@
   let generation = 0;
   let offsetX = 0; // Décalage horizontal de la vue
   let offsetY = 0; // Décalage vertical de la vue
+  let animationSpeed = 200; // Vitesse en ms (200ms par défaut)
 
   // Initialiser la grille
   function initGrid() {
@@ -146,12 +147,25 @@
       isPlaying = true;
       intervalId = setInterval(() => {
         nextGeneration();
-      }, 200);
+      }, animationSpeed);
       // Mettre à jour le bouton
       const btn = document.getElementById("playPauseBtn");
       if (btn) {
         btn.innerHTML = "⏸️ Pause";
       }
+    }
+  };
+
+  // Changer la vitesse d'animation
+  window.changeAnimationSpeed = function (speed) {
+    animationSpeed = speed;
+
+    // Si l'animation est en cours, la redémarrer avec la nouvelle vitesse
+    if (isPlaying) {
+      clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        nextGeneration();
+      }, animationSpeed);
     }
   };
 
@@ -275,6 +289,32 @@
     offsetX = Math.floor((GRID_SIZE - VISIBLE_SIZE) / 2);
     offsetY = Math.floor((GRID_SIZE - VISIBLE_SIZE) / 2);
   }
+
+  // Changer la taille de la grille visible
+  window.changeGridSize = function (newVisibleSize) {
+    window.pauseGameOfLife();
+
+    VISIBLE_SIZE = newVisibleSize;
+    GRID_SIZE = VISIBLE_SIZE * 2;
+
+    // Recalculer la taille des cellules
+    if (canvas) {
+      CELL_SIZE = canvas.width / VISIBLE_SIZE;
+    }
+
+    // Réinitialiser la grille
+    generation = 0;
+    initGrid();
+    centerView();
+    drawGrid();
+    updateGenerationCounter();
+
+    // Mettre à jour le sélecteur visuellement
+    const select = document.getElementById("gridSizeSelect");
+    if (select) {
+      select.value = newVisibleSize;
+    }
+  };
 
   // Initialiser le jeu de la vie
   window.initGameOfLife = function () {
