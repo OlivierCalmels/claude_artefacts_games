@@ -1147,8 +1147,13 @@
       </section>
 
       <section id="opponentsSection" class="glass-card">
-        <h2>50 derniers adversaires</h2>
+        <h2>Adversaires récents</h2>
         <div id="opponents"></div>
+        <div
+          id="opponentsPagination"
+          class="pagination"
+          style="display: none"
+        ></div>
       </section>
     </div>
     <script>
@@ -1215,6 +1220,9 @@
       const gameTypesSection = document.getElementById("gameTypesSection");
       const opponentsSection = document.getElementById("opponentsSection");
       const paginationDiv = document.getElementById("pagination");
+      const opponentsPaginationDiv = document.getElementById(
+        "opponentsPagination"
+      );
 
       // Variables de pagination et filtrage
       let allGames = [];
@@ -1223,6 +1231,11 @@
       const gamesPerPage = 5;
       let currentUsername = "";
       let currentGameType = "all";
+
+      // Variables pour la pagination des adversaires
+      let allOpponents = [];
+      let currentOpponentsPage = 1;
+      const opponentsPerPage = 10;
 
       // Fonction pour récupérer les 200 dernières parties
       async function fetchGamesWithPagination(username) {
@@ -1341,17 +1354,14 @@
         gameTypesSection.classList.add("show");
       }
 
-      // Fonction pour afficher les 50 derniers adversaires
-      function displayOpponents() {
+      // Fonction pour calculer les statistiques des adversaires
+      function calculateOpponents() {
         if (allGames.length === 0) {
-          document.getElementById("opponents").innerHTML =
-            "<p>Aucune partie trouvée.</p>";
-          opponentsSection.classList.add("show");
+          allOpponents = [];
           return;
         }
 
-        // Extraire les adversaires des 50 dernières parties
-        const opponentsList = [];
+        // Extraire les adversaires des 100 dernières parties
         const opponentsMap = new Map(); // Pour compter les parties contre chaque adversaire
 
         allGames.slice(0, 100).forEach((game) => {
@@ -1360,7 +1370,6 @@
           const opponentUsername = isWhite
             ? game.black.username
             : game.white.username;
-          const opponentResult = isWhite ? game.black.result : game.white.result;
 
           // Compter les statistiques pour chaque adversaire
           if (!opponentsMap.has(opponentUsername)) {
@@ -1396,14 +1405,29 @@
         });
 
         // Convertir la Map en tableau et trier par nombre de parties
-        const sortedOpponents = Array.from(opponentsMap.values()).sort(
+        allOpponents = Array.from(opponentsMap.values()).sort(
           (a, b) => b.total - a.total
         );
+      }
+
+      // Fonction pour afficher une page d'adversaires
+      function displayOpponentsPage() {
+        if (allOpponents.length === 0) {
+          document.getElementById("opponents").innerHTML =
+            "<p>Aucun adversaire trouvé.</p>";
+          opponentsPaginationDiv.style.display = "none";
+          opponentsSection.classList.add("show");
+          return;
+        }
+
+        const startIndex = (currentOpponentsPage - 1) * opponentsPerPage;
+        const endIndex = startIndex + opponentsPerPage;
+        const opponentsToShow = allOpponents.slice(startIndex, endIndex);
 
         // Créer le HTML
         let opponentsHTML = '<div class="game-types-list">';
 
-        sortedOpponents.forEach((opponent) => {
+        opponentsToShow.forEach((opponent) => {
           const winRate = ((opponent.wins / opponent.total) * 100).toFixed(0);
           opponentsHTML += `
             <div class="opponent-item">
@@ -1421,6 +1445,113 @@
         opponentsHTML += "</div>";
         document.getElementById("opponents").innerHTML = opponentsHTML;
         opponentsSection.classList.add("show");
+      }
+
+      // Fonction pour configurer la pagination des adversaires
+      function setupOpponentsPagination() {
+        const totalPages = Math.ceil(allOpponents.length / opponentsPerPage);
+
+        if (totalPages <= 1) {
+          opponentsPaginationDiv.style.display = "none";
+          return;
+        }
+
+        opponentsPaginationDiv.style.display = "flex";
+        opponentsPaginationDiv.innerHTML = "";
+
+        // Bouton Précédent
+        const prevButton = document.createElement("button");
+        prevButton.textContent = "« Précédent";
+        prevButton.disabled = currentOpponentsPage === 1;
+        prevButton.onclick = () => {
+          if (currentOpponentsPage > 1) {
+            currentOpponentsPage--;
+            displayOpponentsPage();
+            setupOpponentsPagination();
+          }
+        };
+        opponentsPaginationDiv.appendChild(prevButton);
+
+        // Numéros de pages
+        const startPage = Math.max(1, currentOpponentsPage - 2);
+        const endPage = Math.min(totalPages, currentOpponentsPage + 2);
+
+        if (startPage > 1) {
+          const firstButton = document.createElement("button");
+          firstButton.textContent = "1";
+          firstButton.onclick = () => {
+            currentOpponentsPage = 1;
+            displayOpponentsPage();
+            setupOpponentsPagination();
+          };
+          opponentsPaginationDiv.appendChild(firstButton);
+
+          if (startPage > 2) {
+            const ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            ellipsis.className = "pagination-info";
+            opponentsPaginationDiv.appendChild(ellipsis);
+          }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+          const pageButton = document.createElement("button");
+          pageButton.textContent = i;
+          if (i === currentOpponentsPage) {
+            pageButton.className = "current-page";
+          }
+          pageButton.onclick = () => {
+            currentOpponentsPage = i;
+            displayOpponentsPage();
+            setupOpponentsPagination();
+          };
+          opponentsPaginationDiv.appendChild(pageButton);
+        }
+
+        if (endPage < totalPages) {
+          if (endPage < totalPages - 1) {
+            const ellipsis = document.createElement("span");
+            ellipsis.textContent = "...";
+            ellipsis.className = "pagination-info";
+            opponentsPaginationDiv.appendChild(ellipsis);
+          }
+
+          const lastButton = document.createElement("button");
+          lastButton.textContent = totalPages;
+          lastButton.onclick = () => {
+            currentOpponentsPage = totalPages;
+            displayOpponentsPage();
+            setupOpponentsPagination();
+          };
+          opponentsPaginationDiv.appendChild(lastButton);
+        }
+
+        // Bouton Suivant
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Suivant »";
+        nextButton.disabled = currentOpponentsPage === totalPages;
+        nextButton.onclick = () => {
+          if (currentOpponentsPage < totalPages) {
+            currentOpponentsPage++;
+            displayOpponentsPage();
+            setupOpponentsPagination();
+          }
+        };
+        opponentsPaginationDiv.appendChild(nextButton);
+
+        // Information sur la pagination
+        const info = document.createElement("span");
+        info.className = "pagination-info";
+        info.textContent = `Page ${currentOpponentsPage} sur ${totalPages} (${allOpponents.length} adversaires)`;
+        opponentsPaginationDiv.appendChild(info);
+      }
+
+      // Fonction pour initialiser l'affichage des adversaires
+      function displayOpponents() {
+        calculateOpponents();
+        currentOpponentsPage = 1;
+        displayOpponentsPage();
+        setupOpponentsPagination();
       }
 
       // Fonction pour filtrer les parties par type
@@ -1644,9 +1775,12 @@
         document.getElementById("opponents").innerHTML = "";
         document.getElementById("gameTabs").style.display = "none";
         paginationDiv.style.display = "none";
+        opponentsPaginationDiv.style.display = "none";
         allGames = [];
         filteredGames = [];
+        allOpponents = [];
         currentPage = 1;
+        currentOpponentsPage = 1;
         currentGameType = "all";
 
         try {
