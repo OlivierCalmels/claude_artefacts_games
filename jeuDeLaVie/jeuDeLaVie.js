@@ -71,8 +71,21 @@
     }
   }
 
+  // Vérifier si la grille a changé
+  function hasGridChanged(oldGrid, newGrid) {
+    for (let i = 0; i < GRID_SIZE; i++) {
+      for (let j = 0; j < GRID_SIZE; j++) {
+        if (oldGrid[i][j] !== newGrid[i][j]) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   // Calculer la prochaine génération
   function nextGeneration() {
+    const oldGrid = JSON.parse(JSON.stringify(grid));
     const newGrid = [];
 
     for (let i = 0; i < GRID_SIZE; i++) {
@@ -90,28 +103,51 @@
       }
     }
 
+    // Si la grille n'a pas changé, arrêter l'animation
+    if (!hasGridChanged(oldGrid, newGrid)) {
+      window.pauseGameOfLife();
+      return;
+    }
+
     grid = newGrid;
     generation++;
     drawGrid();
     updateGenerationCounter();
   }
 
-  // Démarrer le jeu
-  window.playGameOfLife = function () {
-    if (isPlaying) return;
-
-    isPlaying = true;
-    intervalId = setInterval(() => {
-      nextGeneration();
-    }, 200);
+  // Basculer entre lecture et pause
+  window.togglePlayPauseGameOfLife = function () {
+    if (isPlaying) {
+      // Mettre en pause
+      isPlaying = false;
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+      // Mettre à jour le bouton
+      const btn = document.getElementById("playPauseBtn");
+      if (btn) {
+        btn.innerHTML = "▶️ Lecture";
+      }
+    } else {
+      // Démarrer
+      isPlaying = true;
+      intervalId = setInterval(() => {
+        nextGeneration();
+      }, 200);
+      // Mettre à jour le bouton
+      const btn = document.getElementById("playPauseBtn");
+      if (btn) {
+        btn.innerHTML = "⏸️ Pause";
+      }
+    }
   };
 
-  // Mettre en pause
+  // Compatibilité avec les anciens appels
+  window.playGameOfLife = window.togglePlayPauseGameOfLife;
   window.pauseGameOfLife = function () {
-    isPlaying = false;
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
+    if (isPlaying) {
+      window.togglePlayPauseGameOfLife();
     }
   };
 
@@ -133,6 +169,35 @@
         grid[i][j] = Math.random() > 0.7;
       }
     }
+    drawGrid();
+    updateGenerationCounter();
+  };
+
+  // Placer une forme prédéfinie
+  window.placePattern = function (patternKey) {
+    if (!LIFE_PATTERNS || !LIFE_PATTERNS[patternKey]) {
+      console.error("Pattern non trouvé:", patternKey);
+      return;
+    }
+
+    window.pauseGameOfLife();
+    generation = 0;
+    initGrid();
+
+    const pattern = LIFE_PATTERNS[patternKey];
+    const startRow = Math.floor((GRID_SIZE - pattern.height) / 2);
+    const startCol = Math.floor((GRID_SIZE - pattern.width) / 2);
+
+    for (let i = 0; i < pattern.pattern.length; i++) {
+      for (let j = 0; j < pattern.pattern[i].length; j++) {
+        const row = startRow + i;
+        const col = startCol + j;
+        if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
+          grid[row][col] = pattern.pattern[i][j] === 1;
+        }
+      }
+    }
+
     drawGrid();
     updateGenerationCounter();
   };
