@@ -1053,20 +1053,56 @@
       </section>
     </div>
     <script>
-      // Mapping entre identifiants et noms personnalisés
+      // Mapping entre identifiants, noms personnalisés et avatars
       const userMapping = {
-        elharicot: "El Haricot",
-        lolou941: "Lolou",
-        blitzstream: "Blitz Stream",
-        jchprn: "Jérôme",
-        bzhgrammaton: "Johann",
-        fabianocaruana: "Fabiano Caruana",
-        alireza: "Alireza Firouzja",
-        animeboy: "Anime Boy",
-        magnuscarlsen: "Magnus Carlsen",
-        hikaru: "Hikaru Nakamura",
-        lowki93: "PaulL",
-        glmt6: "Guillaume (Caroline)",
+        elharicot: {
+          name: "El Haricot",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=elharicot",
+        },
+        lolou941: {
+          name: "Lolou",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=lolou",
+        },
+        blitzstream: {
+          name: "Blitz Stream",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=blitzstream",
+        },
+        jchprn: {
+          name: "Jérôme",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=jerome",
+        },
+        bzhgrammaton: {
+          name: "Johann",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=johann",
+        },
+        fabianocaruana: {
+          name: "Fabiano Caruana",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=fabiano",
+        },
+        alireza: {
+          name: "Alireza Firouzja",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alireza",
+        },
+        animeboy: {
+          name: "Anime Boy",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=animeboy",
+        },
+        magnuscarlsen: {
+          name: "Magnus Carlsen",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=magnus",
+        },
+        hikaru: {
+          name: "Hikaru Nakamura",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=hikaru",
+        },
+        lowki93: {
+          name: "PaulL",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=paull",
+        },
+        glmt6: {
+          name: "Guillaume (Caroline)",
+          avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=guillaume",
+        },
       };
 
       const userList = Object.keys(userMapping);
@@ -1370,7 +1406,7 @@
         userList.forEach((user) => {
           const option = document.createElement("option");
           option.value = user;
-          option.textContent = userMapping[user] || user;
+          option.textContent = userMapping[user]?.name || user;
           select.appendChild(option);
         });
 
@@ -1429,9 +1465,15 @@
           if (!profileRes.ok) throw new Error("Profil non trouvé");
           const profileData = await profileRes.json();
 
+          // Utiliser l'avatar de l'API ou l'avatar personnalisé du mapping
+          const avatarUrl =
+            profileData.avatar ||
+            userMapping[username]?.avatar ||
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+
           document.getElementById("profile").innerHTML = `
       <div class="profile-content">
-        <img src="${profileData.avatar}" alt="Avatar" class="profile-avatar" />
+        <img src="${avatarUrl}" alt="Avatar" class="profile-avatar" />
         <div class="profile-info">
           <h3>${profileData.username}</h3>
           <p><strong>Nom :</strong> ${profileData.name || "N/A"}</p>
