@@ -9,6 +9,7 @@
   let isPlaying = false;
   let intervalId = null;
   let isInitialized = false;
+  let generation = 0;
 
   // Initialiser la grille
   function initGrid() {
@@ -62,6 +63,14 @@
     return count;
   }
 
+  // Mettre à jour le compteur
+  function updateGenerationCounter() {
+    const counter = document.getElementById("generationCounter");
+    if (counter) {
+      counter.textContent = generation;
+    }
+  }
+
   // Calculer la prochaine génération
   function nextGeneration() {
     const newGrid = [];
@@ -82,7 +91,9 @@
     }
 
     grid = newGrid;
+    generation++;
     drawGrid();
+    updateGenerationCounter();
   }
 
   // Démarrer le jeu
@@ -107,24 +118,28 @@
   // Réinitialiser
   window.resetGameOfLife = function () {
     window.pauseGameOfLife();
+    generation = 0;
     initGrid();
     drawGrid();
+    updateGenerationCounter();
   };
 
   // Générer une configuration aléatoire
   window.randomizeGameOfLife = function () {
     window.pauseGameOfLife();
+    generation = 0;
     for (let i = 0; i < GRID_SIZE; i++) {
       for (let j = 0; j < GRID_SIZE; j++) {
         grid[i][j] = Math.random() > 0.7;
       }
     }
     drawGrid();
+    updateGenerationCounter();
   };
 
   // Gérer les clics sur le canvas
   function handleCanvasClick(e) {
-    if (!canvas || isPlaying) return;
+    if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -142,7 +157,7 @@
   // Gérer les événements tactiles
   function handleCanvasTouchStart(e) {
     e.preventDefault();
-    if (!canvas || isPlaying) return;
+    if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
@@ -182,6 +197,7 @@
     }
 
     drawGrid();
+    updateGenerationCounter();
   };
 
   // Initialiser au chargement de la page

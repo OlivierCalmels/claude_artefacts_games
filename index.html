@@ -837,9 +837,13 @@
         </div>
         <!-- Jeu de la Vie -->
         <div class="game-container" id="game8">
+          <div class="score">
+            Génération : <span id="generationCounter">0</span>
+          </div>
           <canvas id="jeuDeLaVieCanvas" width="400" height="400"></canvas>
           <div class="instructions">
-            🎮 Cliquez sur les cellules pour les activer/désactiver
+            🎮 Cliquez sur les cellules pour les activer/désactiver (même
+            pendant l'animation)
           </div>
           <div class="controls">
             <button
