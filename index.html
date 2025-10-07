@@ -1,435 +1,878 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jeux Mobile</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            min-height: 100vh;
-            color: #222;
-        }
-        .header {
-            background: #1976d2;
-            color: white;
-            padding: 24px 0 16px 0;
-            text-align: center;
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-size: 2.2rem;
-            letter-spacing: 2px;
-            box-shadow: 0 2px 12px rgba(30,60,120,0.08);
-        }
+      body {
+        font-family: "Roboto", Arial, sans-serif;
+        background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        min-height: 100vh;
+        color: #222;
+      }
+      .header {
+        background: #1976d2;
+        color: white;
+        padding: 24px 0 16px 0;
+        text-align: center;
+        font-family: "Montserrat", Arial, sans-serif;
+        font-size: 2.2rem;
+        letter-spacing: 2px;
+        box-shadow: 0 2px 12px rgba(30, 60, 120, 0.08);
+      }
+      .container {
+        /* max-width: 480px; */
+        margin: 32px auto 0 auto;
+        background: white;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(30, 60, 120, 0.1);
+        padding: 0 0 24px 0;
+      }
+      .tabs {
+        display: flex;
+        background: #e3eafc;
+        border-radius: 18px 18px 0 0;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(30, 60, 120, 0.04);
+      }
+      .tab {
+        flex: 1;
+        padding: 18px 0;
+        text-align: center;
+        background: transparent;
+        border: none;
+        color: #1976d2;
+        font-size: 1.1rem;
+        font-family: "Montserrat", Arial, sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .tab.active {
+        background: #1976d2;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(30, 60, 120, 0.08);
+      }
+      .tab-content {
+        background: #f7fafd;
+        border-radius: 0 0 18px 18px;
+        padding: 24px 12px 12px 12px;
+        min-height: 420px;
+      }
+      .game-container {
+        display: none;
+        text-align: center;
+      }
+      .game-container.active {
+        display: block;
+      }
+      #pongCanvas,
+      #jeu2Canvas,
+      #jeu3Canvas,
+      #jeu4Canvas,
+      #jeuDeLaVieCanvas {
+        border: 3px solid #1976d2;
+        border-radius: 16px;
+        background: #b3e0ff;
+        box-shadow: 0 4px 24px rgba(30, 60, 120, 0.1);
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 18px;
+      }
+      #jeuDeLaVieCanvas {
+        background: #ffffff;
+        display: block;
+        margin: 0 auto;
+      }
+      .score {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 18px;
+        font-size: 2.1rem;
+        font-family: "Montserrat", Arial, sans-serif;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      .score span {
+        background: #fff;
+        color: #1976d2;
+        border-radius: 50%;
+        padding: 8px 18px;
+        box-shadow: 0 2px 8px rgba(30, 60, 120, 0.08);
+        min-width: 48px;
+        display: inline-block;
+      }
+      .instructions {
+        font-size: 1rem;
+        margin: 10px 0 18px 0;
+        opacity: 0.8;
+      }
+      .controls {
+        margin: 18px 0 0 0;
+      }
+      .control-btn {
+        background: #1976d2;
+        border: none;
+        color: white;
+        padding: 12px 28px;
+        margin: 5px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-family: "Montserrat", Arial, sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(30, 60, 120, 0.08);
+      }
+      .control-btn:hover,
+      .control-btn:active {
+        background: #1251a3;
+        transform: scale(0.97);
+      }
+      .control-btn:focus {
+        outline: none;
+        background: #1251a3;
+      }
+      @media (max-width: 600px) {
         .container {
-            /* max-width: 480px; */
-            margin: 32px auto 0 auto;
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 8px 32px rgba(30,60,120,0.10);
-            padding: 0 0 24px 0;
-        }
-        .tabs {
-            display: flex;
-            background: #e3eafc;
-            border-radius: 18px 18px 0 0;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(30,60,120,0.04);
-        }
-        .tab {
-            flex: 1;
-            padding: 18px 0;
-            text-align: center;
-            background: transparent;
-            border: none;
-            color: #1976d2;
-            font-size: 1.1rem;
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab.active {
-            background: #1976d2;
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(30,60,120,0.08);
+          margin: 10px 2px 0 2px;
+          border-radius: 10px;
         }
         .tab-content {
-            background: #f7fafd;
-            border-radius: 0 0 18px 18px;
-            padding: 24px 12px 12px 12px;
-            min-height: 420px;
-        }
-        .game-container {
-            display: none;
-            text-align: center;
-        }
-        .game-container.active {
-            display: block;
-        }
-        #pongCanvas, #jeu2Canvas, #jeu3Canvas, #jeu4Canvas {
-            border: 3px solid #1976d2;
-            border-radius: 16px;
-            background: #b3e0ff;
-            box-shadow: 0 4px 24px rgba(30,60,120,0.10);
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 18px;
+          padding: 12px 2px 8px 2px;
+          min-height: 320px;
         }
         .score {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 18px;
-            font-size: 2.1rem;
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 700;
-            margin-bottom: 10px;
+          font-size: 1.3rem;
         }
-        .score span {
-            background: #fff;
-            color: #1976d2;
-            border-radius: 50%;
-            padding: 8px 18px;
-            box-shadow: 0 2px 8px rgba(30,60,120,0.08);
-            min-width: 48px;
-            display: inline-block;
-        }
-        .instructions {
-            font-size: 1rem;
-            margin: 10px 0 18px 0;
-            opacity: 0.8;
-        }
-        .controls {
-            margin: 18px 0 0 0;
-        }
-        .control-btn {
-            background: #1976d2;
-            border: none;
-            color: white;
-            padding: 12px 28px;
-            margin: 5px;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 8px rgba(30,60,120,0.08);
-        }
-        .control-btn:hover, .control-btn:active {
-            background: #1251a3;
-            transform: scale(0.97);
-        }
-        .control-btn:focus {
-            outline: none;
-            background: #1251a3;
-        }
-        @media (max-width: 600px) {
-            .container {
-                margin: 10px 2px 0 2px;
-                border-radius: 10px;
-            }
-            .tab-content {
-                padding: 12px 2px 8px 2px;
-                min-height: 320px;
-            }
-            .score {
-                font-size: 1.3rem;
-            }
+      }
+      .cards80s {
+        display: flex;
+        gap: 32px;
+        justify-content: center;
+        margin: 48px 0 32px 0;
+        flex-wrap: wrap;
+        padding: 0 20px;
+        box-sizing: border-box;
+      }
+      .card80s {
+        background: linear-gradient(135deg, #ff00cc 0%, #333399 100%);
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(30, 60, 120, 0.18);
+        padding: 32px 24px 24px 24px;
+        min-width: 200px;
+        max-width: 340px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 3px solid #fff;
+        position: relative;
+        margin: 0 auto 24px auto;
+        box-sizing: border-box;
+      }
+      .card80s.pong {
+        background: linear-gradient(135deg, #00eaff 0%, #ff00cc 100%);
+      }
+      .card80s.football {
+        background: linear-gradient(135deg, #ffea00 0%, #ff00cc 100%);
+      }
+      .card80s.chess {
+        background: linear-gradient(135deg, #00ff88 0%, #ff0080 100%);
+      }
+      .card80s.time-calculator {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+      }
+      .card80s.life-game {
+        background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%);
+      }
+      .card80s:hover {
+        transform: scale(1.04) rotate(-2deg);
+        box-shadow: 0 16px 48px rgba(30, 60, 120, 0.22);
+        z-index: 2;
+      }
+      .card-img svg {
+        width: 100%;
+        height: auto;
+        max-width: 80px;
+        display: block;
+        margin: 0 auto;
+      }
+      .card-img {
+        width: 100%;
+        max-width: 90px;
+        margin: 0 auto 12px auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .card-title {
+        font-family: "Montserrat", Arial, sans-serif;
+        font-size: 2rem;
+        color: #fff;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 8px #222, 0 0 8px #ff00cc;
+        margin-bottom: 18px;
+      }
+      .card-btn {
+        background: #fff;
+        color: #ff00cc;
+        font-family: "Montserrat", Arial, sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 32px;
+        box-shadow: 0 2px 8px rgba(30, 60, 120, 0.1);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .card-btn:hover {
+        background: #ff00cc;
+        color: #fff;
+        transform: scale(1.06);
+      }
+      @media (max-width: 600px) {
+        .container {
+          margin: 10px 5px 0 5px;
+          border-radius: 10px;
         }
         .cards80s {
-            display: flex;
-            gap: 32px;
-            justify-content: center;
-            margin: 48px 0 32px 0;
-            flex-wrap: wrap;
-            padding: 0 20px;
-            box-sizing: border-box;
+          flex-direction: column;
+          gap: 18px;
+          margin: 24px 0 12px 0;
+          padding: 0 15px;
         }
         .card80s {
-            background: linear-gradient(135deg, #ff00cc 0%, #333399 100%);
-            border-radius: 18px;
-            box-shadow: 0 8px 32px rgba(30,60,120,0.18);
-            padding: 32px 24px 24px 24px;
-            min-width: 200px;
-            max-width: 340px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: 3px solid #fff;
-            position: relative;
-            margin: 0 auto 24px auto;
-            box-sizing: border-box;
+          min-width: 0;
+          width: calc(100% - 30px);
+          max-width: calc(100% - 30px);
+          margin: 0 auto;
+          padding: 24px 16px 20px 16px;
         }
-        .card80s.pong {
-            background: linear-gradient(135deg, #00eaff 0%, #ff00cc 100%);
-        }
-        .card80s.football {
-            background: linear-gradient(135deg, #ffea00 0%, #ff00cc 100%);
-        }
-        .card80s.chess {
-            background: linear-gradient(135deg, #00ff88 0%, #ff0080 100%);
-        }
-        .card80s.time-calculator {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-        }
-        .card80s:hover {
-            transform: scale(1.04) rotate(-2deg);
-            box-shadow: 0 16px 48px rgba(30,60,120,0.22);
-            z-index: 2;
-        }
-        .card-img svg {
-            width: 100%;
-            height: auto;
-            max-width: 80px;
-            display: block;
-            margin: 0 auto;
-        }
-        .card-img {
-            width: 100%;
-            max-width: 90px;
-            margin: 0 auto 12px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .card-title {
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-size: 2rem;
-            color: #fff;
-            letter-spacing: 2px;
-            text-shadow: 0 2px 8px #222, 0 0 8px #ff00cc;
-            margin-bottom: 18px;
-        }
-        .card-btn {
-            background: #fff;
-            color: #ff00cc;
-            font-family: 'Montserrat', Arial, sans-serif;
-            font-weight: 700;
-            font-size: 1.1rem;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 32px;
-            box-shadow: 0 2px 8px rgba(30,60,120,0.10);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .card-btn:hover {
-            background: #ff00cc;
-            color: #fff;
-            transform: scale(1.06);
-        }
-        @media (max-width: 600px) {
-            .container {
-                margin: 10px 5px 0 5px;
-                border-radius: 10px;
-            }
-            .cards80s {
-                flex-direction: column;
-                gap: 18px;
-                margin: 24px 0 12px 0;
-                padding: 0 15px;
-            }
-            .card80s {
-                min-width: 0;
-                width: calc(100% - 30px);
-                max-width: calc(100% - 30px);
-                margin: 0 auto;
-                padding: 24px 16px 20px 16px;
-            }
-        }
+      }
+      .csv-btns-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+      .csv-btns-row .control-btn {
+        max-width: 220px;
+        margin: 0 auto;
+        display: block;
+      }
+      @media (max-width: 600px) {
         .csv-btns-row {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
+          flex-direction: column;
+          gap: 8px;
+          align-items: center;
+          justify-content: center;
         }
         .csv-btns-row .control-btn {
-            max-width: 220px;
-            margin: 0 auto;
-            display: block;
+          margin-left: 0 !important;
+          max-width: 220px;
+          margin: 0 auto;
         }
-        @media (max-width: 600px) {
-            .csv-btns-row {
-                flex-direction: column;
-                gap: 8px;
-                align-items: center;
-                justify-content: center;
-            }
-            .csv-btns-row .control-btn {
-                margin-left: 0 !important;
-                max-width: 220px;
-                margin: 0 auto;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="tabs">
-            <button class="tab active" ontouchstart="switchTab(0)" onclick="switchTab(0)">🏠 Accueil</button>
+      <div class="tabs">
+        <button
+          class="tab active"
+          ontouchstart="switchTab(0)"
+          onclick="switchTab(0)"
+        >
+          🏠 Accueil
+        </button>
+      </div>
+      <div class="tab-content">
+        <!-- Accueil -->
+        <div class="game-container active" id="home">
+          <div class="cards80s">
+            <div class="card80s pong">
+              <div class="card-img">
+                <!-- SVG Pong années 80 -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <rect
+                    x="10"
+                    y="20"
+                    width="8"
+                    height="20"
+                    rx="3"
+                    fill="#fff"
+                    stroke="#ff00cc"
+                    stroke-width="2"
+                  />
+                  <rect
+                    x="62"
+                    y="20"
+                    width="8"
+                    height="20"
+                    rx="3"
+                    fill="#fff"
+                    stroke="#00eaff"
+                    stroke-width="2"
+                  />
+                  <circle
+                    cx="40"
+                    cy="30"
+                    r="6"
+                    fill="#fff"
+                    stroke="#ffea00"
+                    stroke-width="2"
+                  />
+                </svg>
+              </div>
+              <div class="card-title">PONG</div>
+              <button class="card-btn" onclick="switchTab(1)">Jouer</button>
+            </div>
+            <div class="card80s chess">
+              <div class="card-img">
+                <!-- SVG Échiquier -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <rect
+                    x="10"
+                    y="10"
+                    width="60"
+                    height="40"
+                    fill="#8B4513"
+                    stroke="#654321"
+                    stroke-width="2"
+                  />
+                  <rect x="10" y="10" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="25" y="10" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="40" y="10" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="55" y="10" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="17.5" y="15" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="32.5" y="15" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="47.5" y="15" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="62.5" y="15" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="10" y="20" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="25" y="20" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="40" y="20" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="55" y="20" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="17.5" y="25" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="32.5" y="25" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="47.5" y="25" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="62.5" y="25" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="10" y="30" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="25" y="30" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="40" y="30" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="55" y="30" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="17.5" y="35" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="32.5" y="35" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="47.5" y="35" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="62.5" y="35" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="10" y="40" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="25" y="40" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="40" y="40" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="55" y="40" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="17.5" y="45" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="32.5" y="45" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="47.5" y="45" width="7.5" height="5" fill="#F5DEB3" />
+                  <rect x="62.5" y="45" width="7.5" height="5" fill="#F5DEB3" />
+                  <circle cx="13.75" cy="12.5" r="2" fill="#000" />
+                  <circle cx="28.75" cy="12.5" r="2" fill="#000" />
+                  <circle cx="43.75" cy="12.5" r="2" fill="#000" />
+                  <circle cx="58.75" cy="12.5" r="2" fill="#000" />
+                  <circle cx="21.25" cy="17.5" r="2" fill="#000" />
+                  <circle cx="36.25" cy="17.5" r="2" fill="#000" />
+                  <circle cx="51.25" cy="17.5" r="2" fill="#000" />
+                  <circle cx="66.25" cy="17.5" r="2" fill="#000" />
+                  <circle cx="13.75" cy="22.5" r="2" fill="#000" />
+                  <circle cx="28.75" cy="22.5" r="2" fill="#000" />
+                  <circle cx="43.75" cy="22.5" r="2" fill="#000" />
+                  <circle cx="58.75" cy="22.5" r="2" fill="#000" />
+                  <circle cx="21.25" cy="27.5" r="2" fill="#000" />
+                  <circle cx="36.25" cy="27.5" r="2" fill="#000" />
+                  <circle cx="51.25" cy="27.5" r="2" fill="#000" />
+                  <circle cx="66.25" cy="27.5" r="2" fill="#000" />
+                  <circle cx="13.75" cy="32.5" r="2" fill="#000" />
+                  <circle cx="28.75" cy="32.5" r="2" fill="#000" />
+                  <circle cx="43.75" cy="32.5" r="2" fill="#000" />
+                  <circle cx="58.75" cy="32.5" r="2" fill="#000" />
+                  <circle cx="21.25" cy="37.5" r="2" fill="#000" />
+                  <circle cx="36.25" cy="37.5" r="2" fill="#000" />
+                  <circle cx="51.25" cy="37.5" r="2" fill="#000" />
+                  <circle cx="66.25" cy="37.5" r="2" fill="#000" />
+                  <circle cx="13.75" cy="42.5" r="2" fill="#000" />
+                  <circle cx="28.75" cy="42.5" r="2" fill="#000" />
+                  <circle cx="43.75" cy="42.5" r="2" fill="#000" />
+                  <circle cx="58.75" cy="42.5" r="2" fill="#000" />
+                  <circle cx="21.25" cy="47.5" r="2" fill="#000" />
+                  <circle cx="36.25" cy="47.5" r="2" fill="#000" />
+                  <circle cx="51.25" cy="47.5" r="2" fill="#000" />
+                  <circle cx="66.25" cy="47.5" r="2" fill="#000" />
+                </svg>
+              </div>
+              <div class="card-title">CHESS.COM</div>
+              <a
+                href="chessCom/index.html"
+                class="card-btn"
+                style="text-decoration: none; display: inline-block"
+                >Accéder</a
+              >
+            </div>
+            <div class="card80s time-calculator">
+              <div class="card-img">
+                <!-- SVG Horloge -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <circle
+                    cx="40"
+                    cy="30"
+                    r="20"
+                    fill="#fff"
+                    stroke="#ff6b35"
+                    stroke-width="3"
+                  />
+                  <circle cx="40" cy="30" r="2" fill="#ff6b35" />
+                  <line
+                    x1="40"
+                    y1="30"
+                    x2="40"
+                    y2="15"
+                    stroke="#ff6b35"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <line
+                    x1="40"
+                    y1="30"
+                    x2="50"
+                    y2="30"
+                    stroke="#f7931e"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <text
+                    x="40"
+                    y="8"
+                    text-anchor="middle"
+                    font-family="Arial"
+                    font-size="8"
+                    fill="#ff6b35"
+                    font-weight="bold"
+                  >
+                    12
+                  </text>
+                  <text
+                    x="72"
+                    y="34"
+                    text-anchor="middle"
+                    font-family="Arial"
+                    font-size="8"
+                    fill="#ff6b35"
+                    font-weight="bold"
+                  >
+                    3
+                  </text>
+                  <text
+                    x="40"
+                    y="56"
+                    text-anchor="middle"
+                    font-family="Arial"
+                    font-size="8"
+                    fill="#ff6b35"
+                    font-weight="bold"
+                  >
+                    6
+                  </text>
+                  <text
+                    x="8"
+                    y="34"
+                    text-anchor="middle"
+                    font-family="Arial"
+                    font-size="8"
+                    fill="#ff6b35"
+                    font-weight="bold"
+                  >
+                    9
+                  </text>
+                </svg>
+              </div>
+              <div class="card-title">TIME CALCULATOR</div>
+              <a
+                href="timeCalculator/index.html"
+                class="card-btn"
+                style="text-decoration: none; display: inline-block"
+                >Calculer</a
+              >
+            </div>
+            <div class="card80s roulette">
+              <div class="card-img">
+                <!-- SVG Roulette -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <circle
+                    cx="40"
+                    cy="30"
+                    r="22"
+                    fill="#fff"
+                    stroke="#222"
+                    stroke-width="2"
+                  />
+                  <path d="M40 8 A22 22 0 0 1 62 30" fill="#ffd600" />
+                  <path d="M62 30 A22 22 0 0 1 40 52" fill="#43a047" />
+                  <path d="M40 52 A22 22 0 0 1 18 30" fill="#1976d2" />
+                  <path d="M18 30 A22 22 0 0 1 40 8" fill="#ff5252" />
+                  <polygon points="40,2 44,14 36,14" fill="#e53935" />
+                </svg>
+              </div>
+              <div class="card-title">ROULETTE</div>
+              <button class="card-btn" onclick="switchTab(5)">Jouer</button>
+            </div>
+            <div class="card80s football">
+              <div class="card-img">
+                <!-- SVG Ballon années 80 -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <ellipse
+                    cx="40"
+                    cy="30"
+                    rx="22"
+                    ry="22"
+                    fill="#fff"
+                    stroke="#222"
+                    stroke-width="2"
+                  />
+                  <polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222" />
+                  <polygon
+                    points="40,42 46,36 43,28 37,28 34,36"
+                    fill="#ff00cc"
+                  />
+                  <polygon
+                    points="28,30 34,24 37,32 37,38 31,36"
+                    fill="#00eaff"
+                  />
+                  <polygon
+                    points="52,30 46,24 43,32 43,38 49,36"
+                    fill="#ffea00"
+                  />
+                </svg>
+              </div>
+              <div class="card-title">FOOTBALL</div>
+              <button class="card-btn" onclick="switchTab(2)">Jouer</button>
+            </div>
+            <div class="card80s football">
+              <div class="card-img">
+                <!-- SVG Ballon années 80 bis -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <ellipse
+                    cx="40"
+                    cy="30"
+                    rx="22"
+                    ry="22"
+                    fill="#fff"
+                    stroke="#222"
+                    stroke-width="2"
+                  />
+                  <polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222" />
+                  <polygon
+                    points="40,42 46,36 43,28 37,28 34,36"
+                    fill="#ff00cc"
+                  />
+                  <polygon
+                    points="28,30 34,24 37,32 37,38 31,36"
+                    fill="#00eaff"
+                  />
+                  <polygon
+                    points="52,30 46,24 43,32 43,38 49,36"
+                    fill="#ffea00"
+                  />
+                </svg>
+              </div>
+              <div class="card-title">FOOTBALL 2</div>
+              <button class="card-btn" onclick="switchTab(3)">Jouer</button>
+            </div>
+            <div class="card80s football">
+              <div class="card-img">
+                <!-- SVG Ballon années 80 ter -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <ellipse
+                    cx="40"
+                    cy="30"
+                    rx="22"
+                    ry="22"
+                    fill="#fff"
+                    stroke="#222"
+                    stroke-width="2"
+                  />
+                  <polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222" />
+                  <polygon
+                    points="40,42 46,36 43,28 37,28 34,36"
+                    fill="#ff00cc"
+                  />
+                  <polygon
+                    points="28,30 34,24 37,32 37,38 31,36"
+                    fill="#00eaff"
+                  />
+                  <polygon
+                    points="52,30 46,24 43,32 43,38 49,36"
+                    fill="#ffea00"
+                  />
+                </svg>
+              </div>
+              <div class="card-title">FOOTBALL 3</div>
+              <button class="card-btn" onclick="switchTab(4)">Jouer</button>
+            </div>
+            <div class="card80s roulette">
+              <div class="card-img">
+                <!-- SVG Roulette -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <circle
+                    cx="40"
+                    cy="30"
+                    r="22"
+                    fill="#fff"
+                    stroke="#222"
+                    stroke-width="2"
+                  />
+                  <path d="M40 8 A22 22 0 0 1 62 30" fill="#ffd600" />
+                  <path d="M62 30 A22 22 0 0 1 40 52" fill="#43a047" />
+                  <path d="M40 52 A22 22 0 0 1 18 30" fill="#1976d2" />
+                  <path d="M18 30 A22 22 0 0 1 40 8" fill="#ff5252" />
+                  <polygon points="40,2 44,14 36,14" fill="#e53935" />
+                </svg>
+              </div>
+              <div class="card-title">ROULETTE CATMAN</div>
+              <button class="card-btn" onclick="switchTab(6)">Jouer</button>
+            </div>
+            <div class="card80s roulette">
+              <div class="card-img">
+                <!-- SVG Questionnaire -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <rect
+                    x="18"
+                    y="10"
+                    width="44"
+                    height="40"
+                    rx="8"
+                    fill="#fff"
+                    stroke="#1976d2"
+                    stroke-width="2"
+                  />
+                  <rect
+                    x="26"
+                    y="18"
+                    width="28"
+                    height="6"
+                    rx="2"
+                    fill="#1976d2"
+                  />
+                  <rect
+                    x="26"
+                    y="28"
+                    width="18"
+                    height="6"
+                    rx="2"
+                    fill="#43a047"
+                  />
+                  <rect
+                    x="26"
+                    y="38"
+                    width="22"
+                    height="6"
+                    rx="2"
+                    fill="#ff00cc"
+                  />
+                </svg>
+              </div>
+              <div class="card-title">QUESTIONNAIRE CSE</div>
+              <button class="card-btn" onclick="switchTab(7)">Charger</button>
+            </div>
+            <div class="card80s life-game">
+              <div class="card-img">
+                <!-- SVG Grille -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <rect
+                    x="15"
+                    y="10"
+                    width="50"
+                    height="40"
+                    fill="#fff"
+                    stroke="#1976d2"
+                    stroke-width="2"
+                  />
+                  <rect x="20" y="15" width="8" height="8" fill="#1976d2" />
+                  <rect x="32" y="15" width="8" height="8" fill="#1976d2" />
+                  <rect x="44" y="15" width="8" height="8" fill="#1976d2" />
+                  <rect x="26" y="23" width="8" height="8" fill="#1976d2" />
+                  <rect x="38" y="23" width="8" height="8" fill="#1976d2" />
+                  <rect x="20" y="31" width="8" height="8" fill="#1976d2" />
+                  <rect x="32" y="31" width="8" height="8" fill="#1976d2" />
+                  <rect x="44" y="31" width="8" height="8" fill="#1976d2" />
+                </svg>
+              </div>
+              <div class="card-title">JEU DE LA VIE</div>
+              <button class="card-btn" onclick="switchTab(8)">Jouer</button>
+            </div>
+          </div>
         </div>
-        <div class="tab-content">
-            <!-- Accueil -->
-            <div class="game-container active" id="home">
-                <div class="cards80s">
-                    <div class="card80s pong">
-                        <div class="card-img">
-                            <!-- SVG Pong années 80 -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><rect x="10" y="20" width="8" height="20" rx="3" fill="#fff" stroke="#ff00cc" stroke-width="2"/><rect x="62" y="20" width="8" height="20" rx="3" fill="#fff" stroke="#00eaff" stroke-width="2"/><circle cx="40" cy="30" r="6" fill="#fff" stroke="#ffea00" stroke-width="2"/></svg>
-                        </div>
-                        <div class="card-title">PONG</div>
-                        <button class="card-btn" onclick="switchTab(1)">Jouer</button>
-                    </div>
-                    <div class="card80s chess">
-                        <div class="card-img">
-                            <!-- SVG Échiquier -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><rect x="10" y="10" width="60" height="40" fill="#8B4513" stroke="#654321" stroke-width="2"/><rect x="10" y="10" width="7.5" height="5" fill="#F5DEB3"/><rect x="25" y="10" width="7.5" height="5" fill="#F5DEB3"/><rect x="40" y="10" width="7.5" height="5" fill="#F5DEB3"/><rect x="55" y="10" width="7.5" height="5" fill="#F5DEB3"/><rect x="17.5" y="15" width="7.5" height="5" fill="#F5DEB3"/><rect x="32.5" y="15" width="7.5" height="5" fill="#F5DEB3"/><rect x="47.5" y="15" width="7.5" height="5" fill="#F5DEB3"/><rect x="62.5" y="15" width="7.5" height="5" fill="#F5DEB3"/><rect x="10" y="20" width="7.5" height="5" fill="#F5DEB3"/><rect x="25" y="20" width="7.5" height="5" fill="#F5DEB3"/><rect x="40" y="20" width="7.5" height="5" fill="#F5DEB3"/><rect x="55" y="20" width="7.5" height="5" fill="#F5DEB3"/><rect x="17.5" y="25" width="7.5" height="5" fill="#F5DEB3"/><rect x="32.5" y="25" width="7.5" height="5" fill="#F5DEB3"/><rect x="47.5" y="25" width="7.5" height="5" fill="#F5DEB3"/><rect x="62.5" y="25" width="7.5" height="5" fill="#F5DEB3"/><rect x="10" y="30" width="7.5" height="5" fill="#F5DEB3"/><rect x="25" y="30" width="7.5" height="5" fill="#F5DEB3"/><rect x="40" y="30" width="7.5" height="5" fill="#F5DEB3"/><rect x="55" y="30" width="7.5" height="5" fill="#F5DEB3"/><rect x="17.5" y="35" width="7.5" height="5" fill="#F5DEB3"/><rect x="32.5" y="35" width="7.5" height="5" fill="#F5DEB3"/><rect x="47.5" y="35" width="7.5" height="5" fill="#F5DEB3"/><rect x="62.5" y="35" width="7.5" height="5" fill="#F5DEB3"/><rect x="10" y="40" width="7.5" height="5" fill="#F5DEB3"/><rect x="25" y="40" width="7.5" height="5" fill="#F5DEB3"/><rect x="40" y="40" width="7.5" height="5" fill="#F5DEB3"/><rect x="55" y="40" width="7.5" height="5" fill="#F5DEB3"/><rect x="17.5" y="45" width="7.5" height="5" fill="#F5DEB3"/><rect x="32.5" y="45" width="7.5" height="5" fill="#F5DEB3"/><rect x="47.5" y="45" width="7.5" height="5" fill="#F5DEB3"/><rect x="62.5" y="45" width="7.5" height="5" fill="#F5DEB3"/><circle cx="13.75" cy="12.5" r="2" fill="#000"/><circle cx="28.75" cy="12.5" r="2" fill="#000"/><circle cx="43.75" cy="12.5" r="2" fill="#000"/><circle cx="58.75" cy="12.5" r="2" fill="#000"/><circle cx="21.25" cy="17.5" r="2" fill="#000"/><circle cx="36.25" cy="17.5" r="2" fill="#000"/><circle cx="51.25" cy="17.5" r="2" fill="#000"/><circle cx="66.25" cy="17.5" r="2" fill="#000"/><circle cx="13.75" cy="22.5" r="2" fill="#000"/><circle cx="28.75" cy="22.5" r="2" fill="#000"/><circle cx="43.75" cy="22.5" r="2" fill="#000"/><circle cx="58.75" cy="22.5" r="2" fill="#000"/><circle cx="21.25" cy="27.5" r="2" fill="#000"/><circle cx="36.25" cy="27.5" r="2" fill="#000"/><circle cx="51.25" cy="27.5" r="2" fill="#000"/><circle cx="66.25" cy="27.5" r="2" fill="#000"/><circle cx="13.75" cy="32.5" r="2" fill="#000"/><circle cx="28.75" cy="32.5" r="2" fill="#000"/><circle cx="43.75" cy="32.5" r="2" fill="#000"/><circle cx="58.75" cy="32.5" r="2" fill="#000"/><circle cx="21.25" cy="37.5" r="2" fill="#000"/><circle cx="36.25" cy="37.5" r="2" fill="#000"/><circle cx="51.25" cy="37.5" r="2" fill="#000"/><circle cx="66.25" cy="37.5" r="2" fill="#000"/><circle cx="13.75" cy="42.5" r="2" fill="#000"/><circle cx="28.75" cy="42.5" r="2" fill="#000"/><circle cx="43.75" cy="42.5" r="2" fill="#000"/><circle cx="58.75" cy="42.5" r="2" fill="#000"/><circle cx="21.25" cy="47.5" r="2" fill="#000"/><circle cx="36.25" cy="47.5" r="2" fill="#000"/><circle cx="51.25" cy="47.5" r="2" fill="#000"/><circle cx="66.25" cy="47.5" r="2" fill="#000"/></svg>
-                        </div>
-                        <div class="card-title">CHESS.COM</div>
-                        <a href="chessCom/index.html" class="card-btn" style="text-decoration:none; display:inline-block;">Accéder</a>
-                    </div>
-                    <div class="card80s time-calculator">
-                        <div class="card-img">
-                            <!-- SVG Horloge -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><circle cx="40" cy="30" r="20" fill="#fff" stroke="#ff6b35" stroke-width="3"/><circle cx="40" cy="30" r="2" fill="#ff6b35"/><line x1="40" y1="30" x2="40" y2="15" stroke="#ff6b35" stroke-width="2" stroke-linecap="round"/><line x1="40" y1="30" x2="50" y2="30" stroke="#f7931e" stroke-width="2" stroke-linecap="round"/><text x="40" y="8" text-anchor="middle" font-family="Arial" font-size="8" fill="#ff6b35" font-weight="bold">12</text><text x="72" y="34" text-anchor="middle" font-family="Arial" font-size="8" fill="#ff6b35" font-weight="bold">3</text><text x="40" y="56" text-anchor="middle" font-family="Arial" font-size="8" fill="#ff6b35" font-weight="bold">6</text><text x="8" y="34" text-anchor="middle" font-family="Arial" font-size="8" fill="#ff6b35" font-weight="bold">9</text></svg>
-                        </div>
-                        <div class="card-title">TIME CALCULATOR</div>
-                        <a href="timeCalculator/index.html" class="card-btn" style="text-decoration:none; display:inline-block;">Calculer</a>
-                    </div>
-                    <div class="card80s roulette">
-                        <div class="card-img">
-                            <!-- SVG Roulette -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><circle cx="40" cy="30" r="22" fill="#fff" stroke="#222" stroke-width="2"/><path d="M40 8 A22 22 0 0 1 62 30" fill="#ffd600"/><path d="M62 30 A22 22 0 0 1 40 52" fill="#43a047"/><path d="M40 52 A22 22 0 0 1 18 30" fill="#1976d2"/><path d="M18 30 A22 22 0 0 1 40 8" fill="#ff5252"/><polygon points="40,2 44,14 36,14" fill="#e53935"/></svg>
-                        </div>
-                        <div class="card-title">ROULETTE</div>
-                        <button class="card-btn" onclick="switchTab(5)">Jouer</button>
-                    </div>
-                    <div class="card80s football">
-                        <div class="card-img">
-                            <!-- SVG Ballon années 80 -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="22" ry="22" fill="#fff" stroke="#222" stroke-width="2"/><polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222"/><polygon points="40,42 46,36 43,28 37,28 34,36" fill="#ff00cc"/><polygon points="28,30 34,24 37,32 37,38 31,36" fill="#00eaff"/><polygon points="52,30 46,24 43,32 43,38 49,36" fill="#ffea00"/></svg>
-                        </div>
-                        <div class="card-title">FOOTBALL</div>
-                        <button class="card-btn" onclick="switchTab(2)">Jouer</button>
-                    </div>
-                    <div class="card80s football">
-                        <div class="card-img">
-                            <!-- SVG Ballon années 80 bis -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="22" ry="22" fill="#fff" stroke="#222" stroke-width="2"/><polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222"/><polygon points="40,42 46,36 43,28 37,28 34,36" fill="#ff00cc"/><polygon points="28,30 34,24 37,32 37,38 31,36" fill="#00eaff"/><polygon points="52,30 46,24 43,32 43,38 49,36" fill="#ffea00"/></svg>
-                        </div>
-                        <div class="card-title">FOOTBALL 2</div>
-                        <button class="card-btn" onclick="switchTab(3)">Jouer</button>
-                    </div>
-                    <div class="card80s football">
-                        <div class="card-img">
-                            <!-- SVG Ballon années 80 ter -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><ellipse cx="40" cy="30" rx="22" ry="22" fill="#fff" stroke="#222" stroke-width="2"/><polygon points="40,18 46,24 43,32 37,32 34,24" fill="#222"/><polygon points="40,42 46,36 43,28 37,28 34,36" fill="#ff00cc"/><polygon points="28,30 34,24 37,32 37,38 31,36" fill="#00eaff"/><polygon points="52,30 46,24 43,32 43,38 49,36" fill="#ffea00"/></svg>
-                        </div>
-                        <div class="card-title">FOOTBALL 3</div>
-                        <button class="card-btn" onclick="switchTab(4)">Jouer</button>
-                    </div>
-                    <div class="card80s roulette">
-                        <div class="card-img">
-                            <!-- SVG Roulette -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><circle cx="40" cy="30" r="22" fill="#fff" stroke="#222" stroke-width="2"/><path d="M40 8 A22 22 0 0 1 62 30" fill="#ffd600"/><path d="M62 30 A22 22 0 0 1 40 52" fill="#43a047"/><path d="M40 52 A22 22 0 0 1 18 30" fill="#1976d2"/><path d="M18 30 A22 22 0 0 1 40 8" fill="#ff5252"/><polygon points="40,2 44,14 36,14" fill="#e53935"/></svg>
-                        </div>
-                        <div class="card-title">ROULETTE CATMAN</div>
-                        <button class="card-btn" onclick="switchTab(6)">Jouer</button>
-                    </div>
-                    <div class="card80s roulette">
-                        <div class="card-img">
-                            <!-- SVG Questionnaire -->
-                            <svg width="80" height="60" viewBox="0 0 80 60"><rect x="18" y="10" width="44" height="40" rx="8" fill="#fff" stroke="#1976d2" stroke-width="2"/><rect x="26" y="18" width="28" height="6" rx="2" fill="#1976d2"/><rect x="26" y="28" width="18" height="6" rx="2" fill="#43a047"/><rect x="26" y="38" width="22" height="6" rx="2" fill="#ff00cc"/></svg>
-                        </div>
-                        <div class="card-title">QUESTIONNAIRE CSE</div>
-                        <button class="card-btn" onclick="switchTab(7)">Charger</button>
-                    </div>
-                </div>
-            </div>
-            <!-- Pong Game -->
-            <div class="game-container" id="game1">
-                <div class="score">
-                    <span id="playerScore">0</span> - <span id="aiScore">0</span>
-                </div>
-                <canvas id="pongCanvas" width="400" height="300"></canvas>
-                <div class="instructions">
-                    📱 Touchez et glissez pour déplacer votre raquette
-                </div>
-                <div class="controls">
-                    <button class="control-btn" ontouchstart="startGame()" onclick="startGame()">▶️ Jouer</button>
-                    <button class="control-btn" ontouchstart="pauseGame()" onclick="pauseGame()">⏸️ Pause</button>
-                    <button class="control-btn" ontouchstart="resetGame()" onclick="resetGame()">🔄 Reset</button>
-                </div>
-            </div>
-            <!-- Football Game -->
-            <div class="game-container" id="game2">
-                <div class="score" id="score2">
-                    <span id="scoreJ1">0</span> - <span id="scoreJ2">0</span>
-                </div>
-                <canvas id="jeu2Canvas" width="400" height="300"></canvas>
-                <div class="instructions">
-                    🕹️ Joueur 1 : ZQSD &nbsp; | &nbsp; Joueur 2 : Flèches directionnelles
-                </div>
-            </div>
-            <!-- Football 2 Game -->
-            <div class="game-container" id="game3">
-                <div class="score" id="score3">
-                    <span id="scoreJ1_2">0</span> - <span id="scoreJ2_2">0</span>
-                </div>
-                <canvas id="jeu3Canvas" width="400" height="300"></canvas>
-                <div class="instructions">
-                    🕹️ Joueur 1 : ZQSD &nbsp; | &nbsp; Joueur 2 : Flèches directionnelles
-                </div>
-            </div>
-            <!-- Football 3 Game -->
-            <div class="game-container" id="game4">
-                <div class="score" id="score4">
-                    <span id="scoreJ1_3">0</span> - <span id="scoreJ2_3">0</span>
-                </div>
-                <canvas id="jeu4Canvas" width="400" height="300"></canvas>
-                <div class="instructions">
-                    🕹️ Joueur 1 : ZQSD &nbsp; | &nbsp; Joueur 2 : Flèches directionnelles
-                </div>
-            </div>
-            <!-- Roulette Game -->
-            <div class="game-container" id="game5">
-                <canvas id="rouletteCanvas" width="400" height="400"></canvas>
-                <div class="instructions">
-                    🎯 Touchez la roue pour la faire tourner !
-                </div>
-            </div>
-            <!-- Roulette Catman Game -->
-            <div class="game-container" id="game6">
-                <canvas id="rouletteCatmanCanvas" width="400" height="400"></canvas>
-                <div class="instructions">
-                    🐾 Touchez la roue Catman pour la faire tourner !
-                </div>
-            </div>
-            <!-- Questionnaire CSE Game -->
-            <div class="game-container" id="game7">
-                <div style="text-align:center; margin-top: 40px;">
-                    <div class="csv-btns-row">
-                        <label for="csvInput" class="control-btn" style="cursor:pointer;">📄 Charger un fichier CSV</label>
-                        <input type="file" id="csvInput" accept=".csv" style="display:none;" />
-                        <label for="tsvInput" class="control-btn" style="cursor:pointer; margin-left: 8px;">📄 Charger un fichier TSV</label>
-                        <input type="file" id="tsvInput" accept=".tsv" style="display:none;" />
-                    </div>
-                    <div id="csvStatus" style="margin-top:20px; font-size:1.1rem;"></div>
-                </div>
-                <!-- <canvas id="cseCanvas" width="400" height="400" style="margin: 30px auto 0 auto; display: block; border: 2px solid #1976d2; border-radius: 12px; background: #f7fafd; max-width: 100%; width: 100%;"></canvas> -->
-            </div>
+        <!-- Pong Game -->
+        <div class="game-container" id="game1">
+          <div class="score">
+            <span id="playerScore">0</span> - <span id="aiScore">0</span>
+          </div>
+          <canvas id="pongCanvas" width="400" height="300"></canvas>
+          <div class="instructions">
+            📱 Touchez et glissez pour déplacer votre raquette
+          </div>
+          <div class="controls">
+            <button
+              class="control-btn"
+              ontouchstart="startGame()"
+              onclick="startGame()"
+            >
+              ▶️ Jouer
+            </button>
+            <button
+              class="control-btn"
+              ontouchstart="pauseGame()"
+              onclick="pauseGame()"
+            >
+              ⏸️ Pause
+            </button>
+            <button
+              class="control-btn"
+              ontouchstart="resetGame()"
+              onclick="resetGame()"
+            >
+              🔄 Reset
+            </button>
+          </div>
         </div>
+        <!-- Football Game -->
+        <div class="game-container" id="game2">
+          <div class="score" id="score2">
+            <span id="scoreJ1">0</span> - <span id="scoreJ2">0</span>
+          </div>
+          <canvas id="jeu2Canvas" width="400" height="300"></canvas>
+          <div class="instructions">
+            🕹️ Joueur 1 : ZQSD &nbsp; | &nbsp; Joueur 2 : Flèches
+            directionnelles
+          </div>
+        </div>
+        <!-- Football 2 Game -->
+        <div class="game-container" id="game3">
+          <div class="score" id="score3">
+            <span id="scoreJ1_2">0</span> - <span id="scoreJ2_2">0</span>
+          </div>
+          <canvas id="jeu3Canvas" width="400" height="300"></canvas>
+          <div class="instructions">
+            🕹️ Joueur 1 : ZQSD &nbsp; | &nbsp; Joueur 2 : Flèches
+            directionnelles
+          </div>
+        </div>
+        <!-- Football 3 Game -->
+        <div class="game-container" id="game4">
+          <div class="score" id="score4">
+            <span id="scoreJ1_3">0</span> - <span id="scoreJ2_3">0</span>
+          </div>
+          <canvas id="jeu4Canvas" width="400" height="300"></canvas>
+          <div class="instructions">
+            🕹️ Joueur 1 : ZQSD &nbsp; | &nbsp; Joueur 2 : Flèches
+            directionnelles
+          </div>
+        </div>
+        <!-- Roulette Game -->
+        <div class="game-container" id="game5">
+          <canvas id="rouletteCanvas" width="400" height="400"></canvas>
+          <div class="instructions">
+            🎯 Touchez la roue pour la faire tourner !
+          </div>
+        </div>
+        <!-- Roulette Catman Game -->
+        <div class="game-container" id="game6">
+          <canvas id="rouletteCatmanCanvas" width="400" height="400"></canvas>
+          <div class="instructions">
+            🐾 Touchez la roue Catman pour la faire tourner !
+          </div>
+        </div>
+        <!-- Questionnaire CSE Game -->
+        <div class="game-container" id="game7">
+          <div style="text-align: center; margin-top: 40px">
+            <div class="csv-btns-row">
+              <label for="csvInput" class="control-btn" style="cursor: pointer"
+                >📄 Charger un fichier CSV</label
+              >
+              <input
+                type="file"
+                id="csvInput"
+                accept=".csv"
+                style="display: none"
+              />
+              <label
+                for="tsvInput"
+                class="control-btn"
+                style="cursor: pointer; margin-left: 8px"
+                >📄 Charger un fichier TSV</label
+              >
+              <input
+                type="file"
+                id="tsvInput"
+                accept=".tsv"
+                style="display: none"
+              />
+            </div>
+            <div
+              id="csvStatus"
+              style="margin-top: 20px; font-size: 1.1rem"
+            ></div>
+          </div>
+          <!-- <canvas id="cseCanvas" width="400" height="400" style="margin: 30px auto 0 auto; display: block; border: 2px solid #1976d2; border-radius: 12px; background: #f7fafd; max-width: 100%; width: 100%;"></canvas> -->
+        </div>
+        <!-- Jeu de la Vie -->
+        <div class="game-container" id="game8">
+          <canvas id="jeuDeLaVieCanvas" width="400" height="400"></canvas>
+          <div class="instructions">
+            🎮 Cliquez sur les cellules pour les activer/désactiver
+          </div>
+          <div class="controls">
+            <button
+              class="control-btn"
+              ontouchstart="playGameOfLife()"
+              onclick="playGameOfLife()"
+            >
+              ▶️ Lecture
+            </button>
+            <button
+              class="control-btn"
+              ontouchstart="pauseGameOfLife()"
+              onclick="pauseGameOfLife()"
+            >
+              ⏸️ Pause
+            </button>
+            <button
+              class="control-btn"
+              ontouchstart="resetGameOfLife()"
+              onclick="resetGameOfLife()"
+            >
+              🔄 Reset
+            </button>
+            <button
+              class="control-btn"
+              ontouchstart="randomizeGameOfLife()"
+              onclick="randomizeGameOfLife()"
+            >
+              🎲 Aléatoire
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="tab.js"></script>
     <script src="pong.js"></script>
@@ -441,5 +884,6 @@
     <script src="rouletteCatman/rouletteCatman.js"></script>
     <script src="rouletteCatman/data.js"></script>
     <script src="csvParser.js"></script>
-</body>
+    <script src="jeuDeLaVie/jeuDeLaVie.js"></script>
+  </body>
 </html>
