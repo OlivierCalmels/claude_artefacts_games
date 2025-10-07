@@ -14,6 +14,8 @@
   let offsetX = 0; // Décalage horizontal de la vue
   let offsetY = 0; // Décalage vertical de la vue
   let animationSpeed = 200; // Vitesse en ms (200ms par défaut)
+  let stateHistory = []; // Historique des états pour détecter les boucles
+  const MAX_HISTORY = 100; // Nombre maximum d'états à garder en mémoire
 
   // Initialiser la grille
   function initGrid() {
@@ -84,21 +86,20 @@
     }
   }
 
-  // Vérifier si la grille a changé
-  function hasGridChanged(oldGrid, newGrid) {
-    for (let i = 0; i < GRID_SIZE; i++) {
-      for (let j = 0; j < GRID_SIZE; j++) {
-        if (oldGrid[i][j] !== newGrid[i][j]) {
-          return true;
-        }
-      }
-    }
-    return false;
+  // Convertir la grille en chaîne pour comparaison
+  function gridToString(g) {
+    return g
+      .map((row) => row.map((cell) => (cell ? "1" : "0")).join(""))
+      .join("|");
+  }
+
+  // Vérifier si cet état a déjà été vu
+  function isStateInHistory(gridStr) {
+    return stateHistory.includes(gridStr);
   }
 
   // Calculer la prochaine génération
   function nextGeneration() {
-    const oldGrid = JSON.parse(JSON.stringify(grid));
     const newGrid = [];
 
     for (let i = 0; i < GRID_SIZE; i++) {
@@ -116,10 +117,23 @@
       }
     }
 
-    // Si la grille n'a pas changé, arrêter l'animation
-    if (!hasGridChanged(oldGrid, newGrid)) {
-      window.pauseGameOfLife();
-      return;
+    // Convertir le nouvel état en chaîne
+    const newGridStr = gridToString(newGrid);
+
+    // Vérifier si cet état a déjà été vu (boucle détectée)
+    if (isStateInHistory(newGridStr)) {
+      // Réinitialiser le compteur et l'historique
+      generation = 0;
+      stateHistory = [];
+      stateHistory.push(newGridStr); // Ajouter le nouvel état initial
+    } else {
+      // Ajouter l'état actuel à l'historique
+      stateHistory.push(newGridStr);
+
+      // Limiter la taille de l'historique
+      if (stateHistory.length > MAX_HISTORY) {
+        stateHistory.shift(); // Retirer le plus ancien
+      }
     }
 
     grid = newGrid;
@@ -145,6 +159,10 @@
     } else {
       // Démarrer
       isPlaying = true;
+      // Réinitialiser l'historique au démarrage
+      stateHistory = [];
+      stateHistory.push(gridToString(grid)); // Ajouter l'état initial
+
       intervalId = setInterval(() => {
         nextGeneration();
       }, animationSpeed);
@@ -181,6 +199,7 @@
   window.resetGameOfLife = function () {
     window.pauseGameOfLife();
     generation = 0;
+    stateHistory = []; // Réinitialiser l'historique
     initGrid();
     centerView();
     drawGrid();
@@ -191,6 +210,7 @@
   window.randomizeGameOfLife = function () {
     window.pauseGameOfLife();
     generation = 0;
+    stateHistory = []; // Réinitialiser l'historique
     centerView();
     for (let i = 0; i < GRID_SIZE; i++) {
       for (let j = 0; j < GRID_SIZE; j++) {
@@ -210,6 +230,7 @@
 
     window.pauseGameOfLife();
     generation = 0;
+    stateHistory = []; // Réinitialiser l'historique
     initGrid();
 
     const pattern = LIFE_PATTERNS[patternKey];
@@ -304,6 +325,7 @@
 
     // Réinitialiser la grille
     generation = 0;
+    stateHistory = []; // Réinitialiser l'historique
     initGrid();
     centerView();
     drawGrid();
