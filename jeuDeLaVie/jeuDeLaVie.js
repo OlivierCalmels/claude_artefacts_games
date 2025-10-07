@@ -1,6 +1,7 @@
 // Jeu de la Vie de Conway - Namespace pour éviter les conflits
 (function () {
-  const GRID_SIZE = 20;
+  const GRID_SIZE = 30; // Taille totale de la grille
+  const VISIBLE_SIZE = 15; // Taille de la zone visible
   let canvas = null;
   let ctx = null;
   let CELL_SIZE = 20;
@@ -10,6 +11,8 @@
   let intervalId = null;
   let isInitialized = false;
   let generation = 0;
+  let offsetX = 0; // Décalage horizontal de la vue
+  let offsetY = 0; // Décalage vertical de la vue
 
   // Initialiser la grille
   function initGrid() {
@@ -22,25 +25,34 @@
     }
   }
 
-  // Dessiner la grille
+  // Dessiner la grille (seulement la partie visible)
   function drawGrid() {
     if (!ctx || !canvas) {
-      console.log("drawGrid: ctx ou canvas manquant");
       return;
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Dessiner les cellules
-    for (let i = 0; i < GRID_SIZE; i++) {
-      for (let j = 0; j < GRID_SIZE; j++) {
-        ctx.fillStyle = grid[i][j] ? "#1976d2" : "#ffffff";
-        ctx.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    // Dessiner seulement les cellules visibles
+    for (let i = 0; i < VISIBLE_SIZE; i++) {
+      for (let j = 0; j < VISIBLE_SIZE; j++) {
+        const gridRow = offsetY + i;
+        const gridCol = offsetX + j;
 
-        // Bordure des cellules
-        ctx.strokeStyle = "#e0e0e0";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        if (
+          gridRow >= 0 &&
+          gridRow < GRID_SIZE &&
+          gridCol >= 0 &&
+          gridCol < GRID_SIZE
+        ) {
+          ctx.fillStyle = grid[gridRow][gridCol] ? "#1976d2" : "#ffffff";
+          ctx.fillRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+
+          // Bordure des cellules
+          ctx.strokeStyle = "#e0e0e0";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
       }
     }
   }
@@ -156,6 +168,7 @@
     window.pauseGameOfLife();
     generation = 0;
     initGrid();
+    centerView();
     drawGrid();
     updateGenerationCounter();
   };
@@ -164,6 +177,7 @@
   window.randomizeGameOfLife = function () {
     window.pauseGameOfLife();
     generation = 0;
+    centerView();
     for (let i = 0; i < GRID_SIZE; i++) {
       for (let j = 0; j < GRID_SIZE; j++) {
         grid[i][j] = Math.random() > 0.7;
@@ -213,8 +227,17 @@
     const col = Math.floor(x / CELL_SIZE);
     const row = Math.floor(y / CELL_SIZE);
 
-    if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
-      grid[row][col] = !grid[row][col];
+    // Convertir en coordonnées de la grille complète
+    const gridRow = offsetY + row;
+    const gridCol = offsetX + col;
+
+    if (
+      gridRow >= 0 &&
+      gridRow < GRID_SIZE &&
+      gridCol >= 0 &&
+      gridCol < GRID_SIZE
+    ) {
+      grid[gridRow][gridCol] = !grid[gridRow][gridCol];
       drawGrid();
     }
   }
@@ -232,10 +255,25 @@
     const col = Math.floor(x / CELL_SIZE);
     const row = Math.floor(y / CELL_SIZE);
 
-    if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
-      grid[row][col] = !grid[row][col];
+    // Convertir en coordonnées de la grille complète
+    const gridRow = offsetY + row;
+    const gridCol = offsetX + col;
+
+    if (
+      gridRow >= 0 &&
+      gridRow < GRID_SIZE &&
+      gridCol >= 0 &&
+      gridCol < GRID_SIZE
+    ) {
+      grid[gridRow][gridCol] = !grid[gridRow][gridCol];
       drawGrid();
     }
+  }
+
+  // Centrer la vue sur la grille
+  function centerView() {
+    offsetX = Math.floor((GRID_SIZE - VISIBLE_SIZE) / 2);
+    offsetY = Math.floor((GRID_SIZE - VISIBLE_SIZE) / 2);
   }
 
   // Initialiser le jeu de la vie
@@ -246,7 +284,7 @@
     }
 
     ctx = canvas.getContext("2d");
-    CELL_SIZE = canvas.width / GRID_SIZE;
+    CELL_SIZE = canvas.width / VISIBLE_SIZE;
 
     // Retirer les anciens listeners s'ils existent
     canvas.removeEventListener("click", handleCanvasClick);
@@ -258,6 +296,7 @@
 
     if (!isInitialized) {
       initGrid();
+      centerView();
       isInitialized = true;
     }
 

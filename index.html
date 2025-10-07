@@ -305,7 +305,33 @@
         <!-- Accueil -->
         <div class="game-container active" id="home">
           <div class="cards80s">
-            <div class="card80s pong">
+            <div class="card80s life-game">
+              <div class="card-img">
+                <!-- SVG Grille -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <rect
+                    x="15"
+                    y="10"
+                    width="50"
+                    height="40"
+                    fill="#fff"
+                    stroke="#1976d2"
+                    stroke-width="2"
+                  />
+                  <rect x="20" y="15" width="8" height="8" fill="#1976d2" />
+                  <rect x="32" y="15" width="8" height="8" fill="#1976d2" />
+                  <rect x="44" y="15" width="8" height="8" fill="#1976d2" />
+                  <rect x="26" y="23" width="8" height="8" fill="#1976d2" />
+                  <rect x="38" y="23" width="8" height="8" fill="#1976d2" />
+                  <rect x="20" y="31" width="8" height="8" fill="#1976d2" />
+                  <rect x="32" y="31" width="8" height="8" fill="#1976d2" />
+                  <rect x="44" y="31" width="8" height="8" fill="#1976d2" />
+                </svg>
+              </div>
+              <div class="card-title">JEU DE LA VIE</div>
+              <button class="card-btn" onclick="switchTab(8)">Jouer</button>
+            </div>
+            <div class="card80s chess">
               <div class="card-img">
                 <!-- SVG Pong années 80 -->
                 <svg width="80" height="60" viewBox="0 0 80 60">
@@ -694,32 +720,6 @@
               <div class="card-title">QUESTIONNAIRE CSE</div>
               <button class="card-btn" onclick="switchTab(7)">Charger</button>
             </div>
-            <div class="card80s life-game">
-              <div class="card-img">
-                <!-- SVG Grille -->
-                <svg width="80" height="60" viewBox="0 0 80 60">
-                  <rect
-                    x="15"
-                    y="10"
-                    width="50"
-                    height="40"
-                    fill="#fff"
-                    stroke="#1976d2"
-                    stroke-width="2"
-                  />
-                  <rect x="20" y="15" width="8" height="8" fill="#1976d2" />
-                  <rect x="32" y="15" width="8" height="8" fill="#1976d2" />
-                  <rect x="44" y="15" width="8" height="8" fill="#1976d2" />
-                  <rect x="26" y="23" width="8" height="8" fill="#1976d2" />
-                  <rect x="38" y="23" width="8" height="8" fill="#1976d2" />
-                  <rect x="20" y="31" width="8" height="8" fill="#1976d2" />
-                  <rect x="32" y="31" width="8" height="8" fill="#1976d2" />
-                  <rect x="44" y="31" width="8" height="8" fill="#1976d2" />
-                </svg>
-              </div>
-              <div class="card-title">JEU DE LA VIE</div>
-              <button class="card-btn" onclick="switchTab(8)">Jouer</button>
-            </div>
           </div>
         </div>
         <!-- Pong Game -->
@@ -847,18 +847,12 @@
           </div>
           <div class="controls">
             <button
+              id="playPauseBtn"
               class="control-btn"
-              ontouchstart="playGameOfLife()"
-              onclick="playGameOfLife()"
+              ontouchstart="togglePlayPauseGameOfLife()"
+              onclick="togglePlayPauseGameOfLife()"
             >
               ▶️ Lecture
-            </button>
-            <button
-              class="control-btn"
-              ontouchstart="pauseGameOfLife()"
-              onclick="pauseGameOfLife()"
-            >
-              ⏸️ Pause
             </button>
             <button
               class="control-btn"
@@ -873,6 +867,67 @@
               onclick="randomizeGameOfLife()"
             >
               🎲 Aléatoire
+            </button>
+          </div>
+          <div class="instructions" style="margin-top: 20px; font-weight: bold">
+            📐 Formes prédéfinies :
+          </div>
+          <div class="controls" style="flex-wrap: wrap; margin-top: 10px">
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('glider')"
+            >
+              ✈️ Planeur
+            </button>
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('gosperGliderGun')"
+            >
+              🔫 Canon
+            </button>
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('pulsar')"
+            >
+              💫 Pulsar
+            </button>
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('lwss')"
+            >
+              🚀 Vaisseau
+            </button>
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('blinker')"
+            >
+              ⚡ Barre
+            </button>
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('beacon')"
+            >
+              🔦 Balise
+            </button>
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('toad')"
+            >
+              🐸 Crapaud
+            </button>
+            <button
+              class="control-btn"
+              style="font-size: 0.9rem; padding: 8px 16px"
+              onclick="placePattern('rPentomino')"
+            >
+              🌀 R-pentomino
             </button>
           </div>
         </div>
