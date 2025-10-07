@@ -360,6 +360,11 @@
       initGrid();
       centerView();
       isInitialized = true;
+
+      // Charger le crapaud par défaut
+      setTimeout(() => {
+        window.placePattern("toad");
+      }, 100);
     }
 
     drawGrid();
