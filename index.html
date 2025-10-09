@@ -146,6 +146,27 @@
         outline: none;
         background: #1251a3;
       }
+      .control-select {
+        background: #1976d2;
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        margin: 5px;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        font-family: "Montserrat", Arial, sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(30, 60, 120, 0.08);
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+      .control-select:focus {
+        outline: 2px solid #1251a3;
+        background: #1565c0;
+      }
       @media (max-width: 600px) {
         .container {
           margin: 10px 2px 0 2px;
@@ -297,13 +318,7 @@
   <body>
     <div class="container">
       <div class="tabs">
-        <button
-          class="tab active"
-          ontouchstart="switchTab(0)"
-          onclick="switchTab(0)"
-        >
-          🏠 Accueil
-        </button>
+        <button class="tab active" onclick="switchTab(0)">🏠 Accueil</button>
       </div>
       <div class="tab-content">
         <!-- Accueil -->
@@ -736,27 +751,9 @@
             📱 Touchez et glissez pour déplacer votre raquette
           </div>
           <div class="controls">
-            <button
-              class="control-btn"
-              ontouchstart="startGame()"
-              onclick="startGame()"
-            >
-              ▶️ Jouer
-            </button>
-            <button
-              class="control-btn"
-              ontouchstart="pauseGame()"
-              onclick="pauseGame()"
-            >
-              ⏸️ Pause
-            </button>
-            <button
-              class="control-btn"
-              ontouchstart="resetGame()"
-              onclick="resetGame()"
-            >
-              🔄 Reset
-            </button>
+            <button class="control-btn" onclick="startGame()">▶️ Jouer</button>
+            <button class="control-btn" onclick="pauseGame()">⏸️ Pause</button>
+            <button class="control-btn" onclick="resetGame()">🔄 Reset</button>
           </div>
         </div>
         <!-- Football Game -->
@@ -853,8 +850,7 @@
             </label>
             <select
               id="gridSizeSelect"
-              class="control-btn"
-              style="padding: 8px 16px; cursor: pointer"
+              class="control-select"
               onchange="changeGridSize(parseInt(this.value))"
             >
               <option value="15" selected>15x15</option>
@@ -872,8 +868,7 @@
             </label>
             <select
               id="speedSelect"
-              class="control-btn"
-              style="padding: 8px 16px; cursor: pointer"
+              class="control-select"
               onchange="changeAnimationSpeed(parseInt(this.value))"
             >
               <option value="25">Très rapide (25ms)</option>
@@ -894,23 +889,14 @@
             <button
               id="playPauseBtn"
               class="control-btn"
-              ontouchstart="togglePlayPauseGameOfLife()"
               onclick="togglePlayPauseGameOfLife()"
             >
               ▶️ Lecture
             </button>
-            <button
-              class="control-btn"
-              ontouchstart="resetGameOfLife()"
-              onclick="resetGameOfLife()"
-            >
+            <button class="control-btn" onclick="resetGameOfLife()">
               🔄 Reset
             </button>
-            <button
-              class="control-btn"
-              ontouchstart="randomizeGameOfLife()"
-              onclick="randomizeGameOfLife()"
-            >
+            <button class="control-btn" onclick="randomizeGameOfLife()">
               🎲 Aléatoire
             </button>
           </div>
@@ -923,8 +909,7 @@
             </label>
             <select
               id="patternSelect"
-              class="control-btn"
-              style="padding: 8px 16px; cursor: pointer"
+              class="control-select"
               onchange="if(this.value) { placePattern(this.value); }"
             >
               <option value="">-- Choisir une forme --</option>
