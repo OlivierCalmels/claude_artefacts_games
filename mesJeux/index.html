@@ -157,6 +157,34 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .ba-card span{font-size:12px;line-height:1.3;color:var(--muted);text-align:center}
 #battle{background:#41582E;touch-action:none}
 #battle-cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#circuit{background:#F7F5EE;touch-action:none}
+#circuit-cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#ci-hud .pill{box-shadow:0 3px 0 #D8D2C2}
+.ci-panel{position:absolute;left:0;right:0;top:58px;padding:0 max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));pointer-events:none}
+.ci-panel>div{background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 3px 0 #E3DDCB;max-width:560px;margin:0 auto;pointer-events:auto}
+.ci-panel h3{margin:0 0 4px;font-family:var(--display);font-weight:400;font-size:17px;color:#2B2542}
+.ci-panel p{margin:0;font-size:13.5px;line-height:1.38;color:#3E3858}
+.ci-panel #ci-task{margin-top:5px;font-weight:800;color:#3B7DD8}
+.ci-panel #ci-task:empty{display:none}
+.ci-bottom{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:6px max(12px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.ci-tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.ci-tools .pill{height:36px;font-size:13px;box-shadow:0 3px 0 #D8D2C2}
+.ci-tools .pill.danger{background:#E5484D;color:#fff;box-shadow:0 3px 0 #A8292E}
+.ci-pal{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:2px 2px 4px}
+.ci-item{flex:none;width:56px;display:flex;flex-direction:column;align-items:center;gap:1px;border:0;border-radius:12px;background:#fff;padding:5px 2px 6px;box-shadow:0 3px 0 #D8D2C2;color:#2B2542}
+.ci-item span{hyphens:manual;font-size:10px;font-weight:800;line-height:1.1;text-align:center}
+.ci-item[disabled]{opacity:.4}
+.ci-item:active{transform:translateY(2px);box-shadow:0 1px 0 #D8D2C2}
+.ci-done{display:flex;align-items:center;gap:10px;background:#3DAA5C;color:#fff;border-radius:14px;padding:8px 8px 8px 14px;box-shadow:0 3px 0 #2E7D32}
+.ci-done b{font-family:var(--display);font-weight:400;font-size:18px}
+.ci-done .pill{height:34px}
+.ci-modes{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0}
+.ci-sec{font-family:var(--display);font-weight:400;font-size:18px;margin:14px 0 6px;color:#2B2542}
+.ci-row{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;text-align:left;border:0;border-radius:12px;background:var(--card);padding:9px 12px;margin-bottom:6px;box-shadow:0 2px 0 var(--tray-deep)}
+.ci-row b{font-size:14px;font-weight:800;line-height:1.25}
+.ci-row span{flex:none;font-size:11px;font-weight:800;color:#2E7D32;text-transform:uppercase}
+.ci-row.done{background:#E3F2E1}
 .ca-title{font-family:'Cinzel',Georgia,serif!important;font-weight:700!important}
 @media (prefers-reduced-motion: reduce){ .pill:active,.lv:active,.big:active{transform:none} }
 </style>
@@ -194,6 +222,14 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
         <g fill="#3B7DD8"><circle cx="24" cy="37" r="2"/><circle cx="28" cy="37" r="2"/><circle cx="24" cy="41" r="2"/><circle cx="28" cy="41" r="2"/></g>
         <rect x="37" y="36" width="5" height="6" fill="#6B4426"/><rect x="4" y="48" width="56" height="12" fill="#3D3A48"/></svg>
       <span><b>Les Remparts</b><small>Défense · place tes troupes, choisis tes renforts</small></span>
+    </button>
+    <button class="game-card" id="go-circuit">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#F7F5EE" stroke="#D8D2C2" stroke-width="2"/>
+        <path d="M14 44V18h36v26H38M26 44H14" stroke="#C0392B" stroke-width="3" fill="none" stroke-linejoin="round"/>
+        <rect x="26" y="39" width="12" height="10" rx="2" fill="#2B2542"/><rect x="26" y="39" width="6" height="10" rx="2" fill="#F5C518"/>
+        <circle cx="32" cy="18" r="9" fill="#FFE27A" stroke="#4A4560" stroke-width="2"/><path d="M27 13l10 10M37 13L27 23" stroke="#4A4560" stroke-width="2"/>
+        <circle cx="50" cy="31" r="6" fill="#DCD5EA" stroke="#4A4560" stroke-width="2"/><text x="50" y="34.5" font-size="9" text-anchor="middle" font-family="Arial" font-weight="bold" fill="#2B2542">M</text></svg>
+      <span><b>L'Atelier des circuits</b><small>Éducatif · piles, lampes, moteurs</small></span>
     </button>
     <p class="save-status" id="save-status">Partie sauvegardée sur cet appareil</p>
   </div>
@@ -281,6 +317,31 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
     <p>La bataille en cours sera abandonnée. Ton record est gardé.</p>
     <button class="big danger" id="ba-reset-ok">Recommencer</button>
     <button class="ghost" id="ba-reset-no">Annuler</button>
+  </div>
+</div>
+
+<div id="circuit" class="screen" hidden>
+  <canvas id="circuit-cv" aria-label="Plan de travail du circuit"></canvas>
+  <div class="ca-hud" id="ci-hud">
+    <div class="bar-l"><button class="pill icon" id="ci-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+      <button class="pill" id="ci-menu">Menu</button></div>
+    <div class="bar-l"><button class="pill" id="ci-hint" hidden>Indice</button><button class="pill" id="ci-clear">Tout effacer</button></div>
+  </div>
+  <div class="ci-panel" id="ci-panel"><div><h3 id="ci-title"></h3><p id="ci-text"></p><p id="ci-task"></p></div></div>
+  <div class="ci-bottom" id="ci-bottom">
+    <div class="ci-done" id="ci-done" hidden><b id="ci-done-t">Bravo !</b><button class="pill" id="ci-done-b">Suivant</button></div>
+    <div class="ci-tools" id="ci-tools" hidden></div>
+    <div class="ci-pal" id="ci-pal"></div>
+  </div>
+</div>
+<div class="overlay" id="ov-ci-menu" hidden>
+  <div class="card">
+    <h2>L'Atelier des circuits</h2>
+    <p>Pose des pièces, puis tire des fils d'une borne à l'autre avec le doigt. Touche une pièce pour la tourner, l'inverser ou la supprimer.</p>
+    <button class="big" id="ci-sandbox">Atelier libre</button>
+    <div class="ci-sec">Découvrir</div><div id="ci-list-l"></div>
+    <div class="ci-sec">Défis</div><div id="ci-list-c"></div>
+    <button class="ghost" id="ci-menu-close">Fermer</button>
   </div>
 </div>
 
@@ -1904,9 +1965,249 @@ $('go-battle').onclick=()=>{$('home').hidden=true;window.Battle.enter()};
 })();
 
 </script>
+<script id="circuit-game">
+/* L'Atelier des circuits: place two-terminal parts, draw wires between terminals, and a nodal solver
+   works out every voltage and current. Lessons explain, challenges check, the free workshop is a sandbox. */
+(()=>{
+const root=document.getElementById('circuit'),cv=document.getElementById('circuit-cv');let ctx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+const DISPLAY="'Lilita One','Arial Rounded MT Bold',system-ui,sans-serif";
+const GX=8,GY=10,EMF=4.5,RINT=.25,GWIRE=1000;
+const TYPES={
+  pile:{name:'Pile',R:RINT},
+  lampe:{name:'Lampe',R:12},
+  inter:{name:'Inter\u00adrupteur'},
+  moteur:{name:'Moteur',R:6},
+  volt:{name:'Volt\u00admètre',R:1e6},
+  aimant:{name:'Électro\u00adaimant',R:4},
+};
+const ORDER=['pile','lampe','inter','moteur','volt','aimant'];
+const P0=Math.pow(EMF/(12+RINT),2)*12;           // a lamp's power on one battery: "normal" brightness
+const I_MOT=EMF/(6+RINT),I_MAG=EMF/(4+RINT);
+
+// ---------- lessons and challenges ----------
+const C=(type,x,y,rot=0,extra={})=>({type,x,y,rot,...extra});
+const LESSONS=[
+  {title:'Le circuit fermé',text:"Le courant sort de la borne + de la pile, fait le tour du circuit et revient par la borne −. Il ne circule que si le chemin est complet, sans coupure : c'est un circuit fermé. L'interrupteur ouvert coupe le chemin, la lampe s'éteint.",
+   task:"Touche l'interrupteur pour l'ouvrir et le fermer.",comps:[C('pile',2,8,0),C('lampe',2,2,0),C('inter',6,4,1,{on:true})],wires:[[0,0,1,0],[1,1,2,0],[2,1,0,1]],check:s=>s.toggled},
+  {title:'Le sens du courant',text:"Par convention, le courant va de la borne + vers la borne − à l'extérieur de la pile. Les petits points jaunes le montrent. Un moteur tourne dans un sens ou dans l'autre selon le sens du courant.",
+   task:"Touche la pile, puis « Inverser ». Regarde l'hélice.",comps:[C('pile',2,8,0),C('moteur',2,3,0)],wires:[[0,0,1,0],[1,1,0,1]],check:s=>s.flipped},
+  {title:'Le montage en série',text:"En série, les lampes sont l'une après l'autre sur un seul chemin. Le même courant les traverse, mais la tension de la pile se partage : chaque lampe n'a qu'environ la moitié, elle brille faiblement. Le voltmètre mesure la tension aux bornes d'une lampe.",
+   task:"Supprime une lampe : l'autre s'éteint aussi, car le chemin est coupé.",comps:[C('pile',2,8,0),C('lampe',1,3,0),C('lampe',5,3,0),C('volt',1,5.5,0)],wires:[[0,0,1,0],[1,1,2,0],[2,1,0,1],[3,0,1,0],[3,1,1,1]],check:s=>s.n.lampe===1},
+  {title:'Le montage en dérivation',text:"En dérivation (on dit aussi « en parallèle »), chaque lampe a son propre chemin vers la pile. Chacune reçoit toute la tension de la pile et brille fort. Si on enlève une lampe, l'autre reste allumée : c'est ainsi qu'est câblée une maison.",
+   task:"Supprime une lampe : l'autre reste allumée.",comps:[C('pile',2,9,0),C('lampe',2,2,0),C('lampe',2,5,0),C('volt',2,.6,0)],wires:[[0,0,1,0],[0,0,2,0],[1,1,2,1],[2,1,0,1],[3,0,1,0],[3,1,1,1]],check:s=>s.n.lampe===1&&s.lit>=1},
+  {title:'Le court-circuit',text:"Un fil branché directement entre les deux bornes d'une lampe offre au courant un chemin sans obstacle : presque tout le courant passe par le fil, la lampe s'éteint, et la pile débite énormément. Elle chauffe et s'use très vite. C'est dangereux avec les prises de la maison !",
+   task:"Supprime le fil de court-circuit (touche-le, puis « Supprimer »).",comps:[C('pile',2,8,0),C('lampe',2,3,0)],wires:[[0,0,1,0],[1,1,0,1],[1,0,1,1]],check:s=>s.lit>=1&&!s.short},
+  {title:'Les piles en série',text:"Deux piles mises bout à bout, la borne + de l'une contre la borne − de l'autre, ajoutent leurs tensions : 4,5 V + 4,5 V = 9 V (le voltmètre affiche un peu moins : les piles s'échauffent un peu en débitant). Le moteur tourne deux fois plus vite. Attention : une lampe prévue pour 4,5 V brillerait trop fort et pourrait griller.",
+   task:"Inverse une des piles : les tensions s'annulent et le moteur s'arrête.",comps:[C('pile',0,8,0),C('pile',3,8,0),C('moteur',2,3,0),C('volt',1.5,9.6,0)],wires:[[0,1,1,0],[1,1,2,1],[2,0,0,0],[3,0,0,0],[3,1,1,1]],check:s=>s.flipped&&s.spin<.2},
+  {title:"L'électroaimant",text:"Un fil enroulé autour d'un clou de fer devient un aimant quand le courant passe : c'est un électroaimant. La boussole posée à côté le prouve, son aiguille dévie. En 1820, Ørsted a découvert ainsi le lien entre électricité et magnétisme. Si on inverse le courant, l'aiguille dévie de l'autre côté.",
+   task:"Ferme l'interrupteur, puis inverse la pile.",comps:[C('pile',2,9,0),C('inter',6,5,1,{on:false}),C('aimant',2,3,0)],wires:[[0,0,2,0],[2,1,1,0],[1,1,0,1]],check:s=>s.toggled&&s.flipped},
+];
+const CHALLENGES=[
+  {text:'Allume la lampe.',parts:{pile:1,lampe:1},hint:'Relie la borne + de la pile à une borne de la lampe, et l’autre borne de la lampe à la borne − de la pile.',check:A=>A().lamps.some(b=>b>.6)},
+  {text:'La lampe doit s’allumer seulement quand l’interrupteur est fermé.',parts:{pile:1,lampe:1,inter:1},hint:'Mets l’interrupteur sur le même chemin que la lampe, en série.',check:A=>A([1]).lamps.some(b=>b>.6)&&!A([0]).lamps.some(b=>b>.1)},
+  {text:'Fais tourner l’hélice.',parts:{pile:1,moteur:1},hint:'Un moteur se branche comme une lampe : un fil vers chaque borne de la pile.',check:A=>A().motors.some(s=>Math.abs(s)>.5)},
+  {text:'Fais tourner l’hélice dans le sens inverse des aiguilles d’une montre.',parts:{pile:1,moteur:1},hint:'Le sens dépend du sens du courant : inverse la pile ou le moteur.',check:A=>A().motors.some(s=>s<-.5)},
+  {text:'Allume deux lampes qui brillent toutes les deux très fort, avec une seule pile.',parts:{pile:1,lampe:2},hint:'Donne à chaque lampe son propre chemin vers la pile : c’est le montage en dérivation.',check:A=>{const l=A().lamps;return l.length===2&&l.every(b=>b>.85)}},
+  {text:'Allume deux lampes avec une seule pile, mais qu’elles brillent faiblement toutes les deux.',parts:{pile:1,lampe:2},hint:'Mets les lampes l’une après l’autre sur un seul chemin : c’est le montage en série.',check:A=>{const l=A().lamps;return l.length===2&&l.every(b=>b>.3&&b<.7)}},
+  {text:'Mesure la tension de la pile avec le voltmètre.',parts:{pile:1,volt:1},hint:'Le voltmètre se branche aux deux bornes de ce qu’on mesure, ici la pile.',check:A=>A().volts.some(v=>Math.abs(v)>4)},
+  {text:'Fais dévier l’aiguille de la boussole.',parts:{pile:1,aimant:1},hint:'Fais passer du courant dans l’électroaimant.',check:A=>A().mags.some(d=>Math.abs(d)>.5)},
+  {text:'Le moteur tourne tout le temps, et l’interrupteur allume ou éteint seulement la lampe.',parts:{pile:1,lampe:1,moteur:1,inter:1},hint:'Deux chemins en dérivation : un pour le moteur, un pour la lampe avec son interrupteur.',
+   check:A=>{const on=A([1]),off=A([0]);return on.lamps[0]>.6&&on.motors.some(s=>Math.abs(s)>.5)&&off.lamps[0]<.1&&off.motors.some(s=>Math.abs(s)>.5)}},
+  {text:'Fais tourner l’hélice deux fois plus vite.',parts:{pile:2,moteur:1},hint:'Mets les deux piles en série, la borne + de l’une reliée à la borne − de l’autre.',check:A=>A().motors.some(s=>Math.abs(s)>1.6)},
+  {text:'Deux lampes en série : mesure la tension aux bornes d’une seule lampe.',parts:{pile:1,lampe:2,volt:1},hint:'Le voltmètre se branche aux deux bornes d’une lampe. Il doit afficher environ la moitié de 4,5 V.',
+   check:A=>{const s=A();return s.lamps.length===2&&s.lamps.every(b=>b>.3&&b<.7)&&s.volts.some(v=>Math.abs(v)>1.5&&Math.abs(v)<2.8)}},
+  {text:'Deux interrupteurs : chacun doit pouvoir allumer la lampe tout seul.',parts:{pile:1,lampe:1,inter:2},hint:'Mets les deux interrupteurs en dérivation l’un de l’autre, puis en série avec la lampe.',
+   check:A=>A([0,0]).lamps[0]<.1&&A([1,0]).lamps[0]>.6&&A([0,1]).lamps[0]>.6},
+];
+
+// ---------- state ----------
+let hintY=0,W=0,H=0,dpr=1,U=40,bx=0,by=0,running=false,last=0;
+let mode=null,idx=0,comps=[],wires=[],sel=null,drag=null,sim=null,phase=0,stats={toggled:false,flipped:false},doneShown=false;
+let save={sandbox:null,done:[],lessons:[]};try{save=Object.assign(save,JSON.parse(localStorage.getItem('circuits')||'{}'))}catch(e){}
+function store(){if(mode==='sandbox')save.sandbox={comps:comps.map(({type,x,y,rot,on})=>({type,x,y,rot,on})),wires};try{localStorage.setItem('circuits',JSON.stringify(save))}catch(e){}}
+function insets(){const r=root.getBoundingClientRect(),a=$('ci-panel').getBoundingClientRect(),b=$('ci-bottom').getBoundingClientRect();return{top:(a.height?a.bottom:$('ci-hud').getBoundingClientRect().bottom)-r.top+6,bot:r.bottom-b.top+6}}
+function resize(){const r=root.getBoundingClientRect();dpr=Math.min(window.devicePixelRatio||1,3);W=r.width;H=r.height;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+  const ins=insets(),top=ins.top+22,bot=ins.bot,ah=H-top-bot;hintY=ins.top+8;U=Math.min((W-28)/GX,ah/(GY+.6));bx=(W-GX*U)/2;by=top+(ah-GY*U)/2}
+new ResizeObserver(resize).observe(root);
+const SX=x=>bx+x*U,SY=y=>by+y*U;
+const ends=c=>{const d=[[2,0],[0,2],[-2,0],[0,-2]][c.rot&3];return[{x:c.x,y:c.y},{x:c.x+d[0],y:c.y+d[1]}]};
+
+// ---------- the solver: every terminal is a node, wires are tiny resistors ----------
+function solve(over){
+  const N=comps.length*2;if(!N)return{V:[],I:[],IW:[],lamps:[],motors:[],volts:[],mags:[],short:false,n:{},lit:0,spin:0};
+  const A=[...Array(N)].map(()=>new Float64Array(N)),b=new Float64Array(N);
+  const g=(p,q,G)=>{A[p][p]+=G;A[q][q]+=G;A[p][q]-=G;A[q][p]-=G};
+  let si=0;const Gc=comps.map((c,i)=>{let R=TYPES[c.type].R;if(c.type==='inter'){const on=over?over[si++]??c.on:c.on;return on?GWIRE:0}if(c.type==='lampe'&&c.burnt)return 0;return 1/R});
+  comps.forEach((c,i)=>{g(2*i,2*i+1,Gc[i]);if(c.type==='pile'){const I=EMF/RINT;b[2*i]+=I;b[2*i+1]-=I}});
+  for(const w of wires)g(2*w[0]+w[1],2*w[2]+w[3],GWIRE);
+  // terminals that sit on the same point are joined
+  const pts=comps.flatMap((c,i)=>ends(c).map((p,k)=>({p,n:2*i+k})));
+  for(let a=0;a<pts.length;a++)for(let c=a+1;c<pts.length;c++)if(Math.abs(pts[a].p.x-pts[c].p.x)<.01&&Math.abs(pts[a].p.y-pts[c].p.y)<.01&&(pts[a].n>>1)!==(pts[c].n>>1))g(pts[a].n,pts[c].n,GWIRE);
+  for(let i=0;i<N;i++)A[i][i]+=1e-7;
+  const V=gauss(A,b);
+  const I=comps.map((c,i)=>{const dv=V[2*i]-V[2*i+1];return c.type==='pile'?(EMF-dv)/RINT:Gc[i]*dv});
+  const IW=wires.map(w=>GWIRE*(V[2*w[0]+w[1]]-V[2*w[2]+w[3]]));
+  const out={V,I,IW,lamps:[],motors:[],volts:[],mags:[],short:false,n:{}};
+  comps.forEach((c,i)=>{out.n[c.type]=(out.n[c.type]||0)+1;
+    if(c.type==='lampe'){const P=I[i]*I[i]*12;if(!over)c.P=P;out.lamps.push(c.burnt?0:Math.sqrt(P/P0))}
+    if(c.type==='moteur')out.motors.push(I[i]/I_MOT);
+    if(c.type==='volt')out.volts.push(V[2*i]-V[2*i+1]);
+    if(c.type==='aimant')out.mags.push(Math.atan(I[i]/(.35*I_MAG))*.95);
+    if(c.type==='pile'&&Math.abs(I[i])>4)out.short=true});
+  out.lit=out.lamps.filter(b=>b>.3).length;out.spin=Math.max(0,...out.motors.map(Math.abs));
+  return out}
+function gauss(A,b){const n=b.length;for(let k=0;k<n;k++){let p=k;for(let i=k+1;i<n;i++)if(Math.abs(A[i][k])>Math.abs(A[p][k]))p=i;[A[k],A[p]]=[A[p],A[k]];[b[k],b[p]]=[b[p],b[k]];
+    const d=A[k][k]||1e-12;for(let i=k+1;i<n;i++){const f=A[i][k]/d;if(!f)continue;for(let j=k;j<n;j++)A[i][j]-=f*A[k][j];b[i]-=f*b[k]}}
+  const x=new Float64Array(n);for(let i=n-1;i>=0;i--){let s=b[i];for(let j=i+1;j<n;j++)s-=A[i][j]*x[j];x[i]=s/(A[i][i]||1e-12)}return x}
+function resolve(){sim=solve();
+  // a lamp given far too much power burns out
+  let burnt=false;comps.forEach(c=>{if(c.type==='lampe'&&!c.burnt&&c.P>5*P0){c.burnt=true;burnt=true}});if(burnt)sim=solve();
+  checkGoal();store()}
+
+// ---------- modes ----------
+function load(list){comps=list.comps.map(c=>({on:false,...c}));wires=(list.wires||[]).map(w=>[...w]);sel=null;stats={toggled:false,flipped:false};doneShown=false;resolve()}
+function start(m,i){mode=m;idx=i||0;$('ov-ci-menu').hidden=true;$('ci-done').hidden=true;
+  if(m==='lesson'){const L=LESSONS[idx];load(L);$('ci-title').textContent='Leçon '+(idx+1)+' · '+L.title;$('ci-text').textContent=L.text;$('ci-task').textContent='À toi : '+L.task;$('ci-hint').hidden=true}
+  if(m==='challenge'){const K=CHALLENGES[idx];load({comps:[],wires:[]});$('ci-title').textContent='Défi '+(idx+1)+' / '+CHALLENGES.length;$('ci-text').textContent=K.text;$('ci-task').textContent='';$('ci-hint').hidden=false}
+  if(m==='sandbox'){load(save.sandbox||{comps:[],wires:[]});$('ci-title').textContent='Atelier libre';$('ci-text').textContent='Ajoute des pièces, tire des fils d’une borne à l’autre et observe.';$('ci-task').textContent='';$('ci-hint').hidden=true}
+  $('ci-clear').hidden=m==='lesson';palette();tools();requestAnimationFrame(()=>resize())}
+function left(type){if(mode!=='challenge')return Infinity;const K=CHALLENGES[idx];return(K.parts[type]||0)-comps.filter(c=>c.type===type).length}
+function checkGoal(){if(!mode||doneShown)return;let ok=false;
+  if(mode==='lesson'){const L=LESSONS[idx];ok=L.check({...sim,...stats})}
+  if(mode==='challenge'){const nsw=comps.filter(c=>c.type==='inter').length;const A=st=>solve(st?Array.from({length:nsw},(_,k)=>!!(st[k]??st[0])):null);try{ok=CHALLENGES[idx].check(A)}catch(e){ok=false}}
+  if(ok){doneShown=true;const key=mode==='lesson'?'lessons':'done';if(!save[key].includes(idx))save[key].push(idx);
+    const list=mode==='lesson'?LESSONS:CHALLENGES,next=idx<list.length-1;$('ci-done-t').textContent=mode==='lesson'?'Bien vu !':'Défi réussi !';
+    $('ci-done-b').textContent=next?(mode==='lesson'?'Leçon suivante':'Défi suivant'):'Retour au menu';$('ci-done-b').onclick=()=>next?start(mode,idx+1):openMenu();$('ci-done').hidden=false;store()}}
+
+// ---------- palette and tools ----------
+function iconCanvas(type,s=40){const c=document.createElement('canvas');c.width=s*2;c.height=s*2;c.style.width=s+'px';c.style.height=s+'px';const old=ctx,oU=U;ctx=c.getContext('2d');ctx.scale(2,2);U=s/2.4;
+  try{drawPart({type,rot:0,on:true},{x:s/2-U,y:s/2},{x:s/2+U,y:s/2},0,0,true)}finally{ctx=old;U=oU}return c}
+function palette(){const p=$('ci-pal');p.innerHTML='';for(const t of ORDER){const n=left(t);if(mode==='challenge'&&!(CHALLENGES[idx].parts[t]))continue;
+  const b=document.createElement('button');b.className='ci-item';b.id='ci-add-'+t;b.disabled=n<=0;b.append(iconCanvas(t));const l=document.createElement('span');l.textContent=TYPES[t].name+(mode==='challenge'?' ×'+n:'');b.append(l);
+  b.onclick=()=>add(t);p.append(b)}}
+function tools(){const t=$('ci-tools');t.innerHTML='';if(!sel){t.hidden=true;return}t.hidden=false;
+  const mk=(label,fn,id,cls)=>{const b=document.createElement('button');b.className='pill'+(cls?' '+cls:'');b.id=id;b.textContent=label;b.onclick=fn;t.append(b)};
+  if(sel.k==='comp'){const c=comps[sel.i];
+    mk('Tourner',()=>{c.rot=(c.rot+1)&3;fit(c);resolve()},'ci-rot');
+    mk('Inverser',()=>{const e=ends(c)[1];c.rot=(c.rot+2)&3;c.x=e.x;c.y=e.y;wires.forEach(w=>{if(w[0]===sel.i)w[1]^=1;if(w[2]===sel.i)w[3]^=1});stats.flipped=true;resolve()},'ci-flip');
+    if(c.type==='lampe'&&c.burnt)mk('Changer l’ampoule',()=>{c.burnt=false;resolve();tools()},'ci-fix');
+    mk('Supprimer',()=>{removeComp(sel.i);sel=null;tools();palette();resolve()},'ci-del','danger')}
+  else mk('Supprimer le fil',()=>{wires.splice(sel.i,1);sel=null;tools();resolve()},'ci-delw','danger')}
+function removeComp(i){comps.splice(i,1);wires=wires.filter(w=>w[0]!==i&&w[2]!==i).map(w=>[w[0]>i?w[0]-1:w[0],w[1],w[2]>i?w[2]-1:w[2],w[3]])}
+function occupied(x,y,skip){return comps.some((c,i)=>i!==skip&&ends(c).some(p=>Math.abs(p.x-x)<.01&&Math.abs(p.y-y)<.01))}
+function bodyClash(c,skip){const[a,b]=ends(c),m={x:(a.x+b.x)/2,y:(a.y+b.y)/2};return comps.some((o,i)=>{if(i===skip)return false;const[p,q]=ends(o);return Math.hypot((p.x+q.x)/2-m.x,(p.y+q.y)/2-m.y)<1.2})}
+function fit(c){const[a,b]=ends(c);const mnx=Math.min(a.x,b.x),mxx=Math.max(a.x,b.x),mny=Math.min(a.y,b.y),mxy=Math.max(a.y,b.y);
+  if(mnx<0){c.x-=mnx}if(mxx>GX){c.x-=mxx-GX}if(mny<0){c.y-=mny}if(mxy>GY){c.y-=mxy-GY}}
+function add(t){if(left(t)<=0)return;const c={type:t,x:3,y:5,rot:0,on:false};
+  outer:for(const y of[5,4,6,3,7,2,8,1,9])for(const x of[3,1,5,2,4,0,6]){c.x=x;c.y=y;const[a,b]=ends(c);if(!occupied(a.x,a.y)&&!occupied(b.x,b.y)&&!bodyClash(c))break outer}
+  comps.push(c);sel={k:'comp',i:comps.length-1};palette();tools();resolve()}
+
+// ---------- input ----------
+function hitTerm(px,py){let best=null,bd=.42;comps.forEach((c,i)=>ends(c).forEach((p,k)=>{const d=Math.hypot(SX(p.x)-px,SY(p.y)-py)/U;if(d<bd){bd=d;best={i,k}}}));return best}
+function hitComp(px,py){for(let i=comps.length-1;i>=0;i--){const[a,b]=ends(comps[i]),mx=SX((a.x+b.x)/2),my=SY((a.y+b.y)/2);if(Math.hypot(mx-px,my-py)<U*.62)return i}return -1}
+function hitWire(px,py){let best=-1,bd=U*.22;wires.forEach((w,i)=>{const a=ends(comps[w[0]])[w[1]],b=ends(comps[w[2]])[w[3]];const ax=SX(a.x),ay=SY(a.y),bx2=SX(b.x),by2=SY(b.y);
+  const L=(bx2-ax)**2+(by2-ay)**2||1,t=Math.max(0,Math.min(1,((px-ax)*(bx2-ax)+(py-ay)*(by2-ay))/L)),d=Math.hypot(ax+(bx2-ax)*t-px,ay+(by2-ay)*t-py);if(d<bd){bd=d;best=i}});return best}
+const evp=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+cv.addEventListener('pointerdown',e=>{if(!mode)return;e.preventDefault();cv.setPointerCapture?.(e.pointerId);const p=evp(e);
+  const t=hitTerm(p.x,p.y),ci=hitComp(p.x,p.y);
+  if(t&&!(ci===t.i&&Math.hypot(p.x-SX(ends(comps[t.i])[t.k].x),p.y-SY(ends(comps[t.i])[t.k].y))>U*.3)){drag={k:'wire',from:t,x:p.x,y:p.y};return}
+  if(ci>=0){const c=comps[ci];drag={k:'move',i:ci,sx:p.x,sy:p.y,ox:c.x,oy:c.y,moved:false};return}
+  const wi=hitWire(p.x,p.y);sel=wi>=0?{k:'wire',i:wi}:null;tools()});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const p=evp(e);
+  if(drag.k==='wire'){drag.x=p.x;drag.y=p.y;return}
+  const dx=(p.x-drag.sx)/U,dy=(p.y-drag.sy)/U;if(Math.hypot(dx,dy)*U>6)drag.moved=true;if(!drag.moved)return;
+  const c=comps[drag.i],nx=Math.round(drag.ox+dx),ny=Math.round(drag.oy+dy);if(nx===c.x&&ny===c.y)return;const keep=[c.x,c.y];c.x=nx;c.y=ny;fit(c);
+  const[a,b]=ends(c);if(bodyClash(c,drag.i)){c.x=keep[0];c.y=keep[1]}else resolve()});
+cv.addEventListener('pointerup',e=>{if(!drag)return;const p=evp(e),d=drag;drag=null;
+  if(d.k==='wire'){const t=hitTerm(p.x,p.y);if(t&&!(t.i===d.from.i&&t.k===d.from.k)){const w=[d.from.i,d.from.k,t.i,t.k];
+      if(!wires.some(x=>(x[0]===w[0]&&x[1]===w[1]&&x[2]===w[2]&&x[3]===w[3])||(x[0]===w[2]&&x[1]===w[3]&&x[2]===w[0]&&x[3]===w[1]))){wires.push(w);resolve()}}
+    else if(!t||(t.i===d.from.i&&t.k===d.from.k)){/* a tap on a terminal selects its part */sel={k:'comp',i:d.from.i};tools()}return}
+  if(!d.moved){const c=comps[d.i];if(c.type==='inter'){c.on=!c.on;stats.toggled=true;resolve()}sel={k:'comp',i:d.i};tools()}});
+cv.addEventListener('pointercancel',()=>{drag=null});
+
+// ---------- drawing ----------
+function rr(x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function circ(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}
+function label(t,x,y,size,col,bg){ctx.font=`${Math.round(size)}px ${DISPLAY}`;ctx.textAlign='center';ctx.textBaseline='middle';if(bg){const w=ctx.measureText(t).width+size*.8;ctx.fillStyle=bg;rr(x-w/2,y-size*.7,w,size*1.4,size*.4);ctx.fill()}ctx.fillStyle=col;ctx.fillText(t,x,y)}
+const fmt=v=>(Math.round(v*10)/10).toFixed(1).replace('.',',').replace('-0,0','0,0');
+// draws one part between its two terminals; local frame: x along the part, from -U (terminal 0) to +U (terminal 1)
+function drawPart(c,a,b,i,now,icon){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2,an=Math.atan2(b.y-a.y,b.x-a.x),u=U,I=sim&&!icon?sim.I[i]||0:0;
+  ctx.save();ctx.translate(mx,my);ctx.rotate(an);
+  const lead=(x0,x1)=>{ctx.strokeStyle='#4A4560';ctx.lineWidth=Math.max(2,u*.07);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-u,0);ctx.lineTo(x0,0);ctx.moveTo(x1,0);ctx.lineTo(u,0);ctx.stroke()};
+  const vert=Math.abs(Math.sin(an))>.5,side=Math.cos(an)<-.1?-1:1,O=d=>vert?[u*.98,0]:[0,d]; // labels go below, or beside a vertical part
+  if(c.type==='pile'){lead(-u*.55,u*.55);ctx.fillStyle='#2B2542';rr(-u*.55,-u*.24,u*1.1,u*.48,u*.1);ctx.fill();ctx.fillStyle='#F5C518';rr(-u*.55,-u*.24,u*.55,u*.48,u*.1);ctx.fill();ctx.fillRect(-u*.2,-u*.24,u*.2,u*.48);
+    ctx.fillStyle='#C9A24A';ctx.fillRect(-u*.66,-u*.1,u*.11,u*.2);ctx.save();ctx.rotate(-an);
+    label('+',-Math.cos(an)*u*.82,-Math.sin(an)*u*.82-u*.32,u*.3,'#E5484D');label('−',Math.cos(an)*u*.82,Math.sin(an)*u*.82-u*.32,u*.3,'#2B2542');
+    if(!icon)label('4,5 V',...O(u*.5),u*.22,'#6B6386');if(!icon&&sim&&Math.abs(I)>4&&Math.sin(now/120)>0)label('Court-circuit !',0,-u*.62,u*.24,'#fff','#E5484D');ctx.restore()}
+  if(c.type==='lampe'){lead(-u*.36,u*.36);const br=icon?.9:c.burnt?0:Math.min(1.6,Math.sqrt((c.P||0)/P0));
+    if(br>.05){const gr=ctx.createRadialGradient(0,0,u*.1,0,0,u*(.5+.6*Math.min(br,1.4)));gr.addColorStop(0,`rgba(255,226,120,${Math.min(.95,br*.8)})`);gr.addColorStop(1,'rgba(255,226,120,0)');ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,u*1.1,0,7);ctx.fill()}
+    circ(0,0,u*.36,c.burnt?'#8E8A9E':br>.05?`rgb(255,${Math.round(210+40*Math.min(1,br))},${Math.round(120+100*Math.min(1,br))})`:'#F4F1E8');
+    ctx.strokeStyle=c.burnt?'#5A5868':'#4A4560';ctx.lineWidth=Math.max(1.5,u*.05);ctx.beginPath();ctx.arc(0,0,u*.36,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(-u*.25,-u*.25);ctx.lineTo(u*.25,u*.25);ctx.moveTo(u*.25,-u*.25);ctx.lineTo(-u*.25,u*.25);ctx.stroke();
+    if(!icon&&c.burnt){ctx.save();ctx.rotate(-an);label('Grillée',...O(u*.6),u*.22,'#fff','#5A5868');ctx.restore()}
+    else if(!icon&&br>1.25){ctx.save();ctx.rotate(-an);label('Trop fort !',...O(u*.62),u*.22,'#fff','#F28C28');ctx.restore()}}
+  if(c.type==='inter'){lead(-u*.5,u*.5);circ(-u*.5,0,u*.09,'#4A4560');circ(u*.5,0,u*.09,'#4A4560');ctx.strokeStyle=c.on?'#3DAA5C':'#E5484D';ctx.lineWidth=Math.max(3,u*.1);ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-u*.5,0);const ang=c.on?0:-.55;ctx.lineTo(-u*.5+Math.cos(ang)*u*.98,Math.sin(ang)*u*.98);ctx.stroke();
+    if(!icon){ctx.save();ctx.rotate(-an);label(c.on?'Fermé':'Ouvert',...O(u*.5),u*.22,c.on?'#2E7D32':'#A8292E');ctx.restore()}}
+  if(c.type==='moteur'){lead(-u*.38,u*.38);circ(0,0,u*.38,'#DCD5EA');ctx.strokeStyle='#4A4560';ctx.lineWidth=Math.max(1.5,u*.05);ctx.beginPath();ctx.arc(0,0,u*.38,0,7);ctx.stroke();
+    // the propeller sits above the motor and turns with the current
+    const sp=icon?0:I/I_MOT;c.ang=(c.ang||0)+sp*.25;const hx=0,hy=-u*.95*side;ctx.strokeStyle='#4A4560';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-u*.38*side);ctx.lineTo(hx,hy);ctx.stroke();
+    for(let k=0;k<3;k++){const a2=(icon?.3:c.ang)+k*2.094;ctx.fillStyle=['#3B7DD8','#E5484D','#F5C518'][k];ctx.save();ctx.translate(hx,hy);ctx.rotate(a2);ctx.beginPath();ctx.ellipse(u*.24,0,u*.24,u*.08,0,0,7);ctx.fill();ctx.restore()}circ(hx,hy,u*.07,'#2B2542');
+    if(!icon&&Math.abs(sp)>.05){ctx.strokeStyle='rgba(43,37,66,.5)';ctx.lineWidth=2;ctx.beginPath();const r=u*.58;if(sp>0)ctx.arc(hx,hy,r,-.9,.6);else ctx.arc(hx,hy,r,Math.PI-.6,Math.PI+.9);ctx.stroke();
+      const tipA=sp>0?.6:Math.PI-.6,tx=hx+Math.cos(tipA)*r,ty=hy+Math.sin(tipA)*r,dir=sp>0?1:-1;ctx.fillStyle='rgba(43,37,66,.6)';ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(tx-dir*u*.12,ty-u*.02);ctx.lineTo(tx-dir*u*.02,ty-u*.13);ctx.fill()}
+    ctx.save();ctx.rotate(-an);label('M',0,u*.02,u*.36,'#2B2542');ctx.restore()}
+  if(c.type==='volt'){lead(-u*.4,u*.4);circ(0,0,u*.4,'#fff');ctx.strokeStyle='#4A4560';ctx.lineWidth=Math.max(1.5,u*.05);ctx.beginPath();ctx.arc(0,0,u*.4,0,7);ctx.stroke();
+    ctx.save();ctx.rotate(-an);label('V',0,u*.02,u*.34,'#3B7DD8');if(!icon){const v=sim?sim.V[2*i]-sim.V[2*i+1]:0;const[ox,oy]=O(u*.68);ctx.fillStyle='#2B2542';rr(ox-u*.5,oy-u*.18,u*1,u*.36,u*.08);ctx.fill();label(fmt(v)+' V',ox,oy,u*.24,'#7BD148');
+      label('+',-Math.cos(an)*u*.82,-Math.sin(an)*u*.82-u*.3,u*.24,'#E5484D')}ctx.restore()}
+  if(c.type==='aimant'){lead(-u*.5,u*.5);ctx.fillStyle='#A7A3B8';rr(-u*.55,-u*.13,u*1.1,u*.26,u*.05);ctx.fill();ctx.strokeStyle='#C97B2A';ctx.lineWidth=Math.max(2,u*.06);
+    for(let k=0;k<7;k++){const x=-u*.45+k*u*.15;ctx.beginPath();ctx.ellipse(x,0,u*.05,u*.2,0,0,7);ctx.stroke()}
+    // compass beside the coil: the needle turns as current flows
+    const cx2=0,cy2=-u*.85*side,def=icon?.6:(sim?Math.atan(I/(.35*I_MAG))*.95:0);circ(cx2,cy2,u*.3,'#fff');ctx.strokeStyle='#4A4560';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx2,cy2,u*.3,0,7);ctx.stroke();
+    ctx.save();ctx.translate(cx2,cy2);ctx.rotate(-an);ctx.rotate(def);ctx.fillStyle='#E5484D';ctx.beginPath();ctx.moveTo(0,-u*.24);ctx.lineTo(u*.06,0);ctx.lineTo(-u*.06,0);ctx.fill();ctx.fillStyle='#3B7DD8';ctx.beginPath();ctx.moveTo(0,u*.24);ctx.lineTo(u*.06,0);ctx.lineTo(-u*.06,0);ctx.fill();circ(0,0,u*.04,'#2B2542');ctx.restore()}
+  ctx.restore();
+  // current dots through the part
+  if(!icon&&Math.abs(I)>.02&&c.type!=='volt'){dots(a,b,I,i*.37)}
+  if(!icon)for(const p of[a,b]){circ(p.x,p.y,u*.14,'#2B2542');circ(p.x,p.y,u*.07,drag&&drag.k==='wire'?'#F5C518':'#fff')}}
+function dots(a,b,I,off){const L=Math.hypot(b.x-a.x,b.y-a.y);if(L<1)return;const step=U*.42,s=((phase*Math.sign(I)*Math.min(2.2,.5+Math.abs(I))*U+off*U)%step+step)%step;
+  ctx.fillStyle='#F5C518';for(let d=s;d<L;d+=step){const t=d/L;circ(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,Math.max(2,U*.055),'#F5C518')}}
+function draw(now){
+  ctx.fillStyle='#F7F5EE';ctx.fillRect(0,0,W,H);
+  // graph paper with the grid points where terminals snap
+  ctx.strokeStyle='rgba(59,125,216,.08)';ctx.lineWidth=1;for(let x=0;x<=GX*2;x++){ctx.beginPath();ctx.moveTo(SX(x/2),SY(-.3));ctx.lineTo(SX(x/2),SY(GY+.3));ctx.stroke()}
+  for(let y=0;y<=GY*2;y++){ctx.beginPath();ctx.moveTo(SX(-.3),SY(y/2));ctx.lineTo(SX(GX+.3),SY(y/2));ctx.stroke()}
+  for(let x=0;x<=GX;x++)for(let y=0;y<=GY;y++)circ(SX(x),SY(y),1.6,'rgba(59,125,216,.35)');
+  // wires
+  wires.forEach((w,i)=>{const a=ends(comps[w[0]])[w[1]],b=ends(comps[w[2]])[w[3]],A={x:SX(a.x),y:SY(a.y)},B={x:SX(b.x),y:SY(b.y)},hot=sel&&sel.k==='wire'&&sel.i===i;
+    ctx.strokeStyle=hot?'#F28C28':'#C0392B';ctx.lineWidth=Math.max(3,U*.09);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();
+    const I=sim?sim.IW[i]||0:0;if(Math.abs(I)>.02)dots(A,B,I,i*.53)});
+  comps.forEach((c,i)=>{const[a,b]=ends(c);const A={x:SX(a.x),y:SY(a.y)},B={x:SX(b.x),y:SY(b.y)};
+    if(sel&&sel.k==='comp'&&sel.i===i){ctx.strokeStyle='rgba(242,140,40,.8)';ctx.lineWidth=3;ctx.setLineDash([6,5]);ctx.beginPath();ctx.arc((A.x+B.x)/2,(A.y+B.y)/2,U*.75,0,7);ctx.stroke();ctx.setLineDash([])}
+    drawPart(c,A,B,i,now,false)});
+  if(drag&&drag.k==='wire'){const p=ends(comps[drag.from.i])[drag.from.k];ctx.strokeStyle='rgba(192,57,43,.6)';ctx.lineWidth=Math.max(3,U*.09);ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(SX(p.x),SY(p.y));ctx.lineTo(drag.x,drag.y);ctx.stroke();ctx.setLineDash([])}
+  if(!comps.length){label(mode==='challenge'?'Ajoute les pièces en bas, puis relie leurs bornes':'Touche une pièce en bas pour l’ajouter',W/2,SY(GY/2),Math.min(17,U*.36),'#6B6386')}
+  else if(!wires.length&&mode!=='lesson')label('Glisse le doigt d’une borne à une autre pour tirer un fil',W/2,hintY,13,'#6B6386')}
+
+// ---------- menu, loop ----------
+function openMenu(){mode=null;$('ci-done').hidden=true;const m=$('ov-ci-menu'),L=$('ci-list-l'),K=$('ci-list-c');L.innerHTML='';K.innerHTML='';
+  LESSONS.forEach((l,i)=>{const b=document.createElement('button');b.className='ci-row'+(save.lessons.includes(i)?' done':'');b.id='ci-l-'+i;b.innerHTML='<b></b><span></span>';b.children[0].textContent=(i+1)+'. '+l.title;b.children[1].textContent=save.lessons.includes(i)?'Vue':'';b.onclick=()=>start('lesson',i);L.append(b)});
+  CHALLENGES.forEach((k,i)=>{const b=document.createElement('button');b.className='ci-row'+(save.done.includes(i)?' done':'');b.id='ci-c-'+i;b.innerHTML='<b></b><span></span>';b.children[0].textContent=(i+1)+'. '+k.text;b.children[1].textContent=save.done.includes(i)?'Réussi':'';b.onclick=()=>start('challenge',i);K.append(b)});
+  m.hidden=false}
+function loop(now){if(!running)return;const dt=Math.min(.05,(now-last)/1000);last=now;phase+=dt;if(mode)draw(now);else{ctx.fillStyle='#F7F5EE';ctx.fillRect(0,0,W,H)}requestAnimationFrame(loop)}
+window.Circuit={enter(){root.hidden=false;resize();running=true;last=performance.now();openMenu();requestAnimationFrame(loop)},leave(){running=false;store();root.hidden=true},
+  _s:()=>({comps,wires,sim,mode,idx,doneShown}),_start:start,_add:add,_wire:(a,b,c,d)=>{wires.push([a,b,c,d]);resolve()},_toggle:i=>{comps[i].on=!comps[i].on;stats.toggled=true;resolve()},
+  _solve:solve,_resolve:resolve,_term:(i,k)=>{const q=ends(comps[i])[k],r=cv.getBoundingClientRect();return{x:r.left+SX(q.x),y:r.top+SY(q.y)}},_set:(cs,ws)=>{comps=cs.map(c=>({on:false,...c}));wires=ws;resolve()},CHALLENGES,LESSONS};
+$('ci-home').onclick=()=>{window.Circuit.leave();$('ov-ci-menu').hidden=true;$('home').hidden=false};
+$('ci-menu').onclick=()=>openMenu();
+$('ci-menu-close').onclick=()=>{if(mode)$('ov-ci-menu').hidden=true;else start('sandbox')};
+$('ci-sandbox').onclick=()=>start('sandbox');
+$('ci-hint').onclick=()=>{if(mode==='challenge')$('ci-task').textContent='Indice : '+CHALLENGES[idx].hint};
+$('ci-clear').onclick=()=>{comps=[];wires=[];sel=null;tools();palette();resolve()};
+$('go-circuit').onclick=()=>{$('home').hidden=true;window.Circuit.enter()};
+})();
+</script>
 <script id="deep-link">
 // #robots, #verger or #chateau in the address opens that game straight away
-(()=>{const go={robots:'go-robots',verger:'go-farm',chateau:'go-castle',remparts:'go-battle'}[location.hash.slice(1)];if(go)setTimeout(()=>document.getElementById(go).click(),0)})();
+(()=>{const go={robots:'go-robots',verger:'go-farm',chateau:'go-castle',remparts:'go-battle',circuits:'go-circuit'}[location.hash.slice(1)];if(go)setTimeout(()=>document.getElementById(go).click(),0)})();
 </script>
 
 </body>
