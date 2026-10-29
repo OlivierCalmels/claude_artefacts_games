@@ -230,6 +230,9 @@
       .card80s.chateau {
         background: linear-gradient(135deg, #6e8b3d 0%, #9b2a1c 100%);
       }
+      .card80s.remparts {
+        background: linear-gradient(135deg, #3b7dd8 0%, #b83a32 100%);
+      }
       .card80s:hover {
         transform: scale(1.04) rotate(-2deg);
         box-shadow: 0 16px 48px rgba(30, 60, 120, 0.22);
@@ -813,6 +816,33 @@
               <div class="card-title">LE CHÂTEAU</div>
               <a
                 href="mesJeux/index.html#chateau"
+                class="card-btn"
+                style="text-decoration: none; display: inline-block"
+                >Défendre</a
+              >
+            </div>
+            <div class="card80s remparts">
+              <div class="card-img">
+                <!-- SVG Les Remparts : escouades, cases et muraille -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <g fill="#b83a32">
+                    <circle cx="22" cy="8" r="3" /><circle cx="30" cy="8" r="3" /><circle cx="38" cy="8" r="3" />
+                    <circle cx="22" cy="15" r="3" /><circle cx="30" cy="15" r="3" /><circle cx="38" cy="15" r="3" />
+                  </g>
+                  <circle cx="56" cy="12" r="6" fill="#d8dce0" />
+                  <circle cx="56" cy="9" r="4" fill="#e5484d" />
+                  <g fill="none" stroke="#fff" stroke-width="1.5">
+                    <rect x="12" y="28" width="12" height="12" /><rect x="26" y="28" width="12" height="12" />
+                    <rect x="40" y="28" width="12" height="12" /><rect x="54" y="28" width="12" height="12" />
+                  </g>
+                  <g fill="#3b7dd8"><circle cx="29" cy="32" r="2" /><circle cx="35" cy="32" r="2" /><circle cx="29" cy="37" r="2" /><circle cx="35" cy="37" r="2" /></g>
+                  <rect x="43" y="31" width="6" height="7" fill="#6b4426" />
+                  <rect x="0" y="46" width="80" height="14" fill="#3d3a48" />
+                </svg>
+              </div>
+              <div class="card-title">LES REMPARTS</div>
+              <a
+                href="mesJeux/index.html#remparts"
                 class="card-btn"
                 style="text-decoration: none; display: inline-block"
                 >Défendre</a
