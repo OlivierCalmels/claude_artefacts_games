@@ -377,6 +377,13 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
   </div>
 </div>
 
+<div class="overlay" id="ov-intro" hidden>
+  <div class="card">
+    <h2 id="intro-t">Nouveau !</h2>
+    <p id="intro-p"></p>
+    <button class="big" id="intro-ok">Compris</button>
+  </div>
+</div>
 <div class="overlay" id="ov-end" hidden>
   <div class="card">
     <h2 id="end-title">Bravo !</h2>
@@ -436,7 +443,16 @@ const LEVELS=[
  {name:"Nuit des moutons",seed:442999959,pad:2,bands:["k","y","p","g","b","k","b","g","o","k","n","c","g"],slots:4,cols:4,len:[30,55],mix:100,art:["dddddddddddddddd","ddyyyddddddddydd","dyyddddddddddddd","dyyddddddydddddd","ddyyyddddddddddd","dddddwwwwwdddddd","ddwwwwwwwwwwnddd","dwwwwwwwwwwwnnnd","dwwwwwwwwwwwwndd","ddwwwwwwwwwwwddd","ddnddnddddnddndd","glglgggglggglggl","gglggglgggggglgg",".gggggggggggggg."]},
  {name:"Jambon",seed:450983524,pad:2,bands:["l","g","n","w","c","o","l","c","l"],slots:4,cols:4,len:[30,55],mix:100,outline:"d",art:["................","..nnnnnnnnn.....",".nkkkkkkkknn....","nkkrrrrrrkkonn..","nkrrwwrrrkkoonww","nkrrwwrrrkkoonww","nkrrrrrrrkkonn..",".nkkkkkkkknnn...","..nnnnnnnnn....."]},
  {name:"Bain du capybara",seed:837215900,pad:2,bands:["k","n","b","k","w","p","n","k","r","k","g"],slots:4,cols:4,len:[30,55],mix:100,outline:"d",art:[".....ogg........","....ooo.........","....ooo.........","..nnnnnnnnn.....",".nnnnnnndnnnn...",".nnnnnnnnnnnnd..",".nnnnnnnnnnnn...","cnnnnnnnnnnncccc","cccbccccbccccbcc","ccbcccccccbccccc","cccccbcccccccbcc",".cccccccccccccc."]},
- {name:"Coffre au trésor",seed:605787694,pad:2,bands:["k","r","g","c","p","b","y","r","w","k","g","r","y"],slots:4,cols:4,len:[30,55],mix:100,outline:"d",art:["................","..nnnnnnnnnnnn..",".nyynnnnnnnnyyn.",".nnnnnnnnnnnnnn.",".yyyyyyyyyyyyyy.",".nnnnnnyynnnnnn.",".nnnnnyddynnnnn.",".nnnnnnyynnnnnn.",".nnnnnnnnnnnnnn.",".yyyyyyyyyyyyyy.","..w..k..r..b..o."]}
+ {name:"Coffre au trésor",seed:605787694,pad:2,bands:["k","r","g","c","p","b","y","r","w","k","g","r","y"],slots:4,cols:4,len:[30,55],mix:100,outline:"d",art:["................","..nnnnnnnnnnnn..",".nyynnnnnnnnyyn.",".nnnnnnnnnnnnnn.",".yyyyyyyyyyyyyy.",".nnnnnnyynnnnnn.",".nnnnnyddynnnnn.",".nnnnnnyynnnnnn.",".nnnnnnnnnnnnnn.",".yyyyyyyyyyyyyy.","..w..k..r..b..o."]},
+ {name:"Champignon",seed:7703,pad:2,bands:["g","l","b","c","y","g","o","p","l","b"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",wood:5,intro:"Les caisses en bois. Elles bloquent le passage. Le chiffre indique combien de cases voisines il faut manger pour les casser.",art:["....rrrrrr....","..rrrwwrrrrr..",".rrwwwrrrrwwr.",".rrwwrrrrrwwr.","rrrrrrrwwrrrrr","rrrrrrwwwwrrrr","..kkkkkkkkkk..",".....wwww.....",".....wwww.....","....wwwwww...."]},
+ {name:"Fusée",seed:7815,pad:2,bands:["d","b","p","k","y","b","p","k","w","b"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",mystery:0.35,intro:"Les boîtes mystère. Leur couleur reste cachée sous un « ? » tant qu'elles ne sont pas en haut de leur colonne.",art:["......rr......",".....rwwr.....","....rwwwwr....","....wwbbww....","....wbccbw....","....wbccbw....","....wwbbww....","....wwwwww....","...rwwwwwwr...","..rrwwwwwwrr..","..rr.oyyo.rr..","......oo......"]},
+ {name:"Pastèque",seed:7948,pad:2,bands:["c","y","o","b","l","y","p","c","o","b","k"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",links:2,intro:"Les boîtes enchaînées. Elles partent toujours ensemble : il faut qu'elles soient toutes les deux en haut, et deux emplacements libres.",art:["rrrrrrrrrrrrrr","rrrdrrrrrrdrrr","wrrrrrdrrrrrrw","gwrrdrrrrrdrwg",".gwrrrrrrrrwg.","..gwwrrrrwwg..","...ggwwwwgg...",".....gggg....."]},
+ {name:"Poisson",seed:8021,pad:2,bands:["b","c","g","b","l","c","p","g","b","y","c"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",wood:5,mystery:0.3,art:["....oooo......","..oooooooo..oo",".oowdooyoooooo","oooooooyooyoo.",".oyyoooooo..oo","..oooooooo..oo","....oooo......"]},
+ {name:"Escargot",seed:8112,pad:2,bands:["c","y","b","p","g","o","c","b","r","y","g"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",links:2,wood:4,art:[".....nnnnn....","...nnkkkkknn..","..nkknnnnnkkn.","..nknkkkkknkn.","..nknknnnknkn.","..nknnnnnkknl.","l.nkkkkkkknll.","ll.nnnnnnnlll.","lllllllllllll."]},
+ {name:"Cerf-volant",seed:8202,pad:2,bands:["c","w","l","c","g","o","w","c","l","g","k"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",mystery:0.4,links:2,art:["......bb......",".....bbyy.....","....bbbyyy....","...bbbbyyyy...","..bbbbbyyyyy..","..rrrrrppppp..","...rrrrpppp...","....rrrppp....",".....rrpp.....","......rp......",".......d......","........k.....",".......k......"]},
+ {name:"Bateau",seed:8306,pad:2,bands:["c","w","y","c","o","w","g","y","c","p","w","k"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",wood:5,mystery:0.3,links:2,art:["......r.......","......rr......","......rrr.....","......rrrr....","......w.......","nnnnnnnnnnnnnn",".nnwnnwnnwnnn.","..nnnnnnnnnn..","bbbbbbbbbbbbbb","bcbbbcbbbbcbbb"]},
+ {name:"Glace",seed:9000,pad:2,bands:["p","b","l","g","p","c","n","b","r","l","g","b"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",wood:6,mystery:0.4,links:3,art:[".....kkkk.....","....kkrkkk....","...kkkkkkkk...","...wwwwwwww...","..wwcwwwwcww..","..wwwwwwwwww..","...oyoyoyoy...","....yoyoyo....",".....oyoy.....","......yo......","......o......."]},
+ {name:"Phare",seed:8507,pad:2,bands:["d","p","b","k","d","p","y","b","g","k","d","p","c"],slots:4,cols:4,len:[24,48],mix:100,outline:"d",wood:7,mystery:0.45,links:3,art:["......yy......",".....dyyd.....",".....rrrr.....",".....wwww.....",".....rrrr.....","....wwwwww....","....rrrrrr....","....wwwwww....","...rrrrrrrr...","nnnnnnnnnnnnnn","bbcbbbbbbbcbbb","bbbbbcbbbbbbbb"]}
 ];
 const DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -488,6 +504,25 @@ function generate(i,seedOverride){
   const cols=Array.from({length:L.cols},()=>[]);
   for(const b of dealt){const min=Math.min(...cols.map(c=>c.length));
     const opts=cols.filter(c=>c.length<=min+1);opts[Math.floor(rng()*opts.length)].push(b)}
+  // wooden crates cover one pixel of the drawing (k×k cells) and break once enough cells around them
+  // are eaten. The count is the number of neighbours peeled before the crate, so the planned order still works.
+  if(L.wood){const k=L.scale||2,owner=new Map();
+    for(const col of new Set(cells.map(x=>x.color))){const list=cells.filter(x=>x.color===col).sort((a,b)=>a.order-b.order);let j=0;
+      for(const b of merged)if(b.color===col)for(let t=0;t<b.n;t++)owner.set(list[j++],b)}
+    const blocks=[];for(let r=0;r<R;r+=k)for(let c=0;c<C;c+=k){const cs=[];for(let dr=0;dr<k;dr++)for(let dc=0;dc<k;dc++){const x=grid[r+dr]?.[c+dc];if(x)cs.push(x)}
+      if(cs.length===k*k&&cs.every(x=>x.color===cs[0].color))blocks.push(cs)}
+    const near=cs=>{const set=new Set(cs),out=new Set();for(const x of cs)for(const[dr,dc]of DIRS){const n=grid[x.r+dr]?.[x.c+dc];if(n&&!set.has(n))out.add(n)}return[...out]};
+    let made=0;for(let t=0;t<400&&made<L.wood&&blocks.length;t++){const cs=blocks.splice(Math.floor(rng()*blocks.length),1)[0],peri=near(cs);
+      const first=Math.min(...cs.map(x=>x.order)),need=peri.filter(n=>n.order<first).length;
+      if(need<3||peri.some(n=>n.wood)||cs.some(x=>x.wood))continue;
+      const use=new Map();for(const x of cs){const b=owner.get(x);use.set(b,(use.get(b)||0)+1)}
+      if([...use].some(([b,u])=>b.n-u<3))continue;
+      const crate={need,hits:0,cells:cs,peri};for(const x of cs){x.wood=crate;owner.get(x).n--}made++}}
+  // mystery boxes keep their colour hidden until they reach the top of their column
+  if(L.mystery)for(const b of merged)if(rng()<L.mystery)b.q=true;
+  // linked boxes: two neighbours at the same depth leave together, so both must be on top
+  if(L.links){let made=0;for(let t=0;t<300&&made<L.links;t++){const a=Math.floor(rng()*(L.cols-1)),m=Math.min(cols[a].length,cols[a+1].length);if(m<3)continue;
+      const j=1+Math.floor(rng()*(m-2)),A=cols[a][j],B=cols[a+1][j];if(A.link||B.link||cols[a][j-1].link||cols[a+1][j-1].link)continue;A.link=B;B.link=A;made++}}
   return{R,C,grid,cells,cols,total:cells.length,acc};
 }
 </script>
@@ -532,7 +567,9 @@ function start(i){
   S={lvl:i,...g,slots:Array(LEVELS[i].slots).fill(null),robots:[],parts:[],eaten:0,status:'play',endT:0,shake:0,placed:0};
   $('lvl-num').textContent='Niveau '+(i+1);$('lvl-name').textContent=LEVELS[i].name;
   $('ov-end').hidden=true;$('ov-levels').hidden=true;
+  const L=LEVELS[i];$('ov-intro').hidden=true;if(L.intro&&!$('app').hidden){$('intro-p').textContent=L.intro;$('ov-intro').hidden=false}
 }
+$('intro-ok').onclick=()=>{$('ov-intro').hidden=true};
 
 function geo(){
   const nS=S.slots.length,nC=S.cols.length,gap=8;
@@ -551,7 +588,7 @@ const cellPos=(G,c)=>({x:G.mx+c.c*G.cs+G.cs/2,y:G.my+c.r*G.cs+G.cs/2});
 
 function open(x){return S.acc(x,n=>n.state===2)} // a side counts as free only once the neighbour is really eaten
 function findTarget(color){let best=null;
-  for(const x of S.cells){if(x.state===0&&x.color===color&&open(x)&&(!best||x.order<best.order))best=x}return best}
+  for(const x of S.cells){if(x.state===0&&!x.wood&&x.color===color&&open(x)&&(!best||x.order<best.order))best=x}return best}
 
 /* Robots walk on a ring of free tiles around the mosaic, and through cells already eaten.
    They never step on a cell that is still there. */
@@ -577,12 +614,16 @@ function walkerPos(G,r){const{pts,cum}=r;let j=1;while(j<cum.length-1&&cum[j]<r.
   const dir=r.phase==='back'?-1:1;
   return{x:G.mx+(gx+.5)*G.cs,y:G.my+(gy+.5)*G.cs,dx:dx*dir,dy:dy*dir};
 }
+const partnerCol=b=>S.cols.findIndex(c=>c[0]===b.link);
+function pickable(ci,free){const col=S.cols[ci];if(!col||!col.length)return false;const b=col[0];
+  return b.link?free>=2&&partnerCol(b)>=0:free>=1}
+function place(G,ci){const box=S.cols[ci].shift(),fi=S.slots.findIndex(s=>s===null);
+  S.slots[fi]={color:box.color,n:box.n,anim:0,from:{x:colX(G,ci)+G.colW/2,y:G.cTop+10+G.b/2},cool:.12,leave:0,bump:0};S.placed++}
 function pick(ci){
   if(!S||S.status!=='play')return;const col=S.cols[ci];if(!col||!col.length)return;
-  const fi=S.slots.findIndex(s=>s===null);if(fi<0){S.shake=.4;return}
-  const G=geo(),box=col.shift();
-  S.slots[fi]={color:box.color,n:box.n,anim:0,from:{x:colX(G,ci)+G.colW/2,y:G.cTop+10+G.b/2},cool:.12,leave:0,bump:0};
-  S.placed++;
+  const free=S.slots.filter(s=>s===null).length,G=geo(),box=col[0];
+  if(box.link){const oc=partnerCol(box);if(oc<0){S.tug=.45;S.tugCol=ci;return}if(free<2){S.shake=.4;return}place(G,ci);place(G,oc);return}
+  if(!free){S.shake=.4;return}place(G,ci);
 }
 
 cv.addEventListener('pointerdown',e=>{
@@ -593,9 +634,14 @@ cv.addEventListener('pointerdown',e=>{
   const ci=Math.max(0,Math.min(G.nC-1,Math.floor(x/(G.colW+G.gap))));pick(ci);
 });
 
+// a cell eaten next to a wooden crate chips it; once enough cells around it are gone, it breaks
+function crack(G,x){const hit=new Set();for(const[dr,dc]of DIRS){const w=S.grid[x.r+dr]?.[x.c+dc];if(w&&w.wood&&w.state===0)hit.add(w.wood)}
+  for(const c of hit){c.hits++;c.jolt=1;if(c.hits<c.need)continue;
+    for(const y of c.cells){y.state=2;S.eaten++;const q=cellPos(G,y);
+      for(let j=0;j<(reduce?1:3);j++){const a=Math.random()*Math.PI*2,sp=40+Math.random()*80;S.parts.push({x:q.x,y:q.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-50,life:.6,max:.6,s:G.cs*(.25+Math.random()*.3),color:j%2?'#B07A45':'#8A5A30'})}}}}
 function update(dt){
   if(!S)return;const G=geo();
-  if(S.shake>0)S.shake=Math.max(0,S.shake-dt);
+  if(S.shake>0)S.shake=Math.max(0,S.shake-dt);if(S.tug>0)S.tug=Math.max(0,S.tug-dt);
   S.slots.forEach((s,i)=>{if(!s)return;
     if(s.bump>0)s.bump=Math.max(0,s.bump-dt*6);
     if(s.anim<1){s.anim=Math.min(1,s.anim+dt/0.24);return}
@@ -610,7 +656,7 @@ function update(dt){
   for(let k=S.robots.length-1;k>=0;k--){const r=S.robots[k];r.step+=dt*14;
     if(r.phase==='go'){r.d+=dt*v;if(r.d>=r.len){r.d=r.len;r.phase='eat';r.eat=0}}
     else if(r.phase==='eat'){r.eat+=dt/.28;r.cell.t=.55+.45*Math.min(1,r.eat);
-      if(r.eat>=1){r.cell.state=2;S.eaten++;r.phase='back';r.carry=true;
+      if(r.eat>=1){r.cell.state=2;S.eaten++;r.phase='back';r.carry=true;crack(G,r.cell);
         const q=cellPos(G,r.cell),n=reduce?2:5;
         for(let j=0;j<n;j++){const a=Math.random()*Math.PI*2,sp=30+Math.random()*60;
           S.parts.push({x:q.x,y:q.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-30,life:.4,max:.4,s:G.cs*(.15+Math.random()*.15),color:PAL[r.color]})}}}
@@ -620,14 +666,14 @@ function update(dt){
   if(S.status==='play'){
     if(S.eaten>=S.total){S.status='won';S.endT=.7}
     else if(!S.robots.some(r=>r.phase!=='back')&&!S.slots.some(s=>s&&(s.anim<1||s.n===0))){
-      const free=S.slots.some(s=>!s),more=S.cols.some(c=>c.length);
-      if(!(free&&more)&&!S.slots.some(s=>s&&s.n>0&&findTarget(s.color))){S.status='lost';S.endT=.7}
+      const free=S.slots.filter(s=>!s).length,more=S.cols.some((c,i)=>pickable(i,free));
+      if(!more&&!S.slots.some(s=>s&&s.n>0&&findTarget(s.color))){S.status='lost';S.endT=.7}
     }
   }else if(S.endT>0){S.endT-=dt;if(S.endT<=0)showEnd()}
 }
 
-function drawBox(x,y,s,color,n,alpha){
-  ctx.save();ctx.globalAlpha=alpha;const hex=PAL[color],r=s*.24;
+function drawBox(x,y,s,color,n,alpha,hidden){
+  ctx.save();ctx.globalAlpha=alpha;const hex=hidden?'#A59FB8':PAL[color],r=s*.24;
   ctx.fillStyle=shade(hex,-.28);rr(x-s/2,y-s/2+s*.07,s,s,r);ctx.fill();
   ctx.fillStyle=hex;rr(x-s/2,y-s/2,s,s,r);ctx.fill();
   ctx.fillStyle='rgba(255,255,255,.28)';rr(x-s/2+s*.1,y-s/2+s*.07,s*.8,s*.16,s*.08);ctx.fill();
@@ -635,9 +681,16 @@ function drawBox(x,y,s,color,n,alpha){
   for(const dx of[-.18,.18]){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x+dx*s,ey,s*.1,0,7);ctx.fill();
     ctx.fillStyle=INK;ctx.beginPath();ctx.arc(x+dx*s,ey+s*.015,s*.048,0,7);ctx.fill()}
   ctx.font=`${Math.round(s*.42)}px ${DISPLAY}`;ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle=LIGHT.includes(color)?INK:'#fff';ctx.fillText(String(n),x,y+s*.2);
+  ctx.fillStyle=!hidden&&LIGHT.includes(color)?INK:'#fff';ctx.fillText(hidden?'?':String(n),x,y+s*.2);
   ctx.restore();
 }
+function drawCrate(G,c){const r0=Math.min(...c.cells.map(x=>x.r)),c0=Math.min(...c.cells.map(x=>x.c)),r1=Math.max(...c.cells.map(x=>x.r)),c1=Math.max(...c.cells.map(x=>x.c));
+  if(c.jolt>0)c.jolt=Math.max(0,c.jolt-.08);const j=(c.jolt||0)*G.cs*.12*Math.sin(performance.now()/25);
+  const x=G.mx+c0*G.cs+G.cs*.06+j,y=G.my+r0*G.cs+G.cs*.06,w=(c1-c0+1)*G.cs-G.cs*.12,h=(r1-r0+1)*G.cs-G.cs*.12;
+  ctx.fillStyle='#8A5A30';rr(x,y,w,h,G.cs*.2);ctx.fill();ctx.fillStyle='#C08A52';rr(x+w*.08,y+h*.08,w*.84,h*.84,G.cs*.12);ctx.fill();
+  ctx.strokeStyle='#8A5A30';ctx.lineWidth=Math.max(1,w*.07);ctx.beginPath();ctx.moveTo(x+w*.12,y+h*.12);ctx.lineTo(x+w*.88,y+h*.88);ctx.stroke();
+  const left=c.need-c.hits;ctx.font=`${Math.round(w*.5)}px ${DISPLAY}`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.lineWidth=Math.max(2,w*.12);ctx.strokeStyle='#5A3A1C';ctx.strokeText(String(left),x+w/2,y+h/2+w*.03);ctx.fillStyle='#fff';ctx.fillText(String(left),x+w/2,y+h/2+w*.03)}
 function drawRobot(x,y,s,color,mouth,step,dx,dy,carry){
   const hex=PAL[color],dark=shade(hex,-.4),sw=Math.sin(step),bob=Math.abs(sw)*s*.06;
   y-=bob;
@@ -660,13 +713,16 @@ function draw(now){
   // mosaic tray
   ctx.fillStyle=TRAY;rr(G.mx-G.cs*1.25,G.my-G.cs*1.25,G.mw+G.cs*2.5,G.mh+G.cs*2.5,16);ctx.fill();
   const g=Math.max(.8,G.cs*.06),cr=G.cs*.2;
+  const crates=new Set();
   for(const x of S.cells){const px=G.mx+x.c*G.cs,py=G.my+x.r*G.cs;
+    if(x.wood&&x.state===0){crates.add(x.wood);continue}
     if(x.state===2){ctx.fillStyle=TRAY_DEEP;ctx.beginPath();ctx.arc(px+G.cs/2,py+G.cs/2,G.cs*.08,0,7);ctx.fill();continue}
     let sc=1;if(x.state===1)sc=1-.55*Math.max(0,(x.t-.55)/.45);
     const w=(G.cs-2*g)*sc,ox=px+G.cs/2-w/2,oy=py+G.cs/2-w/2,hex=PAL[x.color];
     ctx.fillStyle=hex;rr(ox,oy,w,w,cr*sc);ctx.fill();
     ctx.fillStyle='rgba(255,255,255,.22)';rr(ox+w*.12,oy+w*.1,w*.76,w*.2,w*.1);ctx.fill();
   }
+  for(const c of crates)drawCrate(G,c);
   // slots
   const shx=S.shake>0?Math.sin(S.shake*60)*6*(S.shake/.4):0;
   for(let i=0;i<G.nS;i++){const p=slotPos(G,i);ctx.fillStyle=TRAY_DEEP;
@@ -681,11 +737,19 @@ function draw(now){
     // the box you can take, plus the next two waiting under it
     const step=G.b+6,vis=Math.min(3,col.length);
     for(let j=vis-1;j>=0;j--){const bx=x+G.colW/2,by=G.cTop+10+G.b/2+j*step;
-      drawBox(bx,by,j===0?G.b:G.b*.88,col[j].color,col[j].n,j===0?1:.72)}
+      drawBox(bx+(S.tug>0&&S.tugCol===i&&j===0?Math.sin(S.tug*50)*4:0),by,j===0?G.b:G.b*.88,col[j].color,col[j].n,j===0?1:.72,col[j].q&&j>0)}
     if(col.length>vis){ctx.font=`${Math.round(Math.min(16,G.b*.34))}px ${DISPLAY}`;ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillStyle='#6B6386';ctx.fillText('+'+(col.length-vis),x+G.colW/2,G.cTop+10+G.b*.5+(vis-1)*step+G.b*.5+12)}
     if(!col.length){ctx.strokeStyle=TRAY_DEEP;ctx.lineWidth=2;ctx.setLineDash([5,5]);rr(x+G.colW/2-G.b/2,G.cTop+10,G.b,G.b,G.b*.24);ctx.stroke();ctx.setLineDash([])}
   }
+  // chains between linked boxes
+  for(let i=0;i<G.nC-1;i++){const A=S.cols[i],B=S.cols[i+1];
+    for(let j=0;j<Math.min(3,A.length);j++){const k=B.indexOf(A[j].link);if(k<0||k>2)continue;
+      const step=G.b+6,x1=colX(G,i)+G.colW/2+G.b*.42,y1=G.cTop+10+G.b/2+j*step,x2=colX(G,i+1)+G.colW/2-G.b*.42,y2=G.cTop+10+G.b/2+k*step;
+      const n=Math.max(3,Math.round(Math.hypot(x2-x1,y2-y1)/(G.b*.22)));ctx.lineWidth=Math.max(2,G.b*.07);
+      for(let t=0;t<n;t++){const u=(t+.5)/n,cx=x1+(x2-x1)*u,cy=y1+(y2-y1)*u,ang=Math.atan2(y2-y1,x2-x1);
+        ctx.save();ctx.translate(cx,cy);ctx.rotate(ang);ctx.strokeStyle=t%2?'#6B6386':'#8E87A6';ctx.beginPath();
+        if(t%2)ctx.ellipse(0,0,G.b*.13,G.b*.035,0,0,7);else ctx.ellipse(0,0,G.b*.13,G.b*.08,0,0,7);ctx.stroke();ctx.restore()}}}
   // boxes in slots
   S.slots.forEach((s,i)=>{if(!s)return;const p=slotPos(G,i),e=ease(s.anim);
     const x=s.from.x+(p.x-s.from.x)*e+shx,y=s.from.y+(p.y-s.from.y)*e-Math.sin(Math.PI*e)*30;
@@ -737,8 +801,9 @@ let last=performance.now();
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!$('app').hidden){update(dt);draw(now)}requestAnimationFrame(loop)}
 start(current);
 $('home-nb').textContent=LEVELS.length;
-window.Robots={enter(){$('app').hidden=false;resize();if(first){first=false;showLevels()}}};
-$('btn-home').onclick=()=>{$('app').hidden=true;$('ov-levels').hidden=true;$('ov-end').hidden=true;$('home').hidden=false};
+window.Robots={enter(){$('app').hidden=false;resize();if(first){first=false;showLevels()}else if(S&&S.placed===0)start(S.lvl)},
+  _s:()=>S,_start:start,_pick:pick,_update:update};
+$('btn-home').onclick=()=>{$('app').hidden=true;$('ov-intro').hidden=true;$('ov-levels').hidden=true;$('ov-end').hidden=true;$('home').hidden=false};
 requestAnimationFrame(loop);
 })();
 </script>
