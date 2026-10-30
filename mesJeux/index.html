@@ -2041,14 +2041,15 @@ const GX=8,GY=10,EMF=4.5,RINT=.25,GWIRE=1000;
 const TYPES={
   pile:{name:'Pile',R:RINT},
   lampe:{name:'Lampe',R:12},
+  led:{name:'LED',R:15},
   inter:{name:'Inter\u00adrupteur'},
   moteur:{name:'Moteur',R:6},
   volt:{name:'Volt\u00admètre',R:1e6},
   aimant:{name:'Électro\u00adaimant',R:4},
 };
-const ORDER=['pile','lampe','inter','moteur','volt','aimant'];
+const ORDER=['pile','lampe','led','inter','moteur','volt','aimant'];
 const P0=Math.pow(EMF/(12+RINT),2)*12;           // a lamp's power on one battery: "normal" brightness
-const I_MOT=EMF/(6+RINT),I_MAG=EMF/(4+RINT);
+const I_LED=EMF/(15+RINT),I_MOT=EMF/(6+RINT),I_MAG=EMF/(4+RINT);
 
 // ---------- lessons and challenges ----------
 const C=(type,x,y,rot=0,extra={})=>({type,x,y,rot,...extra});
@@ -2067,6 +2068,8 @@ const LESSONS=[
    task:"Inverse une des piles : les tensions s'annulent et le moteur s'arrête.",comps:[C('pile',0,8,0),C('pile',3,8,0),C('moteur',2,3,0),C('volt',1.5,9.6,0)],wires:[[0,1,1,0],[1,1,2,1],[2,0,0,0],[3,0,0,0],[3,1,1,1]],check:s=>s.flipped&&s.spin<.2},
   {title:"L'électroaimant",text:"Un fil enroulé autour d'un clou de fer devient un aimant quand le courant passe : c'est un électroaimant. La boussole posée à côté le prouve, son aiguille dévie. En 1820, Ørsted a découvert ainsi le lien entre électricité et magnétisme. Si on inverse le courant, l'aiguille dévie de l'autre côté.",
    task:"Ferme l'interrupteur, puis inverse la pile.",comps:[C('pile',2,9,0),C('inter',6,5,1,{on:false}),C('aimant',2,3,0)],wires:[[0,0,2,0],[2,1,1,0],[1,1,0,1]],check:s=>s.toggled&&s.flipped},
+  {title:'La LED',text:"Une LED (diode électroluminescente) est une petite lumière qui ne laisse passer le courant que dans un sens : de sa patte + (la plus longue) vers sa patte −. Branchée à l'envers, elle reste éteinte et bloque tout le circuit. Elle éclaire en consommant bien moins qu'une lampe à filament. Dans la réalité, on lui ajoute toujours une résistance pour ne pas la griller.",
+   task:"Elle est branchée à l'envers : touche la LED, puis « Inverser ».",comps:[C('pile',2,8,0),C('led',2,3,0)],wires:[[0,0,1,1],[1,0,0,1]],check:s=>s.leds.some(b=>b>.6)},
 ];
 const CHALLENGES=[
   {text:'Allume la lampe.',parts:{pile:1,lampe:1},hint:'Relie la borne + de la pile à une borne de la lampe, et l’autre borne de la lampe à la borne − de la pile.',check:A=>A().lamps.some(b=>b>.6)},
@@ -2084,6 +2087,8 @@ const CHALLENGES=[
    check:A=>{const s=A();return s.lamps.length===2&&s.lamps.every(b=>b>.3&&b<.7)&&s.volts.some(v=>Math.abs(v)>1.5&&Math.abs(v)<2.8)}},
   {text:'Deux interrupteurs : chacun doit pouvoir allumer la lampe tout seul.',parts:{pile:1,lampe:1,inter:2},hint:'Mets les deux interrupteurs en dérivation l’un de l’autre, puis en série avec la lampe.',
    check:A=>A([0,0]).lamps[0]<.1&&A([1,0]).lamps[0]>.6&&A([0,1]).lamps[0]>.6},
+  {text:'Allume la LED rouge.',parts:{pile:1,led:1},hint:'Une LED ne marche que dans un sens : sa borne + doit aller vers la borne + de la pile. Si elle reste éteinte, inverse-la.',check:A=>A().leds.some(b=>b>.6)},
+  {text:'Allume la lampe et la LED en même temps, avec une seule pile.',parts:{pile:1,lampe:1,led:1},hint:'En série ou en dérivation, les deux marchent, à condition de brancher la LED dans le bon sens.',check:A=>{const s=A();return s.lamps[0]>.3&&s.leds[0]>.3}},
 ];
 
 // ---------- state ----------
@@ -2099,11 +2104,16 @@ const SX=x=>bx+x*U,SY=y=>by+y*U;
 const ends=c=>{const d=[[2,0],[0,2],[-2,0],[0,-2]][c.rot&3];return[{x:c.x,y:c.y},{x:c.x+d[0],y:c.y+d[1]}]};
 
 // ---------- the solver: every terminal is a node, wires are tiny resistors ----------
-function solve(over){
-  const N=comps.length*2;if(!N)return{V:[],I:[],IW:[],lamps:[],motors:[],volts:[],mags:[],short:false,n:{},lit:0,spin:0};
+// an LED only conducts from its + leg to its − leg: guess which LEDs conduct, solve, fix the guess, repeat
+function solve(over){let led=comps.map(c=>c.type==='led'),r;
+  for(let k=0;k<8;k++){r=solve1(over,led);const nx=comps.map((c,i)=>c.type==='led'&&(led[i]?r.I[i]>0:r.V[2*i]-r.V[2*i+1]>.01));
+    if(nx.every((v,i)=>v===led[i]))break;led=nx}
+  return r}
+function solve1(over,led){
+  const N=comps.length*2;if(!N)return{V:[],I:[],IW:[],lamps:[],leds:[],motors:[],volts:[],mags:[],short:false,n:{},lit:0,spin:0};
   const A=[...Array(N)].map(()=>new Float64Array(N)),b=new Float64Array(N);
   const g=(p,q,G)=>{A[p][p]+=G;A[q][q]+=G;A[p][q]-=G;A[q][p]-=G};
-  let si=0;const Gc=comps.map((c,i)=>{let R=TYPES[c.type].R;if(c.type==='inter'){const on=over?over[si++]??c.on:c.on;return on?GWIRE:0}if(c.type==='lampe'&&c.burnt)return 0;return 1/R});
+  let si=0;const Gc=comps.map((c,i)=>{let R=TYPES[c.type].R;if(c.type==='inter'){const on=over?over[si++]??c.on:c.on;return on?GWIRE:0}if(c.type==='lampe'&&c.burnt)return 0;if(c.type==='led')return led[i]?1/R:1e-6;return 1/R});
   comps.forEach((c,i)=>{g(2*i,2*i+1,Gc[i]);if(c.type==='pile'){const I=EMF/RINT;b[2*i]+=I;b[2*i+1]-=I}});
   for(const w of wires)g(2*w[0]+w[1],2*w[2]+w[3],GWIRE);
   // terminals that sit on the same point are joined
@@ -2113,14 +2123,15 @@ function solve(over){
   const V=gauss(A,b);
   const I=comps.map((c,i)=>{const dv=V[2*i]-V[2*i+1];return c.type==='pile'?(EMF-dv)/RINT:Gc[i]*dv});
   const IW=wires.map(w=>GWIRE*(V[2*w[0]+w[1]]-V[2*w[2]+w[3]]));
-  const out={V,I,IW,lamps:[],motors:[],volts:[],mags:[],short:false,n:{}};
+  const out={V,I,IW,lamps:[],leds:[],motors:[],volts:[],mags:[],short:false,n:{}};
   comps.forEach((c,i)=>{out.n[c.type]=(out.n[c.type]||0)+1;
     if(c.type==='lampe'){const P=I[i]*I[i]*12;if(!over)c.P=P;out.lamps.push(c.burnt?0:Math.sqrt(P/P0))}
+    if(c.type==='led')out.leds.push(Math.max(0,I[i])/I_LED);
     if(c.type==='moteur')out.motors.push(I[i]/I_MOT);
     if(c.type==='volt')out.volts.push(V[2*i]-V[2*i+1]);
     if(c.type==='aimant')out.mags.push(Math.atan(I[i]/(.35*I_MAG))*.95);
     if(c.type==='pile'&&Math.abs(I[i])>4)out.short=true});
-  out.lit=out.lamps.filter(b=>b>.3).length;out.spin=Math.max(0,...out.motors.map(Math.abs));
+  out.lit=out.lamps.filter(b=>b>.3).length+out.leds.filter(b=>b>.3).length;out.spin=Math.max(0,...out.motors.map(Math.abs));
   return out}
 function gauss(A,b){const n=b.length;for(let k=0;k<n;k++){let p=k;for(let i=k+1;i<n;i++)if(Math.abs(A[i][k])>Math.abs(A[p][k]))p=i;[A[k],A[p]]=[A[p],A[k]];[b[k],b[p]]=[b[p],b[k]];
     const d=A[k][k]||1e-12;for(let i=k+1;i<n;i++){const f=A[i][k]/d;if(!f)continue;for(let j=k;j<n;j++)A[i][j]-=f*A[k][j];b[i]-=f*b[k]}}
@@ -2207,10 +2218,22 @@ function drawPart(c,a,b,i,now,icon){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2,an=Math.
     if(!icon)label('4,5 V',...O(u*.5),u*.22,'#6B6386');if(!icon&&sim&&Math.abs(I)>4&&Math.sin(now/120)>0)label('Court-circuit !',0,-u*.62,u*.24,'#fff','#E5484D');ctx.restore()}
   if(c.type==='lampe'){lead(-u*.36,u*.36);const br=icon?.9:c.burnt?0:Math.min(1.6,Math.sqrt((c.P||0)/P0));
     if(br>.05){const gr=ctx.createRadialGradient(0,0,u*.1,0,0,u*(.5+.6*Math.min(br,1.4)));gr.addColorStop(0,`rgba(255,226,120,${Math.min(.95,br*.8)})`);gr.addColorStop(1,'rgba(255,226,120,0)');ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,u*1.1,0,7);ctx.fill()}
-    circ(0,0,u*.36,c.burnt?'#8E8A9E':br>.05?`rgb(255,${Math.round(210+40*Math.min(1,br))},${Math.round(120+100*Math.min(1,br))})`:'#F4F1E8');
-    ctx.strokeStyle=c.burnt?'#5A5868':'#4A4560';ctx.lineWidth=Math.max(1.5,u*.05);ctx.beginPath();ctx.arc(0,0,u*.36,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(-u*.25,-u*.25);ctx.lineTo(u*.25,u*.25);ctx.moveTo(u*.25,-u*.25);ctx.lineTo(-u*.25,u*.25);ctx.stroke();
+    const k=Math.min(1,br);
+    if(br>.25&&!c.burnt){ctx.strokeStyle=`rgba(255,190,30,${Math.min(1,br)})`;ctx.lineWidth=Math.max(2,u*.06);ctx.lineCap='round';
+      for(let a=0;a<8;a++){const an2=a*Math.PI/4+.39,r1=u*.46,r2=u*(.56+.16*Math.min(1.3,br));ctx.beginPath();ctx.moveTo(Math.cos(an2)*r1,Math.sin(an2)*r1);ctx.lineTo(Math.cos(an2)*r2,Math.sin(an2)*r2);ctx.stroke()}}
+    circ(0,0,u*.36,c.burnt?'#8E8A9E':br>.05?`rgb(255,${Math.round(238-28*k)},${Math.round(225-190*k)})`:'#E6E3EC');
+    ctx.strokeStyle=c.burnt?'#5A5868':br>.3?'#D9480F':'#4A4560';ctx.lineWidth=Math.max(1.5,u*.05);ctx.beginPath();ctx.arc(0,0,u*.36,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(-u*.25,-u*.25);ctx.lineTo(u*.25,u*.25);ctx.moveTo(u*.25,-u*.25);ctx.lineTo(-u*.25,u*.25);ctx.stroke();
     if(!icon&&c.burnt){ctx.save();ctx.rotate(-an);label('Grillée',...O(u*.6),u*.22,'#fff','#5A5868');ctx.restore()}
     else if(!icon&&br>1.25){ctx.save();ctx.rotate(-an);label('Trop fort !',...O(u*.62),u*.22,'#fff','#F28C28');ctx.restore()}}
+  if(c.type==='led'){lead(-u*.3,u*.3);const br=icon?1:Math.min(1.5,Math.max(0,I)/I_LED),k=Math.min(1,br);
+    if(br>.05){const gr=ctx.createRadialGradient(0,0,u*.05,0,0,u*(.45+.5*k));gr.addColorStop(0,`rgba(255,45,45,${.85*k})`);gr.addColorStop(1,'rgba(255,45,45,0)');ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,u*1.05,0,7);ctx.fill()}
+    ctx.save();ctx.rotate(-an);
+    ctx.fillStyle=br>.05?`rgb(255,${Math.round(150-110*k)},${Math.round(150-110*k)})`:'#C9A3A3';ctx.beginPath();ctx.moveTo(-u*.26,u*.18);ctx.lineTo(-u*.26,-u*.04);ctx.arc(0,-u*.04,u*.26,Math.PI,0);ctx.lineTo(u*.26,u*.18);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=br>.3?'#B3001B':'#7A4E58';ctx.lineWidth=Math.max(1.5,u*.05);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.fillRect(-u*.32,u*.16,u*.64,u*.08);
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(-u*.1,-u*.12,u*.05,u*.09,.4,0,7);ctx.fill();
+    label('+',-Math.cos(an)*u*.82,-Math.sin(an)*u*.82-u*.3,u*.26,'#E5484D');
+    if(!icon&&sim&&sim.V[2*i]-sim.V[2*i+1]<-.5)label('Sens bloqué',...O(u*.55),u*.2,'#fff','#7A4E58');
+    ctx.restore()}
   if(c.type==='inter'){lead(-u*.5,u*.5);circ(-u*.5,0,u*.09,'#4A4560');circ(u*.5,0,u*.09,'#4A4560');ctx.strokeStyle=c.on?'#3DAA5C':'#E5484D';ctx.lineWidth=Math.max(3,u*.1);ctx.lineCap='round';
     ctx.beginPath();ctx.moveTo(-u*.5,0);const ang=c.on?0:-.55;ctx.lineTo(-u*.5+Math.cos(ang)*u*.98,Math.sin(ang)*u*.98);ctx.stroke();
     if(!icon){ctx.save();ctx.rotate(-an);label(c.on?'Fermé':'Ouvert',...O(u*.5),u*.22,c.on?'#2E7D32':'#A8292E');ctx.restore()}}
