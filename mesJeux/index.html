@@ -225,6 +225,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-deep)}
 .an-tile i{font-style:normal;font-size:26px;line-height:1.1}
 .an-tile b{font-size:11px;font-weight:800;line-height:1.15;text-align:center;overflow-wrap:anywhere}
+.an-pic{display:inline-block;width:1.15em;height:1.15em;border-radius:50%;object-fit:cover;vertical-align:-.15em;background:var(--tray);box-shadow:0 0 0 2px #fff}
 .an-badge{display:inline-flex;align-items:center;justify-content:center;width:1.05em;height:1.05em;border-radius:50%;
   background:#F28C28;color:#fff;font-family:var(--display);font-size:.85em;font-style:normal;line-height:1}
 .an-h{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.1;margin:0;text-align:center;color:var(--ink);text-wrap:balance}
@@ -2411,6 +2412,7 @@ $('go-circuit').onclick=()=>{$('home').hidden=true;window.Circuit.enter()};
     <div class="an-sec"><h3>La voix du hibou</h3></div>
     <div class="an-voicebox"><select id="an-voice" aria-label="Voix du hibou"></select><button class="pill" id="an-voice-test">▶ Écouter</button></div>
     <p class="an-legend">★ = la plus belle voix trouvée sur cet appareil. Pour une voix encore plus naturelle : sur iPhone/iPad, Réglages › Accessibilité › Contenu énoncé › Voix › Français, puis télécharge une voix « améliorée » ou « premium » (Amélie, Audrey, Thomas…) ; sur Android, Paramètres › Synthèse vocale › moteur Google › installer la voix française ; sur ordinateur, le navigateur Edge propose des voix « naturelles ».</p>
+    <p class="an-legend">Photos des animaux : Wikipédia et Wikimedia Commons, sous licences libres.</p>
     <details><summary>Les questions du jeu (<span id="an-qn"></span>)</summary><ol class="an-qlist" id="an-qlist"></ol></details>
     <button class="ghost" id="an-forget">Oublier ce que le hibou a appris</button>
     <button class="big" id="an-close" style="display:block;margin:16px auto 0">C'est bon</button>
@@ -2643,7 +2645,12 @@ const ANIMALS=DATA.trim().split('\n').map((l,i)=>{const p=l.split('|');const sp=
   return{id:p[2],e:p[0],a:p[1],n:p[2],g:i<35?0:i<85?1:2,y:sp(p[3]),m:sp(p[4])}});
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const withArt=a=>a.a==="l'"?"l'"+a.n:a.a+' '+a.n;
-const emo=a=>a.e==='*'?`<i class="an-badge">${a.n[0].toUpperCase()}</i>`:a.e;
+// Animaux sans emoji : petite photo libre de Wikimedia Commons (pastille avec l'initiale si elle ne charge pas)
+const IMG={"autruche": "Ostrich_male_RWD.jpg", "marmotte": "Marmotta_alpina_(Marmota_marmota).jpg", "taupe": "Talpa_europaea,_Common_Mole,_Mol_04.jpg", "hyène": "Spotted_Hyena,_Ngorongoro.jpg", "gazelle": "Thomsons-gazelle.jpg", "fourmilier": "Myrmecophaga_tridactyla.jpg", "hippocampe": "Hippocampus_kuda_(Estuary_seahorse).jpg", "raie": "Manta_birostris-Thailand.jpg", "poisson-clown": "Clownfish_(Amphiprion_ocellaris).jpg", "espadon": "Xiphias_gladius.jpg", "narval": "Narwal.jpg", "limace": "Red_slug_(Arion_rufus).JPG", "libellule": "Emperor_dragonfly_(Anax_imperator)_female.JPG", "mille-pattes": "Millipede.jpg", "salamandre": "Fire_salamander_(Salamandra_Salamandra).jpg", "colibri": "Allen's_Hummingbird_(39785632811).jpg", "pélican": "Great_White_Pelican_RWD.jpg", "cigogne": "White_Stork,_Ciconia_ciconia.jpg", "toucan": "Toco_toucan_(Ramphastos_toco).jpg", "mouette": "Black_headed_gull.jpg", "pie": "Eurasian_Magpie_(Pica_pica),_UK.jpg", "pic-vert": "European_green_woodpecker_(Picus_viridis).jpg", "vautour": "Vautour_fauve_(Gyps_fulvus).jpg", "poney": "Shetland_pony_-_Postbridge.jpg", "ornithorynque": "Duck-billed_platypus_(Ornithorhynchus_anatinus)_Scottsdale.jpg"};
+const badge=a=>`<i class="an-badge">${a.n[0].toUpperCase()}</i>`;
+const emo=a=>a.e!=='*'?a.e:IMG[a.n]
+  ?`<img class="an-pic" src="https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(IMG[a.n])}?width=160" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='${badge(a).replace(/"/g,'&quot;')}'">`
+  :badge(a);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 // ---- préférences et mémoire (sur cet appareil) ----
