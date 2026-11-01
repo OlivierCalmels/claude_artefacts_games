@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Manoir">
+<meta name="theme-color" content="#1A1328">
+<title>L'Évasion du manoir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Nunito:wght@700;800;900&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<style>
+/* Escape game dans la maison : 5 marqueurs imprimés sont cachés dans les pièces.
+   Chaque marqueur fait apparaître un objet en 3D (horloge, grimoire, lanterne, coffre, porte).
+   Les trois premiers cachent chacun un chiffre du code du coffre ; le coffre donne la clé ; la clé ouvre la porte. */
+:root{
+  --ink:#F6F0FF;--muted:#C2B6DA;--panel:rgba(26,19,40,.9);--panel2:rgba(255,255,255,.08);
+  --gold:#FFC93C;--violet:#9B7BFF;--red:#FF6B6B;--green:#6BE36B;
+  --display:'Cinzel Decorative',Georgia,serif;--body:'Nunito',system-ui,-apple-system,sans-serif;color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;color:var(--ink);font-family:var(--body);background:#120D1E;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+body.virtual{background:radial-gradient(110% 80% at 50% 35%,#3A2A5A 0%,#1A1328 60%,#0A0712 100%)}
+#cam{object-fit:cover;background:#000;z-index:0}
+body.virtual #cam{display:none}
+#gl{z-index:1;display:block}
+
+.bar{position:fixed;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:8px;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;background:linear-gradient(rgba(14,10,24,.75),rgba(14,10,24,0));pointer-events:none}
+.bar>*{pointer-events:auto}
+.ibtn{width:44px;height:44px;flex:none;border:0;border-radius:14px;background:rgba(26,19,40,.72);color:var(--ink);display:grid;place-items:center;position:relative;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;text-decoration:none}
+.ibtn:active{transform:scale(.94)}
+.ibtn svg{width:22px;height:22px}
+.mid{flex:1;display:flex;justify-content:center;gap:6px}
+.pill{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;background:rgba(26,19,40,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  font-weight:900;font-size:18px;font-variant-numeric:tabular-nums}
+.pill svg{width:18px;height:18px}
+.key{opacity:.35}
+.key.have{opacity:1;filter:drop-shadow(0 0 6px rgba(255,201,60,.8))}
+.dot{position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px #1A1328}
+.bar.idle .mid{visibility:hidden}
+
+/* Carte de l'objet visé */
+.info{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:5;max-width:460px;margin:0 auto;
+  padding:14px 16px;border-radius:20px;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.info h3{margin:0 0 4px;font:900 19px var(--display);color:#FFE9B0;display:flex;align-items:center;gap:8px}
+.info h3 .num{font-size:14px;padding:2px 9px;border-radius:999px;background:var(--violet);color:#fff;font-family:var(--body)}
+.info p{margin:0;font-weight:700;font-size:15px;line-height:1.35;color:var(--ink)}
+.info .act{margin-top:12px;width:100%;border:0;border-radius:16px;padding:14px;font:900 17px var(--body);color:#2A1B00;background:linear-gradient(#FFE08A,#FFC93C);box-shadow:0 4px 0 #B8860B;cursor:pointer}
+.info .act:active{transform:translateY(2px);box-shadow:0 2px 0 #B8860B}
+.seek{display:flex;gap:6px;margin-top:10px}
+.seek span{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.14)}
+.seek span.on{background:var(--violet)}
+
+.sheet{position:fixed;inset:auto 0 0 0;z-index:8;max-height:86%;overflow:auto;touch-action:pan-y;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 16px);
+  background:var(--panel);border-radius:22px 22px 0 0;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 -10px 30px rgba(0,0,0,.45);animation:up .2s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.sheet h3{margin:0 0 12px;font:900 20px var(--display);color:#FFE9B0;display:flex;justify-content:space-between;align-items:center}
+.x{width:38px;height:38px;border:0;border-radius:12px;background:var(--panel2);color:var(--ink);font:900 20px var(--body);cursor:pointer}
+.notes{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;gap:8px}
+.notes li{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--panel2);font-weight:700;font-size:14.5px;line-height:1.3}
+.notes li svg{width:36px;height:36px;flex:none}
+.notes li.unk{color:var(--muted)}
+.notes b{display:block;font-size:15.5px}
+.hintb{width:100%;border:0;border-radius:16px;padding:13px;font:800 15px var(--body);color:var(--ink);background:rgba(155,123,255,.25);cursor:pointer}
+.hint{margin:10px 0 0;padding:12px 14px;border-radius:14px;background:rgba(255,201,60,.12);font-weight:800;line-height:1.35}
+
+/* Clavier du coffre */
+.pad{display:flex;justify-content:center;gap:14px;margin:6px 0 16px}
+.wheel{display:flex;flex-direction:column;align-items:center;gap:6px}
+.wheel small{font:900 15px var(--display);color:var(--violet)}
+.wheel button{width:62px;height:44px;border:0;border-radius:12px;background:var(--panel2);color:var(--ink);font:900 22px var(--body);cursor:pointer}
+.wheel button:active{background:rgba(255,255,255,.18)}
+.wheel output{width:62px;height:72px;border-radius:14px;background:#0E0A18;border:2px solid rgba(255,201,60,.5);display:grid;place-items:center;font:900 40px var(--body);color:var(--gold)}
+.sheet .go{width:100%;border:0;border-radius:16px;padding:15px;font:900 18px var(--body);color:#2A1B00;background:linear-gradient(#FFE08A,#FFC93C);box-shadow:0 4px 0 #B8860B;cursor:pointer}
+.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.fb{text-align:center;font-weight:900;margin:-6px 0 10px;min-height:20px}
+.fb.bad{color:var(--red)}
+
+.msg{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:6;max-width:calc(100% - 40px);padding:14px 18px;border-radius:18px;background:var(--panel);text-align:center;font-weight:800;pointer-events:none}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 118px);transform:translateX(-50%);z-index:20;max-width:calc(100% - 32px);padding:10px 16px;border-radius:14px;background:var(--panel);font-weight:800;text-align:center}
+.flash{position:fixed;inset:0;z-index:9;pointer-events:none;background:radial-gradient(circle,#FFF6D0 0%,rgba(255,220,120,.6) 40%,rgba(255,220,120,0) 75%);animation:flash 1.6s ease-out forwards}
+@keyframes flash{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+
+/* Mode sans caméra : on choisit la pièce à regarder */
+.rooms{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 66px);z-index:5;display:flex;gap:6px;overflow-x:auto;padding:4px 12px;touch-action:pan-x}
+.rooms button{flex:none;border:0;border-radius:14px;padding:8px 12px;background:rgba(26,19,40,.75);color:var(--ink);font:800 14px var(--body);cursor:pointer}
+.rooms button.on{background:var(--violet);color:#fff}
+
+/* Écrans */
+.screen{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;overflow:auto;touch-action:pan-y;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 16px);
+  background:radial-gradient(120% 90% at 50% 0%,rgba(70,46,120,.96) 0%,rgba(26,19,40,.98) 55%,rgba(10,7,18,.99) 100%)}
+.card{width:100%;max-width:430px;display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center}
+.title{margin:0;font:900 clamp(30px,9vw,42px)/1.08 var(--display);color:#FFE9B0;text-shadow:0 3px 0 #3B2A78,0 0 22px rgba(155,123,255,.6)}
+.sub{margin:0;color:var(--muted);font-weight:800;font-size:15px;line-height:1.4}
+.hero{width:150px;height:150px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;width:100%;text-align:left}
+.steps li{display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:16px;background:var(--panel2);font-weight:700;font-size:14.5px;line-height:1.3}
+.steps .n{width:28px;height:28px;flex:none;border-radius:50%;background:var(--violet);color:#fff;display:grid;place-items:center;font-weight:900}
+.steps img{width:40px;height:40px;flex:none;background:#fff;border-radius:6px;padding:3px}
+.big{width:100%;border:0;border-radius:20px;padding:16px;font:900 19px var(--body);color:#2A1B00;cursor:pointer;background:linear-gradient(#FFE08A,#FFC93C);box-shadow:0 5px 0 #B8860B,0 10px 26px rgba(0,0,0,.3)}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 #B8860B}
+.big:disabled{opacity:.7}
+.alt{width:100%;border:0;border-radius:18px;padding:14px;font:800 16px var(--body);color:var(--ink);background:var(--panel2);cursor:pointer;text-decoration:none;display:block}
+.note{margin:0;color:var(--muted);font-size:13px;font-weight:700;line-height:1.4}
+.note a{color:var(--gold)}
+.time{font:900 64px/1 var(--body);margin:0;color:#fff;text-shadow:0 0 24px rgba(155,123,255,.8)}
+.err{color:var(--red);font-weight:800;margin:0}
+@media (prefers-reduced-motion: reduce){.flash,.shake{animation:none}}
+</style>
+</head>
+<body>
+<video id="cam" playsinline muted></video>
+<canvas id="gl"></canvas>
+
+<div class="bar idle" id="bar">
+  <a class="ibtn" href="../mesJeux/" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg></a>
+  <div class="mid">
+    <div class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg><span id="time">0:00</span></div>
+    <div class="pill key" id="keyPill" aria-label="Clé"><svg viewBox="0 0 24 24"><circle cx="7" cy="12" r="4.5" fill="none" stroke="#FFC93C" stroke-width="2.6"/><path d="M11.5 12H22M18 12v4M21 12v3" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+  </div>
+  <button class="ibtn" id="bookBtn" aria-label="Carnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/><path d="M9 8h6"/></svg><span class="dot" id="bookDot" hidden></span></button>
+  <button class="ibtn" id="soundBtn" aria-label="Son"></button>
+</div>
+
+<div class="rooms" id="rooms" hidden></div>
+<div class="info" id="info" hidden></div>
+<div class="msg" id="loading" hidden>Préparation de la caméra…</div>
+<div class="sheet" id="sheet" hidden></div>
+
+<section class="screen" id="start">
+  <div class="card">
+    <svg class="hero" viewBox="0 0 150 150" aria-hidden="true">
+      <defs><radialGradient id="mg" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#9B7BFF" stop-opacity=".55"/><stop offset="1" stop-color="#9B7BFF" stop-opacity="0"/></radialGradient></defs>
+      <circle cx="75" cy="70" r="70" fill="url(#mg)"/>
+      <path d="M30 132V70l45-34 45 34v62z" fill="#3B2A5A"/><path d="M22 72l53-42 53 42" stroke="#6B4FA8" stroke-width="8" fill="none" stroke-linejoin="round"/>
+      <rect x="40" y="82" width="18" height="22" rx="9" fill="#FFC93C"/><rect x="92" y="82" width="18" height="22" rx="9" fill="#FFC93C" opacity=".55"/>
+      <path d="M62 132v-24a13 13 0 0 1 26 0v24z" fill="#1A1328"/><circle cx="82" cy="121" r="2.5" fill="#FFC93C"/>
+      <circle cx="116" cy="30" r="10" fill="#FFF3C4"/><circle cx="121" cy="26" r="9" fill="#2A1E45"/>
+      <g fill="#FFC93C"><circle cx="24" cy="40" r="2"/><circle cx="36" cy="22" r="1.5"/><circle cx="132" cy="58" r="1.6"/></g>
+    </svg>
+    <h1 class="title">L'Évasion du manoir</h1>
+    <p class="sub">Un fantôme farceur a verrouillé la maison ! Trouve les objets magiques, devine le code du coffre et prends la clé pour ouvrir la porte.</p>
+    <button class="big" id="playBtn">Commencer l'aventure</button>
+    <button class="alt" id="resumeBtn" hidden>Reprendre la partie en cours</button>
+    <button class="alt" id="prepBtn">Préparer la maison (pour un adulte)</button>
+    <button class="alt" id="virtBtn">Jouer sans caméra</button>
+    <p class="note">Ton téléphone va demander l'accès à la caméra : rien n'est enregistré ni envoyé.</p>
+    <p class="err" id="loadErr" hidden>Le jeu n'a pas pu se charger. Vérifie ta connexion puis recharge la page.</p>
+  </div>
+</section>
+
+<section class="screen" id="prep" hidden>
+  <div class="card">
+    <h2 class="title" style="font-size:30px">Préparer la maison</h2>
+    <ol class="steps">
+      <li><span class="n">1</span><span>Imprime les 5 marqueurs de l'escape game (<a href="../marqueurs/#escape" style="color:var(--gold)">page des marqueurs</a>), au moins 10 cm de côté, en gardant la marge blanche.</span></li>
+      <li><img src="../marqueurs/horloge.png" alt=""><span>Cache l'<b>horloge</b>, le <b>grimoire</b> et la <b>lanterne</b> dans trois pièces différentes.</span></li>
+      <li><img src="../marqueurs/coffre.png" alt=""><span>Cache le <b>coffre</b> dans une quatrième pièce.</span></li>
+      <li><img src="../marqueurs/porte.png" alt=""><span>Colle la <b>porte</b> près de la porte d'entrée : c'est la sortie !</span></li>
+      <li><span class="n">5</span><span>Le code du coffre change à chaque partie : rien d'autre à préparer.</span></li>
+    </ol>
+    <p class="note">Astuce : les marqueurs sont mieux reconnus à plat ou collés au mur, bien éclairés et sans reflet.</p>
+    <button class="big" id="prepDone">C'est prêt !</button>
+  </div>
+</section>
+
+<section class="screen" id="end" hidden>
+  <div class="card">
+    <h2 class="title">Libre !</h2>
+    <p class="sub">Tu t'es évadé du manoir en</p>
+    <p class="time" id="endTime">0:00</p>
+    <p class="sub" id="endText"></p>
+    <button class="big" id="againBtn">Nouvelle partie</button>
+    <a class="alt" href="../mesJeux/">Retour aux jeux</a>
+  </div>
+</section>
+
+<script>
+window.__loaded=false;
+setTimeout(()=>{if(!window.__loaded){const e=document.getElementById('loadErr');if(e)e.hidden=false}},10000);
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MarkerAR } from '../commun/ar/marqueurs.js';
+window.__loaded=true;
+
+const $=id=>document.getElementById(id);
+const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const store={get(k,d){try{const v=localStorage.getItem('manoir.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('manoir.'+k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem('manoir.'+k)}catch(e){}}};
+
+// ---------------- Son ----------------
+let ac=null,master=null,muted=store.get('muted',false);
+const ICON_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>';
+const ICON_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+function paintSound(){$('soundBtn').innerHTML=muted?ICON_OFF:ICON_ON}
+paintSound();
+function initAudio(){if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;ac=new C();master=ac.createGain();master.gain.value=muted?0:1;master.connect(ac.destination)}if(ac.state==='suspended')ac.resume()}
+function tone(f,dur,{type='sine',vol=.15,to=null,at=0}={}){if(!ac||muted)return;const t=ac.currentTime+at,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.02)}
+const sfx={
+  found(){[660,880,1320].forEach((f,i)=>tone(f,.25,{type:'triangle',vol:.1,at:i*.09}))},
+  click(){tone(900,.04,{type:'square',vol:.04})},
+  wrong(){tone(200,.18,{type:'square',vol:.08});tone(150,.25,{type:'square',vol:.08,at:.15})},
+  chest(){[392,523,659,784,1047].forEach((f,i)=>tone(f,.3,{type:'triangle',vol:.12,at:i*.1}))},
+  key(){tone(1800,.08,{type:'square',vol:.05});tone(2400,.12,{type:'square',vol:.05,at:.07})},
+  locked(){tone(140,.12,{type:'sawtooth',vol:.08});tone(120,.12,{type:'sawtooth',vol:.08,at:.13})},
+  door(){tone(110,.9,{type:'sawtooth',vol:.06,to:70});[523,659,784,1047,1319].forEach((f,i)=>tone(f,.4,{type:'triangle',vol:.12,at:.5+i*.12}))},
+  tick(){tone(1600,.03,{type:'square',vol:.03})},
+};
+$('soundBtn').onclick=()=>{initAudio();muted=!muted;store.set('muted',muted);if(master)master.gain.value=muted?0:1;paintSound()};
+let toastT=0;
+function toast(t,ms=2600){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,ms)}
+
+// ---------------- Scène ----------------
+const renderer=new THREE.WebGLRenderer({canvas:$('gl'),alpha:true,antialias:true});
+renderer.setClearColor(0,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,1,.01,100);
+scene.add(new THREE.HemisphereLight(0xfff2e0,0x3a2a5a,1.7));
+const sun=new THREE.DirectionalLight(0xffffff,1.4);sun.position.set(-1,2,3);scene.add(sun);
+const NAMES=['horloge','grimoire','lanterne','coffre','porte'];
+const ar=new MarkerAR({renderer,camera,scene,video:$('cam'),markers:NAMES.map(n=>({name:n,url:'../marqueurs/'+n+'.patt'}))});
+
+const mat=(c,o={})=>new THREE.MeshLambertMaterial({color:c,...o});
+const M={wood:mat(0x7A4A2A),wood2:mat(0x5A3418),gold:mat(0xFFC93C,{emissive:0x664400}),dark:mat(0x22182E),iron:mat(0x4A4A55),
+  stone:mat(0x8E8698),cream:mat(0xF3E7C9),red:mat(0x8E2B3A),glass:new THREE.MeshLambertMaterial({color:0xFFE9A8,emissive:0xFFB020,emissiveIntensity:.9,transparent:true,opacity:.85})};
+function tex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t}
+function glowTex(){return tex(128,128,(g)=>{const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.3,'rgba(255,255,255,.45)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,128,128)})}
+const GLOW=glowTex();
+function plaque(text){
+  const t=tex(256,128,(g,w,h)=>{g.fillStyle='#3B2A5A';g.beginPath();g.roundRect(6,6,w-12,h-12,26);g.fill();g.strokeStyle='#FFC93C';g.lineWidth=8;g.stroke();
+    g.fillStyle='#FFE9B0';let fs=74;g.font='900 '+fs+'px Georgia,serif';while(g.measureText(text).width>w-50&&fs>20){fs-=4;g.font='900 '+fs+'px Georgia,serif'}g.textAlign='center';g.textBaseline='middle';g.fillText(text,w/2,h/2+4)});
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(.34,.17),new THREE.MeshBasicMaterial({map:t,transparent:true}));return m;
+}
+
+// Chaque objet est dans un « socle » qui pivote pour toujours faire face au joueur.
+const stages={};
+for(const n of NAMES){const s=new THREE.Group();ar.anchor(n).add(s);stages[n]=s}
+
+// ---------------- Partie ----------------
+let S=null; // état sauvegardé
+function newGame(){
+  const a=rint(1,4),b=rint(1,Math.min(5,9-a)); // a lunes + b étoiles = 2e chiffre (2 à 9)
+  S={code:[rint(1,9),a+b,rint(3,9)],a,b,seen:{},key:false,chest:false,start:Date.now(),penalty:0,hints:0,tries:0,done:false};
+  save();
+}
+function save(){store.set('game',S)}
+function elapsed(){return Math.floor((Date.now()-S.start)/1000)+S.penalty}
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+
+// ---------------- Objets ----------------
+let clockHand,pendulum,bookGroup,flies=[],chestLid,keyObj,doorLeaf,doorLight,lanternLight;
+function buildAll(){
+  for(const n of NAMES){const s=stages[n];while(s.children.length)s.remove(s.children[0])}
+  flies=[];
+  // --- Horloge ---
+  {const s=stages.horloge,g=new THREE.Group();s.add(g);
+    const case_=new THREE.Mesh(new THREE.BoxGeometry(.56,1.15,.2),M.wood);case_.position.y=.6;g.add(case_);
+    const top=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.2,24,1,false,0,Math.PI),M.wood2);top.rotation.set(Math.PI/2,0,Math.PI/2,'ZYX');top.position.y=1.17;g.add(top);
+    const face=tex(512,512,(c,w)=>{c.fillStyle='#F3E7C9';c.beginPath();c.arc(256,256,250,0,Math.PI*2);c.fill();c.strokeStyle='#5A3418';c.lineWidth=14;c.stroke();
+      c.fillStyle='#2A1B10';c.font='700 58px Georgia,serif';c.textAlign='center';c.textBaseline='middle';
+      for(let i=1;i<=12;i++){const a=i/12*Math.PI*2;c.fillText(String(i),256+Math.sin(a)*188,256-Math.cos(a)*188)}
+      for(let i=0;i<60;i++){const a=i/60*Math.PI*2,r1=i%5?226:214;c.lineWidth=i%5?3:7;c.beginPath();c.moveTo(256+Math.sin(a)*r1,256-Math.cos(a)*r1);c.lineTo(256+Math.sin(a)*238,256-Math.cos(a)*238);c.stroke()}});
+    const fm=new THREE.Mesh(new THREE.CircleGeometry(.24,48),new THREE.MeshBasicMaterial({map:face}));fm.position.set(0,.88,.105);g.add(fm);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.245,.02,8,48),M.gold);ring.position.copy(fm.position);g.add(ring);
+    const minute=new THREE.Mesh(new THREE.BoxGeometry(.018,.2,.008),M.dark);minute.geometry.translate(0,.09,0);minute.position.set(0,.88,.115);g.add(minute);
+    clockHand=new THREE.Mesh(new THREE.BoxGeometry(.03,.14,.01),M.dark);clockHand.geometry.translate(0,.06,0);clockHand.position.set(0,.88,.12);g.add(clockHand);
+    const hub=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.02,12),M.gold);hub.rotation.x=Math.PI/2;hub.position.set(0,.88,.125);g.add(hub);
+    const win=new THREE.Mesh(new THREE.PlaneGeometry(.3,.42),new THREE.MeshLambertMaterial({color:0x2A1B30}));win.position.set(0,.4,.101);g.add(win);
+    pendulum=new THREE.Group();pendulum.position.set(0,.6,.11);g.add(pendulum);
+    const rod=new THREE.Mesh(new THREE.BoxGeometry(.012,.28,.006),M.gold);rod.position.y=-.14;pendulum.add(rod);
+    const bob=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.015,20),M.gold);bob.rotation.x=Math.PI/2;bob.position.y=-.3;pendulum.add(bob);
+    const pl=plaque('I');pl.position.set(0,1.58,.05);g.add(pl);
+    g.scale.setScalar(.75);
+  }
+  // --- Grimoire ---
+  {const s=stages.grimoire;bookGroup=new THREE.Group();bookGroup.position.y=.55;s.add(bookGroup);
+    const page=(draw)=>tex(384,512,(c,w,h)=>{c.fillStyle='#F2E2BE';c.fillRect(0,0,w,h);const gr=c.createLinearGradient(0,0,w,0);gr.addColorStop(0,'rgba(120,80,30,.18)');gr.addColorStop(.15,'rgba(0,0,0,0)');c.fillStyle=gr;c.fillRect(0,0,w,h);draw(c,w,h)});
+    const icons=(c,n,kind,w,h)=>{const cols=n>4?3:2,rows=Math.ceil(n/cols),cw=w/(cols+.4),ch=Math.min(110,(h-150)/rows);
+      for(let i=0;i<n;i++){const r=Math.floor(i/cols),k=i%cols,inRow=Math.min(cols,n-r*cols),x=w/2+(k-(inRow-1)/2)*cw,y=150+ch*(r+.5);
+        if(kind==='lune'){c.fillStyle='#E8B830';c.beginPath();c.arc(x,y,ch*.36,0,Math.PI*2);c.fill();c.fillStyle='#F2E2BE';c.beginPath();c.arc(x+ch*.16,y-ch*.1,ch*.32,0,Math.PI*2);c.fill()}
+        else{c.fillStyle='#6B4FA8';c.beginPath();for(let j=0;j<10;j++){const a=j*Math.PI/5,rr=j%2?ch*.16:ch*.38;c.lineTo(x+Math.sin(a)*rr,y-Math.cos(a)*rr)}c.closePath();c.fill()}}};
+    const left=page((c,w,h)=>{c.fillStyle='#3B2A5A';c.font='900 64px Georgia,serif';c.textAlign='center';c.fillText('II',w/2,90);icons(c,S.a,'lune',w,h)});
+    const right=page((c,w,h)=>{c.fillStyle='#3B2A5A';c.font='900 72px Georgia,serif';c.textAlign='center';c.fillText('+',w/2,95);icons(c,S.b,'etoile',w,h)});
+    const pg=(t,x,ry)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(.36,.48),new THREE.MeshLambertMaterial({map:t,side:THREE.DoubleSide}));m.geometry.translate(x>0?.18:-.18,0,0);m.rotation.y=ry;bookGroup.add(m);return m};
+    pg(left,-1,.32);pg(right,1,-.32);
+    const cover=(x,ry)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(.38,.5,.02),M.red);m.geometry.translate(x>0?.19:-.19,0,-.012);m.rotation.y=ry;bookGroup.add(m)};
+    cover(-1,.32);cover(1,-.32);
+    const spine=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.5,8),M.red);bookGroup.add(spine);
+    for(let i=0;i<14;i++){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:i%2?0xC9B6FF:0xFFE08A,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
+      sp.userData={a:Math.random()*6.28,r:.3+Math.random()*.2,y:Math.random()*.6-.3,s:.4+Math.random()*.5};sp.scale.setScalar(.06);bookGroup.add(sp);flies.push(sp)}
+  }
+  // --- Lanterne et lucioles ---
+  {const s=stages.lanterne,g=new THREE.Group();s.add(g);
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(.14,.16,.06,8),M.iron);base.position.y=.03;g.add(base);
+    const glass=new THREE.Mesh(new THREE.CylinderGeometry(.11,.11,.32,8),M.glass);glass.position.y=.22;g.add(glass);
+    for(let i=0;i<4;i++){const a=i*Math.PI/2+Math.PI/4,b=new THREE.Mesh(new THREE.BoxGeometry(.02,.34,.02),M.iron);b.position.set(Math.cos(a)*.115,.22,Math.sin(a)*.115);g.add(b)}
+    const roof=new THREE.Mesh(new THREE.ConeGeometry(.16,.14,8),M.iron);roof.position.y=.45;g.add(roof);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.04,.012,6,16),M.iron);ring.position.y=.55;g.add(ring);
+    const core=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xFFB020,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));core.scale.setScalar(.5);core.position.y=.22;g.add(core);
+    lanternLight=new THREE.PointLight(0xFFB020,1.2,2);lanternLight.position.y=.25;g.add(lanternLight);
+    const pl=plaque('III');pl.position.set(0,.75,0);g.add(pl);
+    const n=S.code[2];
+    for(let i=0;i<n;i++){const f=new THREE.Group();
+      const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xC8FF6A,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));halo.scale.setScalar(.11);f.add(halo);
+      const dotm=new THREE.Mesh(new THREE.SphereGeometry(.012,8,6),new THREE.MeshBasicMaterial({color:0xF4FFB0}));f.add(dotm);
+      // orbites réparties pour que les lucioles ne se cachent pas toutes en même temps
+      f.userData={a:i/n*Math.PI*2,r:.32+(i%3)*.09,y:.12+(i%4)*.13,s:(.35+(i%3)*.12)*(i%2?1:-1),bob:Math.random()*6};
+      g.add(f);flies.push(f)}
+  }
+  // --- Coffre ---
+  {const s=stages.coffre,g=new THREE.Group();s.add(g);
+    const box=new THREE.Mesh(new THREE.BoxGeometry(.62,.32,.4),M.wood);box.position.y=.16;g.add(box);
+    for(const x of [-.25,.25]){const band=new THREE.Mesh(new THREE.BoxGeometry(.05,.33,.41),M.iron);band.position.set(x,.165,0);g.add(band)}
+    chestLid=new THREE.Group();chestLid.position.set(0,.32,-.2);g.add(chestLid);
+    const lid=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.62,20,1,false,0,Math.PI),M.wood2);lid.rotation.z=Math.PI/2;lid.position.z=.2;chestLid.add(lid);
+    const lock=new THREE.Mesh(new THREE.BoxGeometry(.1,.12,.03),M.gold);lock.position.set(0,.24,.205);g.add(lock);
+    const hole=new THREE.Mesh(new THREE.CircleGeometry(.018,12),M.dark);hole.position.set(0,.25,.222);g.add(hole);
+    const pl=plaque('I · II · III');pl.scale.set(1.5,1.1,1);pl.position.set(0,.75,0);g.add(pl);
+    keyObj=makeKey();keyObj.position.set(0,.2,0);keyObj.visible=false;g.add(keyObj);
+    if(S.chest){chestLid.rotation.x=-1.9;keyObj.visible=!S.key;keyObj.position.y=.55}
+  }
+  // --- Porte ---
+  {const s=stages.porte,g=new THREE.Group();s.add(g);
+    const frame=new THREE.Mesh(new THREE.BoxGeometry(.72,1.1,.08),M.stone);frame.position.y=.55;g.add(frame);
+    const arch=new THREE.Mesh(new THREE.CylinderGeometry(.36,.36,.08,24,1,false,0,Math.PI),M.stone);arch.rotation.set(Math.PI/2,0,Math.PI/2,'ZYX');arch.position.y=1.1;g.add(arch);
+    doorLight=new THREE.Mesh(new THREE.PlaneGeometry(.5,.95),new THREE.MeshBasicMaterial({color:0xFFF0B0}));doorLight.position.set(0,.5,.041);g.add(doorLight);
+    const dark=new THREE.Mesh(new THREE.PlaneGeometry(.5,.95),new THREE.MeshBasicMaterial({color:0x140E20}));dark.position.set(0,.5,.042);g.add(dark);doorLight.userData.dark=dark;
+    doorLeaf=new THREE.Group();doorLeaf.position.set(-.25,0,.05);g.add(doorLeaf);
+    const leaf=new THREE.Mesh(new THREE.BoxGeometry(.5,.95,.04),M.wood);leaf.position.set(.25,.5,0);doorLeaf.add(leaf);
+    for(const y of [.2,.8]){const h=new THREE.Mesh(new THREE.BoxGeometry(.46,.04,.01),M.iron);h.position.set(.25,y,.025);doorLeaf.add(h)}
+    const knob=new THREE.Mesh(new THREE.SphereGeometry(.025,10,8),M.gold);knob.position.set(.43,.5,.04);doorLeaf.add(knob);
+    const lock=new THREE.Mesh(new THREE.BoxGeometry(.06,.09,.02),M.gold);lock.position.set(.43,.42,.035);doorLeaf.add(lock);
+    g.scale.setScalar(.8);
+  }
+  for(const n of NAMES)stages[n].userData.found=0;
+}
+function makeKey(){
+  const k=new THREE.Group();
+  const bow=new THREE.Mesh(new THREE.TorusGeometry(.06,.018,8,20),M.gold);bow.position.x=-.1;k.add(bow);
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.2,8),M.gold);shaft.rotation.z=Math.PI/2;shaft.position.x=.04;k.add(shaft);
+  for(const [x,h] of [[.1,.05],[.13,.035]]){const t=new THREE.Mesh(new THREE.BoxGeometry(.02,h,.015),M.gold);t.position.set(x,-h/2,0);k.add(t)}
+  const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color:0xFFC93C,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));halo.scale.setScalar(.5);k.add(halo);
+  return k;
+}
+
+// ---------------- Textes ----------------
+const INFO={
+  horloge:{title:'L\'horloge',num:'I',text:()=>'Elle s\'est arrêtée net ! L\'heure qu\'elle indique est le 1er chiffre du code.',icon:'<svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="#F3E7C9" stroke="#7A4A2A" stroke-width="3"/><path d="M18 18V8M18 18l6 3" stroke="#22182E" stroke-width="2.5" stroke-linecap="round"/></svg>'},
+  grimoire:{title:'Le grimoire',num:'II',text:()=>'Ses pages brillent… Compte les lunes et les étoiles ensemble : c\'est le 2e chiffre.',icon:'<svg viewBox="0 0 36 36"><path d="M4 8l14 3 14-3v20l-14 3-14-3z" fill="#F2E2BE" stroke="#8E2B3A" stroke-width="2.5"/><path d="M18 11v20" stroke="#8E2B3A" stroke-width="2"/></svg>'},
+  lanterne:{title:'La lanterne',num:'III',text:()=>'Des lucioles dansent autour. Combien sont-elles ? C\'est le 3e chiffre.',icon:'<svg viewBox="0 0 36 36"><rect x="12" y="10" width="12" height="18" rx="2" fill="#FFE08A" stroke="#4A4A55" stroke-width="2.5"/><path d="M10 10h16l-3-4h-10z" fill="#4A4A55"/><circle cx="6" cy="14" r="2" fill="#C8FF6A"/><circle cx="30" cy="20" r="2" fill="#C8FF6A"/></svg>'},
+  coffre:{title:'Le coffre',num:'',text:()=>S.chest?(S.key?'Le coffre est vide : tu as déjà pris la clé.':'Le coffre est ouvert ! Une clé dorée brille à l\'intérieur.'):'Il est fermé par un cadenas à 3 chiffres : I, II et III.',icon:'<svg viewBox="0 0 36 36"><rect x="5" y="14" width="26" height="16" rx="2" fill="#7A4A2A"/><path d="M5 15a13 8 0 0 1 26 0z" fill="#5A3418"/><rect x="15" y="17" width="6" height="7" rx="1" fill="#FFC93C"/></svg>'},
+  porte:{title:'La porte de sortie',num:'',text:()=>S.key?'Tu as la clé ! Ouvre la porte pour t\'évader.':'Elle est verrouillée. Il faut trouver la clé…',icon:'<svg viewBox="0 0 36 36"><path d="M8 32V14a10 10 0 0 1 20 0v18z" fill="#7A4A2A" stroke="#8E8698" stroke-width="3"/><circle cx="23" cy="22" r="2" fill="#FFC93C"/></svg>'},
+};
+let current=null,shownInfo='';
+function renderInfo(){
+  const box=$('info');
+  if(!S||S.done){box.hidden=true;return}
+  let html;
+  if(current){
+    const I=INFO[current];
+    let act='';
+    if(current==='coffre'&&!S.chest)act='<button class="act" data-act="code">Essayer un code</button>';
+    else if(current==='coffre'&&S.chest&&!S.key)act='<button class="act" data-act="take">Prendre la clé</button>';
+    else if(current==='porte')act='<button class="act" data-act="door">'+(S.key?'Ouvrir la porte':'Essayer d\'ouvrir')+'</button>';
+    html=`<h3>${I.title}${I.num?`<span class="num">${I.num}</span>`:''}</h3><p>${I.text()}</p>${act}`;
+  }else{
+    const n=NAMES.filter(k=>S.seen[k]).length;
+    html=`<h3>Explore la maison</h3><p>${ar.mode==='virtual'?'Choisis une pièce en haut de l\'écran.':'Cherche les marqueurs cachés et vise-les avec ton téléphone.'} Objets trouvés : ${n} sur 5.</p><div class="seek">${NAMES.map(k=>`<span class="${S.seen[k]?'on':''}"></span>`).join('')}</div>`;
+  }
+  if(html!==shownInfo){shownInfo=html;box.innerHTML=html}
+  box.hidden=false;
+}
+$('info').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;initAudio();act(b.dataset.act)});
+function act(a){
+  if(a==='code')openCode();
+  else if(a==='take'){if(!S.chest||S.key)return;S.key=true;save();sfx.key();keyObj.userData.fly=0;$('keyPill').classList.add('have');toast('Tu as la clé ! Trouve la porte de sortie.');renderInfo()}
+  else if(a==='door'){
+    if(!S.key){sfx.locked();toast('La porte est verrouillée. Il te faut la clé du coffre.');doorLeaf.userData.shake=.4;return}
+    if(S.done)return;S.done=true;S.end=elapsed();save();openDoor();
+  }
+}
+
+// --- Carnet ---
+function openBook(){
+  const sh=$('sheet');$('bookDot').hidden=true;
+  const items=NAMES.map(k=>{const I=INFO[k];return S.seen[k]?`<li>${I.icon}<span><b>${I.title}${I.num?' · '+I.num:''}</b>${I.text()}</span></li>`:`<li class="unk"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15" fill="rgba(255,255,255,.08)"/><text x="18" y="24" text-anchor="middle" font-size="17" font-weight="900" fill="#C2B6DA">?</text></svg><span><b>Objet mystère</b>Pas encore trouvé</span></li>`}).join('');
+  sh.innerHTML=`<h3>Mon carnet<button class="x" data-close aria-label="Fermer">×</button></h3><ul class="notes">${items}</ul><button class="hintb" data-hint>Demander un indice (+30 s)</button><div id="hintBox"></div>`;
+  sh.hidden=false;
+}
+function hintText(){
+  const missing=['horloge','grimoire','lanterne','coffre','porte'].filter(k=>!S.seen[k]);
+  if(S.key)return 'Tu as la clé : trouve le marqueur de la porte, souvent près de l\'entrée de la maison.';
+  if(S.chest)return 'Le coffre est ouvert : vise-le et prends la clé !';
+  const clues=['horloge','grimoire','lanterne'].filter(k=>!S.seen[k]);
+  if(clues.length)return 'Il te manque encore : '+clues.map(k=>INFO[k].title.toLowerCase()).join(', ')+'. Fouille les autres pièces !';
+  if(S.hints<2)return 'Le code du coffre se lit dans l\'ordre : I = l\'horloge, II = le grimoire, III = la lanterne.';
+  // indice ultime : on révèle un chiffre
+  const i=Math.min(2,S.hints-2);return 'Le chiffre '+['I','II','III'][i]+' est '+S.code[i]+'.';
+}
+$('sheet').addEventListener('click',e=>{
+  if(e.target.closest('[data-close]')){closeSheet();return}
+  if(e.target.closest('[data-hint]')){S.hints++;S.penalty+=30;save();sfx.click();const hb=$('hintBox');hb.innerHTML=`<p class="hint">${hintText()}</p>`;return}
+  const w=e.target.closest('[data-w]');
+  if(w){const i=+w.dataset.w,d=+w.dataset.d;codeVals[i]=(codeVals[i]+d+10)%10;$('cv'+i).textContent=codeVals[i];sfx.tick();return}
+  if(e.target.closest('[data-try]'))tryCode();
+});
+function closeSheet(){$('sheet').hidden=true}
+$('bookBtn').onclick=()=>{initAudio();if(!$('sheet').hidden){closeSheet();return}openBook()};
+
+// --- Cadenas ---
+let codeVals=[0,0,0];
+function openCode(){
+  const sh=$('sheet');
+  sh.innerHTML=`<h3>Le cadenas<button class="x" data-close aria-label="Fermer">×</button></h3><div class="pad">${[0,1,2].map(i=>`<div class="wheel"><small>${['I','II','III'][i]}</small><button data-w="${i}" data-d="1" aria-label="Plus">▲</button><output id="cv${i}">${codeVals[i]}</output><button data-w="${i}" data-d="-1" aria-label="Moins">▼</button></div>`).join('')}</div><p class="fb" id="fb"></p><button class="go" data-try>Ouvrir le cadenas</button>`;
+  sh.hidden=false;
+}
+function tryCode(){
+  S.tries++;save();
+  if(codeVals.every((v,i)=>v===S.code[i])){
+    S.chest=true;save();closeSheet();sfx.chest();chestLid.userData.open=0;keyObj.visible=true;keyObj.position.y=.2;keyObj.userData.rise=0;
+    toast('Clic ! Le coffre s\'ouvre…');renderInfo();
+  }else{
+    sfx.wrong();const p=document.querySelector('.pad');p.classList.remove('shake');void p.offsetWidth;p.classList.add('shake');
+    const ok=codeVals.filter((v,i)=>v===S.code[i]).length;
+    $('fb').className='fb bad';$('fb').textContent=S.tries>=3?`Raté… ${ok} chiffre${ok>1?'s':''} sur 3 ${ok>1?'sont':'est'} bon${ok>1?'s':''}.`:'Le cadenas ne bouge pas. Vérifie tes indices !';
+  }
+}
+
+// --- Porte ---
+function openDoor(){
+  doorLeaf.userData.open=0;sfx.door();
+  setTimeout(()=>{const f=document.createElement('div');f.className='flash';document.body.appendChild(f);setTimeout(()=>f.remove(),1700)},900);
+  setTimeout(showEnd,2300);
+}
+function showEnd(){
+  const t=S.end;const bestT=store.get('best',null);const isBest=!bestT||t<bestT;if(isBest)store.set('best',t);
+  $('endTime').textContent=fmt(t);
+  $('endText').textContent=(S.hints?`${S.hints} indice${S.hints>1?'s':''} utilisé${S.hints>1?'s':''} (+${S.hints*30} s). `:'Sans aucun indice, bravo ! ')+(isBest?'Nouveau record !':'Record : '+fmt(bestT));
+  $('end').hidden=false;$('bar').classList.add('idle');$('info').hidden=true;$('rooms').hidden=true;store.del('game');
+}
+
+// ---------------- Mode sans caméra ----------------
+let virtualPick='horloge';
+function buildRooms(){
+  const r=$('rooms');const lab={horloge:'Horloge',grimoire:'Grimoire',lanterne:'Lanterne',coffre:'Coffre',porte:'Porte'};r.innerHTML=NAMES.map(n=>`<button data-room="${n}" class="${n===virtualPick?'on':''}">${lab[n]}</button>`).join('');r.hidden=false;
+}
+$('rooms').addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(!b)return;virtualPick=b.dataset.room;sfx.click();buildRooms()});
+
+// ---------------- Démarrage ----------------
+function enterGame(){
+  buildAll();$('keyPill').classList.toggle('have',!!S.key);
+  $('start').hidden=true;$('prep').hidden=true;$('end').hidden=true;$('bar').classList.remove('idle');
+  current=null;shownInfo='';renderInfo();
+}
+async function launch(resume){
+  initAudio();
+  if(!resume||!S)newGame();
+  const b=$('playBtn');b.disabled=true;$('loading').hidden=false;
+  const ok=ar.mode==='camera'||await ar.startCamera();
+  b.disabled=false;$('loading').hidden=true;
+  if(!ok){toast('Caméra indisponible : partie sans caméra');startVirtual();enterGame();return}
+  document.body.classList.remove('virtual');$('rooms').hidden=true;
+  enterGame();
+}
+function startVirtual(){document.body.classList.add('virtual');ar.startVirtual({tilt:.32,height:-.75,distance:3});buildRooms()}
+$('playBtn').onclick=()=>launch(false);
+$('resumeBtn').onclick=()=>{S=store.get('game',null);launch(true)};
+$('prepBtn').onclick=()=>{$('start').hidden=true;$('prep').hidden=false};
+$('prepDone').onclick=()=>{$('prep').hidden=true;$('start').hidden=false};
+$('virtBtn').onclick=()=>{initAudio();newGame();startVirtual();enterGame()};
+$('againBtn').onclick=()=>{$('end').hidden=true;if(ar.mode==='virtual'){newGame();startVirtual();enterGame()}else launch(false)};
+{const g=store.get('game',null);if(g&&!g.done&&Date.now()-g.start<6*3600e3)$('resumeBtn').hidden=false}
+
+// Toucher le coffre ou la porte à l'écran fait la même chose que le bouton
+addEventListener('pointerup',e=>{if(!S||S.done||!current||e.target.closest('.sheet,.bar,.info,.screen,.rooms'))return;
+  if(current==='coffre'&&!S.chest)act('code');else if(current==='coffre'&&S.chest&&!S.key)act('take');else if(current==='porte')act('door')});
+
+// ---------------- Boucle ----------------
+let last=performance.now(),clock=0,lastSec=-1;
+const wp=new THREE.Vector3(),qA=new THREE.Quaternion(),qW=new THREE.Quaternion(),lookM=new THREE.Matrix4(),ORIGIN=new THREE.Vector3(),UP=new THREE.Vector3(0,1,0);
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=Math.min(.1,(now-last)/1000);last=now;clock+=dt;
+  ar.update(dt,now/1000);
+  if(ar.mode==='virtual')for(const n of NAMES)ar.anchor(n).visible=S&&n===virtualPick;
+  // objet visé : le plus proche du centre de l'écran
+  let best=null,bd=1e9;
+  if(S&&!S.done&&$('start').hidden)for(const n of NAMES){if(!ar.tracked(n))continue;const a=ar.anchor(n);a.getWorldPosition(wp);const p=ar.toClient(wp);const d=Math.hypot(p.x-innerWidth/2,p.y-innerHeight/2);if(d<bd){bd=d;best=n}}
+  if(best!==current){current=best;
+    if(best&&!S.seen[best]){S.seen[best]=true;save();sfx.found();toast('Nouvel objet : '+INFO[best].title.toLowerCase()+' ! Il est noté dans ton carnet.');$('bookDot').hidden=false}
+  }
+  if(S)renderInfo();
+  if(S&&!S.done){const s=elapsed();if(s!==lastSec){lastSec=s;$('time').textContent=fmt(s)}}
+  // Chaque objet se tient droit par rapport à l'écran et fait face au joueur :
+  // ça marche que le marqueur soit posé sur une table ou collé au mur.
+  for(const n of NAMES){const a=ar.anchor(n);if(!a.visible)continue;a.updateMatrixWorld();
+    a.getWorldPosition(wp);a.getWorldQuaternion(qA);
+    lookM.lookAt(ORIGIN,wp,UP);qW.setFromRotationMatrix(lookM);
+    stages[n].quaternion.copy(qA.invert().multiply(qW));stages[n].position.set(0,.06,0)}
+  animate(dt);
+  renderer.render(scene,camera);
+}
+function animate(dt){
+  if(!S)return;
+  if(clockHand){clockHand.rotation.z=-(S.code[0]%12)/12*Math.PI*2}
+  if(pendulum)pendulum.rotation.z=Math.sin(clock*2.4)*.32;
+  if(bookGroup){bookGroup.position.y=.55+Math.sin(clock*1.6)*.04;bookGroup.rotation.x=-.35}
+  for(const f of flies){const u=f.userData;u.a+=u.s*dt;if(f.isSprite){f.position.set(Math.cos(u.a)*u.r,u.y+Math.sin(clock*2+u.a)*.05,Math.sin(u.a)*u.r)}
+    else{f.position.set(Math.cos(u.a)*u.r,u.y+Math.sin(clock*2.3+u.bob)*.05,Math.sin(u.a)*u.r);f.children[0].material.opacity=.75+.25*Math.sin(clock*7+u.bob)}}
+  if(lanternLight)lanternLight.intensity=1.1+Math.sin(clock*13)*.15+Math.sin(clock*7)*.1;
+  if(chestLid&&chestLid.userData.open!==undefined){chestLid.userData.open=Math.min(1,chestLid.userData.open+dt*1.4);chestLid.rotation.x=-1.9*easeOut(chestLid.userData.open)}
+  if(keyObj&&keyObj.visible){
+    if(keyObj.userData.rise!==undefined&&keyObj.userData.rise<1){keyObj.userData.rise=Math.min(1,keyObj.userData.rise+dt*.8);keyObj.position.y=.2+.35*easeOut(keyObj.userData.rise)}
+    keyObj.rotation.y+=dt*2;
+    if(keyObj.userData.fly!==undefined){keyObj.userData.fly+=dt*1.6;keyObj.position.y+=dt*.8;keyObj.scale.setScalar(Math.max(.01,1-keyObj.userData.fly));if(keyObj.userData.fly>=1)keyObj.visible=false}
+  }
+  if(doorLeaf){
+    if(doorLeaf.userData.shake>0){doorLeaf.userData.shake-=dt;doorLeaf.rotation.y=Math.sin(doorLeaf.userData.shake*60)*.04}
+    if(doorLeaf.userData.open!==undefined){doorLeaf.userData.open=Math.min(1,doorLeaf.userData.open+dt*.7);doorLeaf.rotation.y=-1.7*easeOut(doorLeaf.userData.open);if(doorLight.userData.dark)doorLight.userData.dark.visible=doorLeaf.userData.open<.15}
+  }
+}
+const easeOut=x=>1-Math.pow(1-x,3);
+requestAnimationFrame(frame);
+
+window.__manoir={get S(){return S},ar,act,tryCode,codeVals,openBook,get current(){return current}};
+</script>
+</body>
+</html>

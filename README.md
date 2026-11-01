@@ -1,6 +1,10 @@
 # claude_artefacts_games
 
 - Nouveau jeu : Roulette (roue de la fortune avec acronymes)
+- Nouveaux jeux en réalité augmentée avec marqueurs imprimés (page `marqueurs/` à imprimer ou à afficher sur un autre écran) :
+  - `chateauAR/` — Défense du château : une île et son château apparaissent sur le marqueur Hiro posé sur la table. Des gobelins, loups, ogres et dragons arrivent par quatre chemins ; on touche les dalles de pierre pour construire des tours (archers, canon, glace qui ralentit), on les améliore jusqu'au niveau 3 et on tient 10 vagues. Jouable aussi sans marqueur (l'île s'affiche devant soi et tourne au doigt).
+  - `escapeManoir/` — L'Évasion du manoir : 5 marqueurs (horloge, grimoire, lanterne, coffre, porte) sont cachés dans la maison. L'horloge, le grimoire (lunes + étoiles) et les lucioles de la lanterne donnent les 3 chiffres du cadenas, le coffre contient la clé, la clé ouvre la porte. Code différent à chaque partie, chrono, carnet, indices (+30 s), partie reprise si la page se recharge, et mode sans caméra.
+  - `commun/ar/` — module partagé de suivi des marqueurs (AR.js / ARToolKit copié dans le dépôt, licence MIT) : la vidéo et la scène 3D sont superposées au pixel près, les motifs sont chargés un par un avant de lancer l'analyse.
 - Nouveau jeu en réalité augmentée : `chasseFantomes/` — Chasse aux fantômes. Le flux de la caméra arrière sert de décor et des fantômes en 3D apparaissent tout autour du joueur (orientés par le gyroscope de l'iPhone). On se tourne dans la pièce en suivant les flèches au bord de l'écran et on touche les fantômes pour les capturer (blancs 1 pt, bleus rapides 2 pts, dorés 5 pts, combos ×2 / ×3) en 60 secondes. Sans gyroscope on regarde autour en glissant le doigt ; sans caméra la chasse se passe dans une nuit étoilée. Accessible depuis l'accueil de `mesJeux/`.
 - Nouveau : `mesJeux/` regroupe six jeux pour mobile, avec un écran d'accueil commun
   - Robots Gourmands : casse-tête où des robots mangent une mosaïque de cases colorées (56 niveaux, avec caisses en bois, boîtes mystère et boîtes enchaînées)
