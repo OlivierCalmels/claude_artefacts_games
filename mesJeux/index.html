@@ -187,6 +187,11 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .ci-row.done{background:#E3F2E1}
 .ca-title{font-family:'Cinzel',Georgia,serif!important;font-weight:700!important}
 @media (prefers-reduced-motion: reduce){ .pill:active,.lv:active,.big:active{transform:none} }
+@media (max-width:420px){#btn-levels{font-size:0;gap:0;width:40px;padding:0;justify-content:center}}
+.lvl b{white-space:nowrap}
+.share-toast{position:fixed;left:50%;bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 12px);transform:translateX(-50%);z-index:50;
+  background:var(--ink);color:#fff;border-radius:14px;padding:10px 16px;font-family:var(--body);font-weight:800;font-size:14px;max-width:calc(100% - 32px);text-align:center;
+  box-shadow:0 4px 14px rgba(43,37,66,.3);pointer-events:none}
 /* ---- À quel animal je pense ? ---- */
 #animal{background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch;
   background-image:radial-gradient(var(--tray) 1.1px,transparent 1.4px);background-size:18px 18px}
@@ -329,7 +334,7 @@ button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-de
 
 <div id="app" hidden>
   <header class="bar">
-    <div class="bar-l"><button class="pill icon" id="btn-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+    <div class="bar-l"><button class="pill icon" id="btn-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button><button class="pill icon" data-share="robots" data-share-name="Robots Gourmands" aria-label="Partager ce jeu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
     <button class="pill" id="btn-levels" aria-label="Choisir un niveau">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>
       Niveaux
@@ -345,7 +350,7 @@ button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-de
 <div id="farm" class="screen" hidden>
   <canvas id="farm-cv" aria-label="Le verger"></canvas>
   <div class="farm-hud">
-    <div class="bar-l"><button class="pill icon" id="farm-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+    <div class="bar-l"><button class="pill icon" id="farm-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button><button class="pill icon" data-share="verger" data-share-name="Le Verger" aria-label="Partager ce jeu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
     <button class="pill icon" id="farm-reset" aria-label="Recommencer la partie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg></button></div>
     <div class="money" aria-label="Argent"><i></i><b id="farm-money">0</b></div>
   </div>
@@ -364,7 +369,7 @@ button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-de
 <div id="castle" class="screen" hidden>
   <canvas id="castle-cv" aria-label="Champ de bataille"></canvas>
   <div class="ca-hud" id="ca-hud">
-    <div class="bar-l"><button class="pill icon" id="ca-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+    <div class="bar-l"><button class="pill icon" id="ca-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button><button class="pill icon" data-share="chateau" data-share-name="Le Château" aria-label="Partager ce jeu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
       <button class="pill icon" id="ca-map" aria-label="Carte d'Ysmère" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></button></div>
     <div class="ca-stats" id="ca-stats" hidden>
       <div class="money" aria-label="Or"><i></i><b id="ca-gold">0</b></div>
@@ -381,7 +386,7 @@ button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-de
 <div id="battle" class="screen" hidden>
   <canvas id="battle-cv" aria-label="Les remparts"></canvas>
   <div class="ca-hud" id="ba-hud">
-    <div class="bar-l"><button class="pill icon" id="ba-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+    <div class="bar-l"><button class="pill icon" id="ba-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button><button class="pill icon" data-share="remparts" data-share-name="Les Remparts" aria-label="Partager ce jeu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
       <button class="pill icon" id="ba-reset" aria-label="Nouvelle bataille"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v5h5"/></svg></button></div>
     <div class="money lives" aria-label="Solidité de la muraille"><i></i><b id="ba-hp">100</b></div>
   </div>
@@ -415,7 +420,7 @@ button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-de
 <div id="circuit" class="screen" hidden>
   <canvas id="circuit-cv" aria-label="Plan de travail du circuit"></canvas>
   <div class="ca-hud" id="ci-hud">
-    <div class="bar-l"><button class="pill icon" id="ci-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+    <div class="bar-l"><button class="pill icon" id="ci-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button><button class="pill icon" data-share="circuits" data-share-name="L'Atelier des circuits" aria-label="Partager ce jeu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
       <button class="pill" id="ci-menu">Menu</button></div>
     <div class="bar-l"><button class="pill" id="ci-hint" hidden>Indice</button><button class="pill" id="ci-clear">Tout effacer</button></div>
   </div>
@@ -2388,7 +2393,7 @@ $('go-circuit').onclick=()=>{$('home').hidden=true;window.Circuit.enter()};
 <div id="animal" class="screen" hidden>
   <div class="an-wrap">
     <div class="an-top">
-      <button class="pill icon" id="an-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+      <div class="bar-l"><button class="pill icon" id="an-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button><button class="pill icon" data-share="animal" data-share-name="À quel animal je pense ?" aria-label="Partager ce jeu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button></div>
       <span class="an-count" id="an-count"></span>
       <div class="bar-l">
         <button class="pill icon" id="an-sound" aria-label="Lire les questions à voix haute"></button>
@@ -2856,6 +2861,22 @@ window.Animal={ANIMALS,QS,probs:()=>S&&probs(),newGame,_S:()=>S};
 })();
 </script>
 
+<script id="share">
+// Bouton « Partager » de chaque jeu : partage le lien direct du jeu (menu de partage du téléphone, sinon copie du lien)
+(()=>{
+let tid=0;
+function toast(t){let el=document.getElementById('share-toast');
+  if(!el){el=document.createElement('div');el.id='share-toast';el.className='share-toast';el.setAttribute('role','status');document.body.appendChild(el)}
+  el.textContent=t;el.hidden=false;clearTimeout(tid);tid=setTimeout(()=>{el.hidden=true},2600)}
+async function share(hash,name){
+  const url=location.href.split('#')[0]+'#'+hash;
+  const data={title:name,text:'Viens jouer à « '+name+' » !',url};
+  try{if(navigator.share){await navigator.share(data);return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(url);toast('Lien du jeu copié !');return}catch(e){}
+  window.prompt('Copie le lien du jeu :',url)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-share]');if(!b)return;e.preventDefault();share(b.dataset.share,b.dataset.shareName)});
+})();
+</script>
 <script id="deep-link">
 // #robots, #verger, #chateau, #remparts, #circuits or #animal in the address opens that game straight away
 (()=>{const go={robots:'go-robots',verger:'go-farm',chateau:'go-castle',remparts:'go-battle',circuits:'go-circuit',animal:'go-animal'}[location.hash.slice(1)];if(go)setTimeout(()=>document.getElementById(go).click(),0)})();
