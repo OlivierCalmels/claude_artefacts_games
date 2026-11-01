@@ -2415,7 +2415,9 @@ $('go-circuit').onclick=()=>{$('home').hidden=true;window.Circuit.enter()};
 // À quel animal je pense ? — le joueur pense à un animal, le hibou pose des questions oui / non / je ne sais pas.
 (()=>{
 const $=id=>document.getElementById(id);
-// [clé, icône, question, petit libellé, poids (questions générales posées en priorité)]
+// [clé, icône, question, petit libellé, poids (questions générales posées en priorité), inversée]
+// Aucune question à la forme négative : si « inversée », la question est posée à l'affirmative et la réponse est retournée
+// en interne (ex. « A-t-il des pattes ? » oui = « sans pattes » non).
 const QS=[
 ['poils','🐾',"A-t-il des poils ?",'poils',1.2],
 ['plumes','🪶',"A-t-il des plumes ?",'plumes',1.2],
@@ -2440,7 +2442,7 @@ const QS=[
 ['lourd','🚗',"Est-il plus lourd qu'une voiture ?",'très lourd',1],
 ['p4','🐾',"Marche-t-il sur 4 pattes ?",'4 pattes',1.1],
 ['p2','🦶',"Marche-t-il sur 2 pattes ?",'2 pattes',1],
-['p0','🚫',"Est-ce qu'il n'a pas de pattes du tout ?",'sans pattes',1],
+['p0','🦶',"A-t-il des pattes ?",'des pattes',1,true],
 ['pplus','🦵',"A-t-il plus de 4 pattes ?",'plein de pattes',1],
 ['queue','➰',"A-t-il une queue ?",'queue',.9],
 ['cornes','🦴',"A-t-il des cornes ou des bois sur la tête ?",'cornes',1],
@@ -2652,7 +2654,7 @@ let sel=new Set(get('animal-choix',null)||ANIMALS.filter(isDefault).map(a=>a.id)
  if(v<3)ANIMALS.filter(a=>a.g===2&&isDefault(a)).forEach(a=>sel.add(a.id));
  if(v<3){put('animal-choix',[...sel]);put('animal-choix-v',3)}}
 let learned=get('animal-appris',{});
-let sound=get('animal-voix',true);
+let sound=get('animal-voix',false);
 const enabled=()=>ANIMALS.filter(a=>sel.has(a.id));
 
 const base=(a,k)=>a.y.has(k)?1:a.m.has(k)?.5:0;
@@ -2676,8 +2678,8 @@ function loadVoices(){try{voices=window.speechSynthesis.getVoices().filter(v=>/^
 const pickVoice=()=>voices.find(v=>v.name===voiceName)||voices[0]||null;
 function say(t,force){if(!sound&&!force)return;try{const s=window.speechSynthesis;s.cancel();
   if(!voices.length)loadVoices();
-  // petites retouches pour que la phrase sonne mieux à l'oral
-  const txt=t.replace(/[«»]/g,'').replace(/A-t-il/g,'Est-ce qu\'il a').replace(/ \?/g,' ?').replace(/…/g,'...');
+  // la voix lit exactement le texte affiché ; on retire seulement les guillemets et les emoji
+  const txt=t.replace(/[«»]/g,'').replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu,'').replace(/\s+/g,' ').trim();
   const u=new SpeechSynthesisUtterance(txt);const v=pickVoice();u.lang=v?v.lang:'fr-FR';if(v)u.voice=v;
   const nice=v&&voiceScore(v)>=8;u.rate=nice?1:.92;u.pitch=nice?1:1.08;
   setTimeout(()=>s.speak(u),40)}catch(e){}}
@@ -2686,6 +2688,8 @@ function voiceSelect(){const el=$('an-voice');if(!el)return;
   el.disabled=false;const cur=pickVoice();
   el.innerHTML=voices.map((v,i)=>`<option value="${esc(v.name)}"${cur&&v.name===cur.name?' selected':''}>${i===0?'★ ':''}${esc(v.name.replace(/^(Microsoft|Google)\s+/,''))}${/^fr[-_]FR/i.test(v.lang)?'':' ('+esc(v.lang)+')'}</option>`).join('')}
 try{window.speechSynthesis.onvoiceschanged=loadVoices}catch(e){}
+// lit, dans l'ordre, tous les textes de l'écran marqués data-say
+const sayScreen=force=>say([...body().querySelectorAll('[data-say]')].map(e=>e.textContent.trim()).join(' '),force);
 const hush=()=>{try{window.speechSynthesis.cancel()}catch(e){}};
 function soundIcon(){$('an-sound').innerHTML=sound
   ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>'
@@ -2734,7 +2738,7 @@ const body=()=>$('an-body');
 function count(t){$('an-count').textContent=t}
 function chips(who){
   if(!S||!S.hist.length)return'';let miss=0;
-  const c=S.hist.map(([k,ans])=>{const q=QK[k];const m=ans===1?'<b style="color:#2E7D32">oui</b>':ans===-1?'<b style="color:#C0392B">non</b>':'<b style="color:var(--muted)">?</b>';
+  const c=S.hist.map(([k,ans])=>{const q=QK[k];const shown=q[5]?-ans:ans;const m=shown===1?'<b style="color:#2E7D32">oui</b>':shown===-1?'<b style="color:#C0392B">non</b>':'<b style="color:var(--muted)">?</b>';
     const b=who?base(who,k):.5,x=who&&ans&&((ans===1&&b===0)||(ans===-1&&b===1));if(x)miss++;
     return`<span class="an-chip${x?' miss':''}">${q[1]} ${esc(q[3])} ${m}</span>`}).reverse().join('');
   return`<div class="an-panel"><div class="an-ptitle">Tes réponses</div><div class="an-chips">${c}</div>${miss?`<p class="an-legend">En rouge : d'après ma fiche, ${esc(withArt(who))} c'est plutôt le contraire.</p>`:''}</div>`}
@@ -2747,39 +2751,39 @@ function intro(){
   S=null;hush();count('');$('an-gear').hidden=false;
   const L=enabled();
   body().innerHTML=`${owl('think')}
-  <div class="an-bubble"><h1 class="an-h">À quel animal je pense ?</h1>
-  <p class="an-sub">Choisis dans ta tête un animal de la liste, garde-le secret… Réponds à mes questions par <b style="color:#2E7D32">oui</b>, <b style="color:#C0392B">non</b> ou <b>je ne sais pas</b>, et je vais le deviner !</p></div>
+  <div class="an-bubble"><h1 class="an-h" data-say>À quel animal je pense ?</h1>
+  <p class="an-sub" data-say>Choisis dans ta tête un animal de la liste, garde-le secret… Réponds à mes questions par <b style="color:#2E7D32">oui</b>, <b style="color:#C0392B">non</b> ou <b>je ne sais pas</b>, et je vais le deviner !</p></div>
   <button class="an-btn an-go" id="an-start">C'est parti !</button>
   <div class="an-panel"><div class="an-ptitle">Les ${L.length} animaux que je connais</div><div class="an-grid">${L.slice().sort((x,y)=>x.n.localeCompare(y.n,'fr')).map(a=>`<div class="an-tile"><i>${emo(a)}</i><b>${esc(cap(a.n))}</b></div>`).join('')}</div></div>`;
   $('an-start').disabled=L.length<2;
   $('an-start').onclick=()=>{$('an-gear').hidden=true;newGame()};
-  say("À quel animal je pense ? Choisis un animal dans ta tête, et je vais le deviner !")}
+  sayScreen()}
 
 function ask(q,P){
   curQ=q;count('Question '+(S.hist.length+1));
   body().innerHTML=`<div class="an-qrow">${owl('think',(S.hist.length%3)-1)}<div class="an-bubble an-left" id="an-q" role="button" tabindex="0" aria-label="Relire la question">
-   <div class="an-qicon">${q[1]}</div><p class="an-qtext">${esc(q[2])}</p></div></div>
+   <div class="an-qicon">${q[1]}</div><p class="an-qtext" data-say>${esc(q[2])}</p></div></div>
   <div class="an-btns3">
    <button class="an-btn an-yes" data-a="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Oui</button>
    <button class="an-btn an-no" data-a="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Non</button>
    <button class="an-btn an-idk" data-a="0">Je ne sais pas</button></div>
   ${S.hist.length?'<button class="ghost" id="an-undo">↩ Changer ma dernière réponse</button>':''}
   ${ideas(P)}${chips()}`;
-  body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{S.hist.push([q[0],+b.dataset.a]);step()});
+  body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=+b.dataset.a;S.hist.push([q[0],q[5]?-a:a]);step()});
   const u=$('an-undo');if(u)u.onclick=()=>{S.hist.pop();if(S.lastGuess>S.hist.length)S.lastGuess=S.hist.length;step()};
-  $('an-q').onclick=()=>say(q[2]);
-  say(q[2])}
+  $('an-q').onclick=()=>sayScreen(true);
+  sayScreen()}
 
 function guess(a,P){
   count('Ma réponse !');S.lastGuess=S.hist.length;
-  body().innerHTML=`<div class="an-qrow">${owl('',1)}<div class="an-bubble an-left"><p class="an-sub" style="margin:0">Je pense que c'est…</p>
-   <div class="an-big">${emo(a)}</div><p class="an-name">${esc(cap(withArt(a)))} !</p></div></div>
+  body().innerHTML=`<div class="an-qrow">${owl('',1)}<div class="an-bubble an-left"><p class="an-sub" style="margin:0" data-say>Je pense que c'est…</p>
+   <div class="an-big">${emo(a)}</div><p class="an-name" data-say>${esc(cap(withArt(a)))} !</p></div></div>
   <div class="an-btns2"><button class="an-btn an-yes" id="an-ok">Oui, bravo !</button><button class="an-btn an-no" id="an-ko">Non, raté</button></div>
   ${chips()}`;
   $('an-ok').onclick=()=>win(a);
   $('an-ko').onclick=()=>{S.ex.add(a.id);S.tried.push(a.id);S.guesses++;
     if(S.guesses>=3||S.hist.length>=MAXQ)giveUp();else step()};
-  say('Je pense que c\'est '+withArt(a)+' !')}
+  sayScreen()}
 
 function learn(a){
   const L=learned[a.id]||(learned[a.id]={});
@@ -2789,7 +2793,7 @@ function learn(a){
 function factSheet(a){
   const yes=QS.filter(q=>a.y.has(q[0])&&!['p0'].includes(q[0])||(q[0]==='p0'&&a.y.has('p0')));
   return`<div class="an-panel"><div class="an-ptitle">La fiche ${a.a==="l'"?"de l'":a.a==='la'?'de la ':'du '}${esc(a.n)}</div>
-  <div class="an-chips">${yes.map(q=>`<span class="an-chip">${q[1]} ${esc(q[3])}</span>`).join('')}</div></div>`}
+  <div class="an-chips">${yes.map(q=>`<span class="an-chip">${q[1]} ${esc(q[5]?'pas de pattes':q[3])}</span>`).join('')}</div></div>`}
 function photo(a){
   return`<figure class="an-photo" id="an-photo"><div class="an-ph-ph">${emo(a)}</div><figcaption></figcaption></figure>`}
 async function loadPhoto(a){
@@ -2806,27 +2810,27 @@ async function loadPhoto(a){
     box.querySelector('figcaption').innerHTML=`Photo : <a href="${esc(page)}" target="_blank" rel="noopener">Wikipédia / Wikimedia Commons</a>`;
     return}catch(e){}}}
 
-function end(a,title,msg,line){
+function end(a,title,msg){
   body().innerHTML=`<div class="an-confetti">🎉 ⭐ 🎈 ⭐ 🎉</div>
-  <h2 class="an-h">${title}</h2><p class="an-sub" style="text-align:center;margin-top:-6px">${msg}</p>
-  ${photo(a)}<p class="an-name" style="text-align:center;font-size:26px;margin-top:-4px">${emo(a)} ${esc(cap(withArt(a)))}</p>
+  <h2 class="an-h" data-say>${title}</h2><p class="an-sub" style="text-align:center;margin-top:-6px" data-say>${msg}</p>
+  ${photo(a)}<p class="an-name" style="text-align:center;font-size:26px;margin-top:-4px">${emo(a)} <span data-say>${esc(cap(withArt(a)))}</span></p>
   <button class="an-btn an-go" id="an-again">Rejouer</button>
   ${factSheet(a)}${chips(a)}
   <button class="ghost" id="an-menu">Retour à la liste des animaux</button>`;
   $('an-again').onclick=()=>newGame();$('an-menu').onclick=()=>intro();
-  loadPhoto(a);say(line)}
+  loadPhoto(a);sayScreen()}
 function win(a){
   learn(a);count('Gagné !');const n=S.hist.length;
-  end(a,"J'ai trouvé !",`En ${n} question${n>1?'s':''}${S.guesses?` et ${S.guesses+1} essais`:''}. Je suis un hibou très malin !`,"Youpi ! J'ai trouvé : c'était "+withArt(a)+" !")}
+  end(a,"J'ai trouvé !",`En ${n} question${n>1?'s':''}${S.guesses?` et ${S.guesses+1} essais`:''}. Je suis un hibou très malin !`)}
 function giveUp(){
   count('Je donne ma langue au chat');hush();
   const L=enabled().slice().sort((x,y)=>x.n.localeCompare(y.n,'fr'));
-  body().innerHTML=`<div class="an-qrow">${owl('',-1)}<div class="an-bubble an-left"><p class="an-qtext" style="font-size:20px">Je donne ma langue au chat !</p><p class="an-sub">Tu m'as eu… Montre-moi à quel animal tu pensais :</p></div></div>
+  body().innerHTML=`<div class="an-qrow">${owl('',-1)}<div class="an-bubble an-left"><p class="an-qtext" style="font-size:20px" data-say>Je donne ma langue au chat !</p><p class="an-sub" data-say>Tu m'as eu… Montre-moi à quel animal tu pensais :</p></div></div>
   <div class="an-grid">${L.map(a=>`<button class="an-tile" data-id="${esc(a.id)}"><i>${emo(a)}</i><b>${esc(cap(a.n))}</b></button>`).join('')}</div>
   ${chips()}`;
   body().querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const a=ANIMALS.find(x=>x.id===b.dataset.id);learn(a);count('Bien joué !');
-    end(a,'Bien joué, tu as gagné !',"Merci, je m'en souviendrai pour la prochaine fois.","Ah, c'était "+withArt(a)+" ! Bien joué, je m'en souviendrai.")});
-  say('Je donne ma langue au chat ! À quel animal pensais-tu ?')}
+    end(a,'Bien joué, tu as gagné !',"Merci, je m'en souviendrai pour la prochaine fois.")});
+  sayScreen()}
 
 // ---- tableau oui / non des animaux ----
 function table(){
@@ -2840,11 +2844,11 @@ function table(){
 $('an-qn').textContent=QS.length;
 $('an-qlist').innerHTML=QS.map(q=>`<li>${q[1]} ${esc(q[2])}</li>`).join('');
 $('an-gear').onclick=()=>{table();loadVoices();$('ov-animal').hidden=false};
-$('an-voice').onchange=e=>{voiceName=e.target.value;put('animal-voix-nom',voiceName);say("Bonjour ! Je suis le hibou devin. À quel animal penses-tu ?",true)};
-$('an-voice-test').onclick=()=>say("Bonjour ! Je suis le hibou devin. Est-ce qu'il a des plumes ?",true);
+$('an-voice').onchange=e=>{voiceName=e.target.value;put('animal-voix-nom',voiceName);say("A-t-il des plumes ?",true)};
+$('an-voice-test').onclick=()=>say("A-t-il des plumes ?",true);
 $('an-close').onclick=()=>{$('ov-animal').hidden=true;intro()};
 $('an-forget').onclick=()=>{learned={};put('animal-appris',learned);$('an-forget').textContent='Mémoire effacée'};
-$('an-sound').onclick=()=>{sound=!sound;put('animal-voix',sound);soundIcon();if(!sound)hush();else if(curQ&&S)say(curQ[2])};
+$('an-sound').onclick=()=>{sound=!sound;put('animal-voix',sound);soundIcon();if(!sound)hush();else sayScreen()};
 $('an-home').onclick=()=>{hush();$('animal').hidden=true;$('ov-animal').hidden=true;$('home').hidden=false};
 $('go-animal').onclick=()=>{$('home').hidden=true;$('animal').hidden=false;soundIcon();intro()};
 loadVoices();
