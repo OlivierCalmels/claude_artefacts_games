@@ -1,6 +1,7 @@
 # claude_artefacts_games
 
 - Nouveau jeu : Roulette (roue de la fortune avec acronymes)
+- Nouveau jeu en réalité augmentée : `chasseFantomes/` — Chasse aux fantômes. Le flux de la caméra arrière sert de décor et des fantômes en 3D apparaissent tout autour du joueur (orientés par le gyroscope de l'iPhone). On se tourne dans la pièce en suivant les flèches au bord de l'écran et on touche les fantômes pour les capturer (blancs 1 pt, bleus rapides 2 pts, dorés 5 pts, combos ×2 / ×3) en 60 secondes. Sans gyroscope on regarde autour en glissant le doigt ; sans caméra la chasse se passe dans une nuit étoilée. Accessible depuis l'accueil de `mesJeux/`.
 - Nouveau : `mesJeux/` regroupe six jeux pour mobile, avec un écran d'accueil commun
   - Robots Gourmands : casse-tête où des robots mangent une mosaïque de cases colorées (56 niveaux, avec caisses en bois, boîtes mystère et boîtes enchaînées)
   - Le Verger : jeu de gestion où l'on cueille, vend et embauche en déplaçant son fermier
