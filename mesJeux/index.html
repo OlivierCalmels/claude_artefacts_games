@@ -187,6 +187,86 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .ci-row.done{background:#E3F2E1}
 .ca-title{font-family:'Cinzel',Georgia,serif!important;font-weight:700!important}
 @media (prefers-reduced-motion: reduce){ .pill:active,.lv:active,.big:active{transform:none} }
+/* ---- À quel animal je pense ? ---- */
+#animal{background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch;
+  background-image:radial-gradient(var(--tray) 1.1px,transparent 1.4px);background-size:18px 18px}
+.an-wrap{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+  padding:max(10px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.an-top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:44px}
+.an-count{font-family:var(--display);font-size:19px;color:var(--ink)}
+.an-body{flex:1;display:flex;flex-direction:column;gap:12px;padding:6px 0 12px}
+.an-owl{width:84px;height:84px;margin:0 auto -6px;display:block;flex:none}
+.an-owl.think{animation:anBob 1.6s ease-in-out infinite}
+@keyframes anBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(3deg)}}
+.an-bubble{position:relative;background:var(--card);border-radius:22px;padding:12px 14px;text-align:center;box-shadow:0 5px 0 var(--tray-deep)}
+.an-bubble::before{content:"";position:absolute;left:50%;top:-11px;margin-left:-12px;border:12px solid transparent;border-top:0;border-bottom-color:var(--card)}
+.an-qicon{font-size:34px;line-height:1.1}
+.an-qtext{font-family:var(--display);font-weight:400;font-size:20px;line-height:1.2;margin:4px 0 0;color:var(--ink);text-wrap:balance}
+.an-sub{margin:6px 0 0;font-size:14px;line-height:1.45;color:var(--muted);font-weight:600;text-wrap:pretty}
+.an-btns{display:grid;gap:10px}
+.an-btn{height:50px;border:0;border-radius:16px;font-family:var(--display);font-size:20px;letter-spacing:.02em;color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.an-btn:active{transform:translateY(3px)}
+.an-yes{background:#3DAA5C;box-shadow:0 5px 0 #2E7D32}.an-yes:active{box-shadow:0 2px 0 #2E7D32}
+.an-no{background:#E5484D;box-shadow:0 5px 0 #A8292E}.an-no:active{box-shadow:0 2px 0 #A8292E}
+.an-idk{background:var(--card);color:var(--ink);box-shadow:0 5px 0 var(--tray-deep);font-size:16px}
+.an-go{background:var(--accent);box-shadow:0 5px 0 #B8621A}.an-go:active{box-shadow:0 2px 0 #B8621A}
+.an-btn svg{width:20px;height:20px}
+.an-big{font-size:64px;line-height:1.1;text-align:center}
+.an-name{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.1;margin:2px 0 0;color:var(--ink)}
+.an-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:6px}
+.an-tile{border:0;border-radius:14px;background:var(--card);padding:8px 3px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  box-shadow:0 3px 0 var(--tray-deep);color:var(--ink);min-width:0}
+button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-deep)}
+.an-tile i{font-style:normal;font-size:26px;line-height:1.1}
+.an-tile b{font-size:11px;font-weight:800;line-height:1.15;text-align:center;overflow-wrap:anywhere}
+.an-badge{display:inline-flex;align-items:center;justify-content:center;width:1.05em;height:1.05em;border-radius:50%;
+  background:#F28C28;color:#fff;font-family:var(--display);font-size:.85em;font-style:normal;line-height:1}
+.an-h{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.1;margin:0;text-align:center;color:var(--ink);text-wrap:balance}
+.an-confetti{font-size:22px;text-align:center;letter-spacing:6px;animation:anPop .6s ease-out}
+@keyframes anPop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.an-card{text-align:left;max-width:460px}
+.an-card h2{text-align:center;font-size:26px}
+.an-sec{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:14px 0 6px}
+.an-sec h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0;color:var(--ink)}
+.an-mini{border:0;background:none;padding:4px;color:#B8621A;font-weight:800;font-size:13px;text-decoration:underline}
+.an-row{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:10px;padding:3px 6px;margin-bottom:4px}
+.an-row .em{font-size:21px;width:28px;text-align:center;flex:none;line-height:1}
+.an-row b{flex:1;min-width:0;font-size:14px;font-weight:800;color:var(--ink)}
+.an-seg{display:flex;flex:none;border-radius:10px;overflow:hidden;box-shadow:0 0 0 2px var(--tray-deep)}
+.an-seg button{border:0;width:44px;height:28px;font-weight:800;font-size:13px;background:#fff;color:var(--muted)}
+.an-seg button.on.y{background:#3DAA5C;color:#fff}
+.an-seg button.on.n{background:#E5484D;color:#fff}
+.an-total{margin:8px 0 0;text-align:center;font-weight:800;color:var(--muted);font-size:14px}
+.an-qlist{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.5;color:var(--ink)}
+.an-card details{margin-top:16px;background:var(--card);border-radius:12px;padding:10px 12px}
+.an-card summary{font-family:var(--display);font-size:18px;cursor:pointer;color:var(--ink)}
+.an-qrow{display:flex;align-items:center;gap:6px}
+.an-qrow .an-owl{margin:0}
+.an-left{flex:1;min-width:0}
+.an-left::before{left:-11px;top:50%;margin:-12px 0 0;border:12px solid transparent;border-left:0;border-right-color:var(--card)}
+.an-bubble[role=button]{cursor:pointer}
+.an-btns3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.an-btns3 .an-idk{grid-column:1/-1;height:42px}
+.an-btns2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.an-panel{background:rgba(255,255,255,.72);border-radius:16px;padding:10px 12px;box-shadow:0 3px 0 var(--tray)}
+.an-ptitle{display:flex;justify-content:space-between;gap:8px;font-family:var(--display);font-size:15px;color:var(--ink);margin-bottom:8px}
+.an-ptitle span{font-family:var(--body);font-weight:800;font-size:12px;color:var(--muted)}
+.an-chips{display:flex;flex-wrap:wrap;gap:5px}
+.an-chip.miss{box-shadow:0 0 0 1.5px #E5484D;background:#FFF1F0}
+.an-legend{font-size:11.5px;color:var(--muted);margin:6px 0 0}
+.an-chip{display:inline-flex;align-items:center;gap:4px;background:var(--card);border-radius:999px;padding:3px 9px;font-size:12.5px;font-weight:700;color:var(--ink);box-shadow:0 1px 0 var(--tray-deep)}
+.an-ideas{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.an-idea{display:flex;flex-direction:column;align-items:center;gap:4px}
+.an-idea i{font-style:normal;font-size:26px;line-height:1.1}
+.an-idea span{display:block;height:5px;border-radius:3px;background:var(--accent);align-self:flex-start}
+.an-photo{margin:0;background:var(--card);border-radius:18px;padding:8px;box-shadow:0 5px 0 var(--tray-deep);transform:rotate(-1.5deg)}
+.an-photo img,.an-ph-ph{display:block;width:100%;height:220px;object-fit:cover;border-radius:12px;background:var(--tray)}
+.an-ph-ph{display:flex;align-items:center;justify-content:center;font-size:90px}
+.an-photo figcaption{font-size:11px;color:var(--muted);text-align:center;margin-top:5px;min-height:14px}
+.an-photo figcaption a{color:var(--muted)}
+.an-confetti{margin-bottom:-6px}
+@media (prefers-reduced-motion: reduce){.an-owl.think,.an-confetti{animation:none}.an-btn:active,button.an-tile:active{transform:none}}
 </style>
 
 <div id="home" class="screen">
@@ -230,6 +310,15 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
         <circle cx="32" cy="18" r="9" fill="#FFE27A" stroke="#4A4560" stroke-width="2"/><path d="M27 13l10 10M37 13L27 23" stroke="#4A4560" stroke-width="2"/>
         <circle cx="50" cy="31" r="6" fill="#DCD5EA" stroke="#4A4560" stroke-width="2"/><text x="50" y="34.5" font-size="9" text-anchor="middle" font-family="Arial" font-weight="bold" fill="#2B2542">M</text></svg>
       <span><b>L'Atelier des circuits</b><small>Éducatif · piles, lampes, moteurs</small></span>
+    </button>
+    <button class="game-card" id="go-animal">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="4" width="56" height="56" rx="14" fill="#FFE9C7"/>
+        <path d="M32 9l7 12H25z" fill="#8E5CD9"/><circle cx="32" cy="10" r="2.2" fill="#F5C518"/>
+        <ellipse cx="32" cy="38" rx="15" ry="17" fill="#9A6236"/><ellipse cx="32" cy="43" rx="9" ry="11" fill="#F2E6C8"/>
+        <circle cx="26" cy="32" r="6" fill="#fff"/><circle cx="38" cy="32" r="6" fill="#fff"/><circle cx="27" cy="33" r="3" fill="#2B2542"/><circle cx="39" cy="33" r="3" fill="#2B2542"/>
+        <path d="M29.5 37h5l-2.5 4z" fill="#F28C28"/>
+        <circle cx="51" cy="16" r="8" fill="#3B7DD8"/><text x="51" y="20.5" font-size="12" text-anchor="middle" font-family="Arial" font-weight="bold" fill="#fff">?</text></svg>
+      <span><b>À quel animal je pense ?</b><small>Devinette · le hibou devine ton animal</small></span>
     </button>
     <p class="save-status" id="save-status">Partie sauvegardée sur cet appareil</p>
   </div>
@@ -2293,9 +2382,386 @@ $('ci-clear').onclick=()=>{comps=[];wires=[];sel=null;tools();palette();resolve(
 $('go-circuit').onclick=()=>{$('home').hidden=true;window.Circuit.enter()};
 })();
 </script>
+<div id="animal" class="screen" hidden>
+  <div class="an-wrap">
+    <div class="an-top">
+      <button class="pill icon" id="an-home" aria-label="Accueil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/></svg></button>
+      <span class="an-count" id="an-count"></span>
+      <div class="bar-l">
+        <button class="pill icon" id="an-sound" aria-label="Lire les questions à voix haute"></button>
+        <button class="pill icon" id="an-gear" aria-label="Choisir les animaux"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></button>
+      </div>
+    </div>
+    <div class="an-body" id="an-body"></div>
+  </div>
+</div>
+<div class="overlay" id="ov-animal" hidden>
+  <div class="card an-card">
+    <h2>Les animaux du jeu</h2>
+    <p class="an-total" id="an-total"></p>
+    <div id="an-table"></div>
+    <details><summary>Les questions du jeu (<span id="an-qn"></span>)</summary><ol class="an-qlist" id="an-qlist"></ol></details>
+    <button class="ghost" id="an-forget">Oublier ce que le hibou a appris</button>
+    <button class="big" id="an-close" style="display:block;margin:16px auto 0">C'est bon</button>
+  </div>
+</div>
+<script id="animal-game">
+// À quel animal je pense ? — le joueur pense à un animal, le hibou pose des questions oui / non / je ne sais pas.
+(()=>{
+const $=id=>document.getElementById(id);
+// [clé, icône, question, petit libellé, poids (questions générales posées en priorité)]
+const QS=[
+['poils','🐾',"A-t-il des poils ?",'poils',1.2],
+['plumes','🪶',"A-t-il des plumes ?",'plumes',1.2],
+['ecailles','🔷',"A-t-il des écailles ?",'écailles',1],
+['carapace','🛡️',"A-t-il une carapace ou une coquille ?",'carapace',1],
+['ailes','🪽',"A-t-il des ailes ?",'ailes',1.1],
+['vole','☁️',"Est-ce qu'il vole ?",'vole',1.2],
+['eau','💧',"Vit-il dans l'eau ?",'dans l\'eau',1.2],
+['mer','🌊',"Vit-il dans la mer ?",'mer',1],
+['nageoires','🐟',"A-t-il des nageoires ?",'nageoires',.9],
+['ferme','🚜',"Vit-il à la ferme ?",'ferme',1.2],
+['maison','🏠',"Peut-il vivre à la maison avec nous ?",'maison',1.1],
+['foret','🌲',"Vit-il dans la forêt ?",'forêt',1],
+['afrique','🌍',"Vit-il en Afrique, là où il fait très chaud ?",'Afrique',1],
+['froid','❄️',"Vit-il là où il fait très froid, dans la neige ou la glace ?",'grand froid',1],
+['desert','🏜️',"Vit-il dans le désert ?",'désert',.9],
+['terrier','🕳️',"Vit-il dans un trou sous la terre ?",'sous terre',.9],
+['grimpe','🌳',"Grimpe-t-il aux arbres ?",'grimpe',1],
+['grand','📏',"Est-il plus grand que toi ?",'plus grand que toi',1.2],
+['petit','✋',"Est-il plus petit que ta main ?",'tout petit',1.2],
+['lourd','🚗',"Est-il plus lourd qu'une voiture ?",'très lourd',1],
+['p4','🐾',"Marche-t-il sur 4 pattes ?",'4 pattes',1.1],
+['p2','🦶',"Marche-t-il sur 2 pattes ?",'2 pattes',1],
+['p0','🚫',"Est-ce qu'il n'a pas de pattes du tout ?",'sans pattes',1],
+['pplus','🦵',"A-t-il plus de 4 pattes ?",'plein de pattes',1],
+['queue','➰',"A-t-il une queue ?",'queue',.9],
+['cornes','🦴',"A-t-il des cornes ou des bois sur la tête ?",'cornes',1],
+['criniere','💇',"A-t-il une crinière (de longs poils autour du cou) ?",'crinière',.9],
+['cou','↕️',"A-t-il un très long cou ?",'long cou',1],
+['trompe','👃',"A-t-il une trompe ?",'trompe',.8],
+['oreilles','👂',"A-t-il de grandes oreilles ?",'grandes oreilles',.9],
+['moustaches','🥸',"A-t-il des moustaches ?",'moustaches',.9],
+['bec','🔺',"A-t-il un bec ?",'bec',1],
+['antennes','📡',"A-t-il des antennes sur la tête ?",'antennes',.9],
+['pique','📌',"Peut-il piquer, ou a-t-il des piquants ?",'pique',.9],
+['rayures','🦓',"A-t-il des rayures ?",'rayures',1],
+['taches','🔵',"A-t-il des taches ?",'taches',1],
+['nb','☯️',"Est-il noir et blanc ?",'noir et blanc',1],
+['gris','🩶',"Est-il gris ?",'gris',.8],
+['marron','🤎',"Est-il marron ?",'marron',.8],
+['orange','🧡',"Est-il orange ou roux ?",'orange',.8],
+['jaune','💛',"Est-il jaune ?",'jaune',.8],
+['vert','💚',"Est-il vert ?",'vert',.85],
+['rose','🩷',"Est-il rose ?",'rose',.85],
+['rouge','❤️',"Est-il rouge ?",'rouge',.85],
+['blanc','🤍',"Est-il blanc ?",'blanc',.8],
+['noir','🖤',"Est-il noir ?",'noir',.8],
+['bleu','💙',"A-t-il du bleu sur lui ?",'bleu',.8],
+['rapide','⚡',"Va-t-il très vite ?",'rapide',1],
+['lent','⏳',"Est-il très lent ?",'très lent',1],
+['saute','⤴️',"Saute-t-il beaucoup ?",'saute',.9],
+['nuit','🌙',"Se promène-t-il surtout la nuit ?",'la nuit',.9],
+['hiver','😴',"Dort-il pendant tout l'hiver ?",'dort l\'hiver',.8],
+['fort','📢',"Fait-il un bruit très fort ?",'bruyant',.9],
+['chante','🎵',"Est-ce qu'il chante ?",'chante',.8],
+['bzz','〰️',"Fait-il « bzzz » ?",'bzzz',.8],
+['silence','🤫',"Est-il presque toujours silencieux ?",'silencieux',.8],
+['danger','⚠️',"Peut-il être dangereux pour les humains ?",'dangereux',1],
+['plantes','🌿',"Mange-t-il de l'herbe, des feuilles ou des fruits ?",'mange des plantes',1],
+['viande','🍖',"Mange-t-il d'autres animaux ?",'mange des animaux',1],
+['oeufs','🥚',"Pond-il des œufs ?",'pond des œufs',.9],
+['donne','🥛',"Nous donne-t-il du lait, des œufs, de la laine ou du miel ?",'nous donne lait/œufs/laine/miel',.9],
+['poche','👝',"A-t-il une poche sur le ventre ?",'poche',.7],
+['bosse','⛰️',"A-t-il une bosse sur le dos ?",'bosse',.8],
+['sabots','👞',"A-t-il des sabots au bout des pattes ?",'sabots',.8],
+['griffes','💅',"A-t-il des griffes ?",'griffes',.8],
+['pinces','✂️',"A-t-il des pinces ?",'pinces',.8],
+['crocs','🦷',"A-t-il de grandes dents pointues ?",'crocs',.9],
+['defenses','🐘',"A-t-il des défenses (de grandes dents qui sortent de la bouche) ?",'défenses',.8],
+['yeux','👀',"A-t-il de très gros yeux ?",'gros yeux',.8],
+['couleur','🎨',"Peut-il changer de couleur ?",'change de couleur',.7],
+['tentacules','🪢',"A-t-il des tentacules ?",'tentacules',.8],
+['parle','💬',"Peut-il répéter des mots ?",'répète des mots',.7]];
+const QK={};QS.forEach(q=>QK[q[0]]=q);
+// emoji | article | nom | oui | parfois   (tout ce qui n'est pas listé = non). Les 35 premiers = animaux de base.
+const DATA=`🐶|le|chien|poils p4 queue maison griffes|ferme moustaches rapide fort marron noir blanc taches nb crocs grand oreilles viande saute
+🐱|le|chat|poils p4 queue maison moustaches griffes grimpe viande|ferme nuit saute rayures taches nb gris orange noir blanc marron crocs rapide
+🐮|la|vache|poils p4 queue ferme grand sabots plantes donne|cornes taches nb marron noir blanc fort lourd
+🐷|le|cochon|p4 queue ferme rose sabots|poils grand fort plantes viande oreilles taches noir
+🐴|le|cheval|poils p4 queue ferme grand sabots criniere rapide plantes|marron noir blanc gris taches donne saute fort maison
+🫏|l'|âne|poils p4 queue ferme sabots plantes oreilles gris fort|grand criniere marron donne
+🐑|le|mouton|poils p4 ferme sabots plantes donne blanc|queue cornes noir
+🐐|la|chèvre|poils p4 queue ferme sabots plantes cornes donne|blanc marron noir gris saute grimpe
+🐔|la|poule|plumes ailes p2 bec ferme oeufs donne|vole queue marron blanc rouge plantes viande fort
+🦆|le|canard|plumes ailes vole p2 bec oeufs|eau ferme jaune blanc marron vert donne plantes queue fort
+🐰|le|lapin|poils p4 oreilles moustaches plantes saute maison|ferme terrier queue blanc gris marron silence rapide
+🐭|la|souris|poils p4 queue moustaches petit gris|maison ferme terrier nuit plantes oreilles marron blanc rapide griffes grimpe
+🦁|le|lion|poils p4 queue afrique grand criniere viande crocs danger fort moustaches griffes|jaune marron orange rapide nuit
+🐯|le|tigre|poils p4 queue grand rayures orange viande crocs danger fort moustaches griffes|foret rapide nuit noir blanc grimpe eau
+🐘|l'|éléphant|p4 queue afrique grand lourd trompe oreilles gris plantes defenses fort|danger eau
+🦒|la|girafe|poils p4 queue afrique grand cou taches plantes sabots|jaune marron cornes silence lourd rapide orange
+🦓|le|zèbre|poils p4 queue afrique sabots rayures nb criniere plantes|grand rapide
+🐵|le|singe|poils grimpe queue|p4 p2 foret afrique marron saute fort plantes viande grand
+🐻|l'|ours|poils grand foret marron griffes hiver danger crocs fort|p4 p2 viande plantes grimpe noir froid lourd
+🐺|le|loup|poils p4 queue foret viande crocs|gris danger fort nuit rapide froid grand moustaches griffes noir blanc
+🦊|le|renard|poils p4 queue foret orange viande|terrier nuit moustaches crocs griffes rapide blanc oreilles
+🐊|le|crocodile|ecailles p4 queue grand eau viande crocs danger oeufs vert|afrique marron rapide silence
+🐍|le|serpent|ecailles p0 queue oeufs viande|vert marron jaune noir rouge danger grimpe foret desert terrier silence rayures taches eau hiver crocs pique grand afrique
+🐢|la|tortue|carapace p4 lent oeufs silence|ecailles queue maison eau mer vert marron plantes viande hiver bec nageoires grand
+🐸|la|grenouille|p4 saute vert oeufs yeux viande|eau petit nuit hiver fort taches
+🐠|le|poisson rouge|ecailles eau nageoires p0 queue maison orange petit silence oeufs|rouge jaune plantes
+🦈|le|requin|eau mer nageoires p0 queue grand viande crocs danger gris rapide|lourd silence oeufs ecailles bleu
+🐬|le|dauphin|eau mer nageoires p0 queue grand gris rapide saute viande|bleu fort
+🐳|la|baleine|eau mer nageoires p0 queue grand lourd|bleu gris froid chante fort viande bosse silence plantes
+🦋|le|papillon|ailes vole pplus antennes petit oeufs silence|plantes jaune orange bleu rouge noir blanc taches foret trompe
+🐝|l'|abeille|ailes vole pplus antennes petit pique rayures jaune noir bzz oeufs donne|plantes danger
+🐌|l'|escargot|carapace lent p0 petit plantes silence oeufs|tentacules antennes marron hiver cornes gris
+🦉|le|hibou|plumes ailes vole p2 bec nuit yeux viande foret griffes oeufs|marron gris fort chante oreilles
+🐧|le|pingouin|plumes ailes p2 bec nb froid viande oeufs|eau mer nageoires
+🦜|le|perroquet|plumes ailes vole p2 bec parle fort oeufs|vert rouge bleu jaune maison foret grimpe plantes queue griffes
+🦔|le|hérisson|pique p4 nuit hiver marron viande|poils petit foret terrier griffes silence
+🐿️|l'|écureuil|poils p4 queue grimpe foret saute plantes|orange marron rapide hiver griffes moustaches petit
+🦘|le|kangourou|poils p2 queue saute poche plantes|grand marron gris rapide oreilles griffes
+🐨|le|koala|poils grimpe gris poche plantes|p4 lent nuit oreilles griffes foret
+🐼|le|panda|poils p4 nb plantes grand|foret grimpe lent griffes
+🦛|l'|hippopotame|p4 queue afrique grand lourd gris plantes danger|eau rose crocs defenses fort
+🦏|le|rhinocéros|p4 queue afrique grand lourd cornes gris plantes|danger sabots rapide fort
+🐫|le|chameau|poils p4 queue desert grand bosse plantes|marron jaune afrique donne cou sabots fort silence
+🦍|le|gorille|poils grand noir plantes foret|p4 p2 afrique grimpe fort danger crocs gris
+🐆|le|guépard|poils p4 queue afrique rapide taches viande jaune|crocs griffes moustaches grand danger orange
+🐻‍❄️|l'|ours polaire|poils grand blanc froid viande griffes danger crocs|p4 eau mer lourd fort hiver
+🦭|le|phoque|poils eau mer nageoires froid moustaches viande|gris grand p0 queue fort noir blanc taches
+🦭|le|morse|eau mer nageoires froid moustaches defenses grand viande|poils marron rose fort p0 crocs danger lourd
+🐙|la|pieuvre|eau mer tentacules pplus couleur viande oeufs silence|rose rouge bec yeux grand p0
+🪼|la|méduse|eau mer tentacules p0 pique silence|danger rose bleu blanc petit lent grand viande
+⭐|l'|étoile de mer|eau mer lent silence|p0 pplus orange rouge rose jaune petit viande oeufs pique
+🦀|le|crabe|pinces pplus carapace mer oeufs silence|eau rouge orange antennes petit viande
+🦐|la|crevette|eau mer pplus antennes petit oeufs silence|rose orange carapace pinces queue
+🐋|l'|orque|eau mer nageoires p0 queue grand lourd nb viande crocs rapide|danger froid saute fort taches
+🦩|le|flamant rose|plumes ailes vole p2 bec rose cou oeufs|eau grand viande plantes afrique
+🦅|l'|aigle|plumes ailes vole p2 bec viande griffes rapide oeufs|marron blanc fort grand
+🦢|le|cygne|plumes ailes vole p2 bec cou blanc oeufs|eau noir fort plantes grand
+🦚|le|paon|plumes ailes p2 bec bleu queue fort vert oeufs|vole ferme taches grand
+*|l'|autruche|plumes ailes p2 bec cou grand rapide afrique oeufs|noir blanc marron plantes danger
+🐦‍⬛|le|corbeau|plumes ailes vole p2 bec noir oeufs|fort parle viande plantes ferme
+🐦|le|pigeon|plumes ailes vole p2 bec gris oeufs|plantes blanc chante rapide
+🐞|la|coccinelle|ailes vole pplus petit rouge taches noir antennes oeufs viande silence|bzz hiver jaune
+🐜|la|fourmi|pplus petit antennes oeufs terrier|noir rouge marron pique ailes vole viande plantes silence grimpe
+🕷️|l'|araignée|pplus petit oeufs viande silence|noir marron pique danger grimpe nuit saute yeux
+🪱|le|ver de terre|p0 terrier lent silence rose|petit marron plantes oeufs
+🦟|le|moustique|ailes vole pplus petit pique bzz antennes oeufs|nuit trompe viande eau
+🪰|la|mouche|ailes vole pplus petit bzz yeux antennes oeufs noir|rapide ferme
+🦗|la|sauterelle|pplus petit saute vert antennes plantes oeufs|ailes vole marron chante
+🐛|la|chenille|pplus petit lent plantes silence|vert rayures antennes marron jaune poils pique
+🦂|le|scorpion|pplus pinces pique queue danger desert viande silence|petit noir marron jaune nuit carapace terrier
+🦎|le|lézard|ecailles p4 queue petit oeufs viande|vert marron grimpe desert rapide hiver silence
+🦎|le|caméléon|ecailles p4 queue grimpe couleur yeux viande vert oeufs|lent foret silence
+🐹|le|hamster|poils p4 petit maison moustaches plantes|marron orange blanc nuit terrier griffes
+🐹|le|cochon d'Inde|poils p4 maison moustaches plantes|marron orange blanc noir petit taches fort
+🦌|le|cerf|poils p4 queue foret cornes sabots marron plantes rapide grand|taches fort saute
+🐗|le|sanglier|poils p4 queue foret sabots marron defenses|noir grand danger plantes viande fort nuit rapide rayures crocs
+🦫|le|castor|poils p4 queue eau marron plantes|foret crocs griffes nuit moustaches hiver
+🦇|la|chauve-souris|poils ailes vole nuit hiver|noir marron gris petit oreilles griffes viande plantes silence
+🦦|la|loutre|poils p4 queue eau moustaches viande marron|mer froid griffes
+🦥|le|paresseux|poils lent grimpe foret plantes griffes|marron gris silence p4 nuit
+🦙|le|lama|poils p4 cou plantes|blanc marron grand donne froid queue sabots oreilles
+🦌|le|renne|poils p4 cornes froid sabots plantes grand|marron ferme donne rapide queue foret
+🦃|le|dindon|plumes ailes p2 bec ferme oeufs fort|marron noir rouge queue donne plantes grand vole
+🪿|l'|oie|plumes ailes vole p2 bec ferme oeufs plantes fort|blanc gris cou eau donne
+🦬|le|bison|poils p4 queue grand cornes sabots marron plantes|lourd froid bosse danger criniere noir foret rapide fort`;
+// titre de la page Wikipédia d'où vient la photo (images libres de Wikimedia Commons)
+const WIKI={'chien':'Chien','chat':'Chat','vache':'Vache','cochon':'Cochon domestique','cheval':'Cheval','âne':'Âne','mouton':'Mouton','chèvre':'Chèvre','poule':'Poule domestique','canard':'Canard colvert','lapin':'Lapin de garenne','souris':'Souris grise','lion':'Lion','tigre':'Tigre','éléphant':"Éléphant de savane d'Afrique",'girafe':'Girafe','zèbre':'Zèbre des plaines','singe':'Chimpanzé','ours':'Ours brun','loup':'Loup gris','renard':'Renard roux','crocodile':'Crocodile du Nil','serpent':'Couleuvre verte et jaune','tortue':"Tortue d'Hermann",'grenouille':'Rainette verte','poisson rouge':'Poisson rouge','requin':'Grand requin blanc','dauphin':'Grand dauphin','baleine':'Baleine à bosse','papillon':'Machaon (papillon)','abeille':'Abeille domestique','escargot':'Escargot de Bourgogne','hibou':'Hibou moyen-duc','pingouin':'Manchot empereur','perroquet':'Ara macao','hérisson':"Hérisson d'Europe",'écureuil':'Écureuil roux','kangourou':'Kangourou roux','koala':'Koala','panda':'Panda géant','hippopotame':'Hippopotame amphibie','rhinocéros':'Rhinocéros blanc','chameau':'Chameau de Bactriane','gorille':"Gorille de l'Ouest",'guépard':'Guépard','ours polaire':'Ours blanc','phoque':'Phoque veau-marin','morse':'Morse (animal)','pieuvre':'Poulpe commun','méduse':'Méduse','étoile de mer':'Asterias rubens','crabe':'Crabe vert','crevette':'Crevette grise','orque':'Orque','flamant rose':'Flamant rose','aigle':'Aigle royal','cygne':'Cygne tuberculé','paon':'Paon bleu','autruche':"Autruche d'Afrique",'corbeau':'Grand Corbeau','pigeon':'Pigeon biset','coccinelle':'Coccinelle à sept points','fourmi':'Fourmi rousse des bois','araignée':'Épeire diadème','ver de terre':'Lombric terrestre','moustique':'Moustique tigre','mouche':'Mouche domestique','sauterelle':'Grande sauterelle verte','chenille':'Chenille','scorpion':'Scorpion','lézard':'Lézard des murailles','caméléon':'Caméléon panthère','hamster':'Hamster doré','cochon d\'Inde':"Cochon d'Inde",'cerf':'Cerf élaphe','sanglier':'Sanglier','castor':"Castor d'Europe",'chauve-souris':'Pipistrelle commune','loutre':"Loutre d'Europe",'paresseux':'Paresseux à trois doigts','lama':'Lama','renne':'Renne','dindon':'Dindon','oie':'Oie cendrée','bison':"Bison d'Amérique"};
+const ANIMALS=DATA.trim().split('\n').map((l,i)=>{const p=l.split('|');const sp=s=>new Set((s||'').split(' ').filter(Boolean));
+  return{id:p[2],e:p[0],a:p[1],n:p[2],base:i<35,y:sp(p[3]),m:sp(p[4])}});
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const withArt=a=>a.a==="l'"?"l'"+a.n:a.a+' '+a.n;
+const emo=a=>a.e==='*'?`<i class="an-badge">${a.n[0].toUpperCase()}</i>`:a.e;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ---- préférences et mémoire (sur cet appareil) ----
+const get=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let sel=new Set(get('animal-choix',null)||ANIMALS.filter(a=>a.base).map(a=>a.id));
+let learned=get('animal-appris',{});
+let sound=get('animal-voix',true);
+const enabled=()=>ANIMALS.filter(a=>sel.has(a.id));
+
+const base=(a,k)=>a.y.has(k)?1:a.m.has(k)?.5:0;
+function val(a,k){const b=base(a,k),l=learned[a.id]&&learned[a.id][k];if(!l)return b;return(b*4+l[0])/(4+l[0]+l[1])}
+const lik=(v,ans)=>ans===1?.06+.88*v:.94-.88*v;
+const ent=ps=>{let h=0;for(const p of ps)if(p>1e-12)h-=p*Math.log2(p);return h};
+
+// ---- voix ----
+function say(t){if(!sound)return;try{const s=window.speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[«»]/g,''));u.lang='fr-FR';
+  const v=s.getVoices().find(v=>/^fr/i.test(v.lang));if(v)u.voice=v;u.rate=.95;s.speak(u)}catch(e){}}
+const hush=()=>{try{window.speechSynthesis.cancel()}catch(e){}};
+function soundIcon(){$('an-sound').innerHTML=sound
+  ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>'
+  :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+  $('an-sound').setAttribute('aria-pressed',sound)}
+
+// ---- le hibou ----
+const OWL=`<svg class="an-owl OWLCLS" viewBox="0 0 120 120" aria-hidden="true">
+<path d="M60 4l15 26H45z" fill="#8E5CD9"/><circle cx="60" cy="8" r="4" fill="#F5C518"/><path d="M42 30h36" stroke="#6B47B0" stroke-width="5" stroke-linecap="round"/>
+<path d="M30 40l8 14M90 40l-8 14" stroke="#7A4A25" stroke-width="7" stroke-linecap="round"/>
+<ellipse cx="60" cy="74" rx="34" ry="38" fill="#9A6236"/><ellipse cx="60" cy="84" rx="21" ry="24" fill="#F2E6C8"/>
+<path d="M50 80q4 4 8 0M62 90q4 4 8 0M50 98q4 4 8 0" stroke="#D9C7A0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<circle cx="46" cy="60" r="13" fill="#fff"/><circle cx="74" cy="60" r="13" fill="#fff"/>
+<circle cx="EYEL" cy="61" r="6" fill="#2B2542"/><circle cx="EYER" cy="61" r="6" fill="#2B2542"/><circle cx="49.5" cy="58" r="2" fill="#fff"/><circle cx="77.5" cy="58" r="2" fill="#fff"/>
+<path d="M54 70h12l-6 9z" fill="#F28C28"/><ellipse cx="28" cy="80" rx="7" ry="16" fill="#7A4A25"/><ellipse cx="92" cy="80" rx="7" ry="16" fill="#7A4A25"/>
+<path d="M50 111v5M56 111v5M64 111v5M70 111v5" stroke="#F28C28" stroke-width="3" stroke-linecap="round"/></svg>`;
+const owl=(cls='',look=0)=>OWL.replace('OWLCLS',cls).replace('EYEL',48+look).replace('EYER',76+look);
+
+// ---- partie ----
+let S=null,curQ=null;
+const MAXQ=30;
+function newGame(){S={hist:[],ex:new Set(),guesses:0,lastGuess:0,tried:[]};step()}
+function probs(){
+  const pool=enabled().filter(a=>!S.ex.has(a.id));
+  const w=pool.map(a=>{let p=1;for(const [k,ans] of S.hist){if(ans)p*=lik(val(a,k),ans)}return p});
+  const s=w.reduce((x,y)=>x+y,0)||1;
+  return pool.map((a,i)=>({a,p:w[i]/s})).sort((x,y)=>y.p-x.p)}
+function pickQ(P){
+  const asked=new Set(S.hist.map(h=>h[0]));const H0=ent(P.map(x=>x.p));const sc=[];
+  for(const q of QS){if(asked.has(q[0]))continue;let py=0;const ly=[],ln=[];
+    for(const x of P){const v=val(x.a,q[0]);const a=x.p*lik(v,1),b=x.p*lik(v,-1);ly.push(a);ln.push(b);py+=a}
+    const pn=1-py;if(py<1e-6||pn<1e-6)continue;
+    const g=H0-(py*ent(ly.map(t=>t/py))+pn*ent(ln.map(t=>t/pn)));sc.push([g*q[4],g,q])}
+  if(!sc.length)return null;sc.sort((x,y)=>y[0]-x[0]);
+  const top=sc.filter(s=>s[0]>=sc[0][0]*.9).slice(0,3);const c=top[Math.floor(Math.random()*top.length)];
+  return{q:c[2],g:c[1]}}
+function step(){
+  const P=probs();if(!P.length)return giveUp();
+  const n=S.hist.length,top=P[0],since=n-S.lastGuess;
+  if(P.length===1||n>=MAXQ||(top.p>.8&&n>=3&&(S.guesses===0||since>=2)))return guess(top.a,P);
+  const b=pickQ(P);if(!b||b.g<.01)return guess(top.a,P);
+  ask(b.q,P)}
+
+// ---- affichage ----
+const body=()=>$('an-body');
+function count(t){$('an-count').textContent=t}
+function chips(who){
+  if(!S||!S.hist.length)return'';let miss=0;
+  const c=S.hist.map(([k,ans])=>{const q=QK[k];const m=ans===1?'<b style="color:#2E7D32">oui</b>':ans===-1?'<b style="color:#C0392B">non</b>':'<b style="color:var(--muted)">?</b>';
+    const b=who?base(who,k):.5,x=who&&ans&&((ans===1&&b===0)||(ans===-1&&b===1));if(x)miss++;
+    return`<span class="an-chip${x?' miss':''}">${q[1]} ${esc(q[3])} ${m}</span>`}).reverse().join('');
+  return`<div class="an-panel"><div class="an-ptitle">Tes réponses</div><div class="an-chips">${c}</div>${miss?`<p class="an-legend">En rouge : d'après ma fiche, ${esc(withArt(who))} c'est plutôt le contraire.</p>`:''}</div>`}
+function ideas(P){
+  const t=P.slice(0,5);const mx=t[0]?t[0].p:1;
+  return`<div class="an-panel"><div class="an-ptitle">Le hibou hésite entre… <span>${P.filter(x=>x.p>.01).length} possibles</span></div>
+  <div class="an-ideas">${t.map(x=>`<div class="an-idea" style="opacity:${(.35+.65*x.p/mx).toFixed(2)}"><i>${emo(x.a)}</i><span style="width:${Math.max(6,Math.round(100*x.p))}%"></span></div>`).join('')}</div></div>`}
+
+function intro(){
+  S=null;hush();count('');$('an-gear').hidden=false;
+  const L=enabled();
+  body().innerHTML=`${owl('think')}
+  <div class="an-bubble"><h1 class="an-h">À quel animal je pense ?</h1>
+  <p class="an-sub">Choisis dans ta tête un animal de la liste, garde-le secret… Réponds à mes questions par <b style="color:#2E7D32">oui</b>, <b style="color:#C0392B">non</b> ou <b>je ne sais pas</b>, et je vais le deviner !</p></div>
+  <button class="an-btn an-go" id="an-start">C'est parti !</button>
+  <div class="an-panel"><div class="an-ptitle">Les ${L.length} animaux que je connais</div><div class="an-grid">${L.slice().sort((x,y)=>x.n.localeCompare(y.n,'fr')).map(a=>`<div class="an-tile"><i>${emo(a)}</i><b>${esc(cap(a.n))}</b></div>`).join('')}</div></div>`;
+  $('an-start').disabled=L.length<2;
+  $('an-start').onclick=()=>{$('an-gear').hidden=true;newGame()};
+  say("À quel animal je pense ? Choisis un animal dans ta tête, et je vais le deviner !")}
+
+function ask(q,P){
+  curQ=q;count('Question '+(S.hist.length+1));
+  body().innerHTML=`<div class="an-qrow">${owl('think',(S.hist.length%3)-1)}<div class="an-bubble an-left" id="an-q" role="button" tabindex="0" aria-label="Relire la question">
+   <div class="an-qicon">${q[1]}</div><p class="an-qtext">${esc(q[2])}</p></div></div>
+  <div class="an-btns3">
+   <button class="an-btn an-yes" data-a="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Oui</button>
+   <button class="an-btn an-no" data-a="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>Non</button>
+   <button class="an-btn an-idk" data-a="0">Je ne sais pas</button></div>
+  ${S.hist.length?'<button class="ghost" id="an-undo">↩ Changer ma dernière réponse</button>':''}
+  ${ideas(P)}${chips()}`;
+  body().querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{S.hist.push([q[0],+b.dataset.a]);step()});
+  const u=$('an-undo');if(u)u.onclick=()=>{S.hist.pop();if(S.lastGuess>S.hist.length)S.lastGuess=S.hist.length;step()};
+  $('an-q').onclick=()=>say(q[2]);
+  say(q[2])}
+
+function guess(a,P){
+  count('Ma réponse !');S.lastGuess=S.hist.length;
+  body().innerHTML=`<div class="an-qrow">${owl('',1)}<div class="an-bubble an-left"><p class="an-sub" style="margin:0">Je pense que c'est…</p>
+   <div class="an-big">${emo(a)}</div><p class="an-name">${esc(cap(withArt(a)))} !</p></div></div>
+  <div class="an-btns2"><button class="an-btn an-yes" id="an-ok">Oui, bravo !</button><button class="an-btn an-no" id="an-ko">Non, raté</button></div>
+  ${chips()}`;
+  $('an-ok').onclick=()=>win(a);
+  $('an-ko').onclick=()=>{S.ex.add(a.id);S.tried.push(a.id);S.guesses++;
+    if(S.guesses>=3||S.hist.length>=MAXQ)giveUp();else step()};
+  say('Je pense que c\'est '+withArt(a)+' !')}
+
+function learn(a){
+  const L=learned[a.id]||(learned[a.id]={});
+  for(const [k,ans] of S.hist){if(!ans)continue;const c=L[k]||(L[k]=[0,0]);c[ans===1?0:1]++}
+  put('animal-appris',learned)}
+
+function factSheet(a){
+  const yes=QS.filter(q=>a.y.has(q[0])&&!['p0'].includes(q[0])||(q[0]==='p0'&&a.y.has('p0')));
+  return`<div class="an-panel"><div class="an-ptitle">La fiche ${a.a==="l'"?"de l'":a.a==='la'?'de la ':'du '}${esc(a.n)}</div>
+  <div class="an-chips">${yes.map(q=>`<span class="an-chip">${q[1]} ${esc(q[3])}</span>`).join('')}</div></div>`}
+function photo(a){
+  return`<figure class="an-photo" id="an-photo"><div class="an-ph-ph">${emo(a)}</div><figcaption></figcaption></figure>`}
+async function loadPhoto(a){
+  const box=$('an-photo');if(!box)return;
+  const tries=[WIKI[a.n],cap(a.n)].filter((t,i,arr)=>t&&arr.indexOf(t)===i);
+  for(const t of tries){try{
+    const r=await fetch('https://fr.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(t.replace(/ /g,'_')));
+    if(!r.ok)continue;const d=await r.json();const src=d.thumbnail&&d.thumbnail.source;if(!src)continue;
+    const img=new Image();img.alt=cap(a.n);img.referrerPolicy='no-referrer';
+    await new Promise((ok,ko)=>{img.onload=ok;img.onerror=ko;img.src=src.replace(/\/(\d+)px-/,'/480px-')}).catch(()=>new Promise((ok,ko)=>{img.onload=ok;img.onerror=ko;img.src=src}));
+    if(!$('an-photo'))return;
+    box.querySelector('.an-ph-ph').replaceWith(img);
+    const page=(d.content_urls&&d.content_urls.mobile&&d.content_urls.mobile.page)||('https://fr.wikipedia.org/wiki/'+encodeURIComponent(t));
+    box.querySelector('figcaption').innerHTML=`Photo : <a href="${esc(page)}" target="_blank" rel="noopener">Wikipédia / Wikimedia Commons</a>`;
+    return}catch(e){}}}
+
+function end(a,title,msg,line){
+  body().innerHTML=`<div class="an-confetti">🎉 ⭐ 🎈 ⭐ 🎉</div>
+  <h2 class="an-h">${title}</h2><p class="an-sub" style="text-align:center;margin-top:-6px">${msg}</p>
+  ${photo(a)}<p class="an-name" style="text-align:center;font-size:26px;margin-top:-4px">${emo(a)} ${esc(cap(withArt(a)))}</p>
+  <button class="an-btn an-go" id="an-again">Rejouer</button>
+  ${factSheet(a)}${chips(a)}
+  <button class="ghost" id="an-menu">Retour à la liste des animaux</button>`;
+  $('an-again').onclick=()=>newGame();$('an-menu').onclick=()=>intro();
+  loadPhoto(a);say(line)}
+function win(a){
+  learn(a);count('Gagné !');const n=S.hist.length;
+  end(a,"J'ai trouvé !",`En ${n} question${n>1?'s':''}${S.guesses?` et ${S.guesses+1} essais`:''}. Je suis un hibou très malin !`,"Youpi ! J'ai trouvé : c'était "+withArt(a)+" !")}
+function giveUp(){
+  count('Je donne ma langue au chat');hush();
+  const L=enabled().slice().sort((x,y)=>x.n.localeCompare(y.n,'fr'));
+  body().innerHTML=`<div class="an-qrow">${owl('',-1)}<div class="an-bubble an-left"><p class="an-qtext" style="font-size:20px">Je donne ma langue au chat !</p><p class="an-sub">Tu m'as eu… Montre-moi à quel animal tu pensais :</p></div></div>
+  <div class="an-grid">${L.map(a=>`<button class="an-tile" data-id="${esc(a.id)}"><i>${emo(a)}</i><b>${esc(cap(a.n))}</b></button>`).join('')}</div>
+  ${chips()}`;
+  body().querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const a=ANIMALS.find(x=>x.id===b.dataset.id);learn(a);count('Bien joué !');
+    end(a,'Bien joué, tu as gagné !',"Merci, je m'en souviendrai pour la prochaine fois.","Ah, c'était "+withArt(a)+" ! Bien joué, je m'en souviendrai.")});
+  say('Je donne ma langue au chat ! À quel animal pensais-tu ?')}
+
+// ---- tableau oui / non des animaux ----
+function table(){
+  const sec=(title,list)=>`<div class="an-sec"><h3>${title}</h3><span><button class="an-mini" data-all="${list===0?'b':'x'}" data-v="1">tout oui</button> <button class="an-mini" data-all="${list===0?'b':'x'}" data-v="0">tout non</button></span></div>`+
+    ANIMALS.filter(a=>a.base===(list===0)).map(a=>{const on=sel.has(a.id);return`<div class="an-row"><span class="em">${emo(a)}</span><b>${esc(cap(a.n))}</b>
+    <span class="an-seg" role="group" aria-label="${esc(a.n)} dans le jeu"><button class="y${on?' on':''}" data-id="${esc(a.id)}" data-v="1" aria-pressed="${on}">Oui</button><button class="n${on?'':' on'}" data-id="${esc(a.id)}" data-v="0" aria-pressed="${!on}">Non</button></span></div>`}).join('');
+  $('an-table').innerHTML=sec('Animaux de base',0)+sec('50 animaux en plus',1);
+  $('an-total').textContent=sel.size+' animaux dans le jeu'+(sel.size<2?' — il en faut au moins 2':'');
+  $('an-table').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{b.dataset.v==='1'?sel.add(b.dataset.id):sel.delete(b.dataset.id);put('animal-choix',[...sel]);table()});
+  $('an-table').querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{ANIMALS.filter(a=>a.base===(b.dataset.all==='b')).forEach(a=>b.dataset.v==='1'?sel.add(a.id):sel.delete(a.id));put('animal-choix',[...sel]);table()})}
+$('an-qn').textContent=QS.length;
+$('an-qlist').innerHTML=QS.map(q=>`<li>${q[1]} ${esc(q[2])}</li>`).join('');
+$('an-gear').onclick=()=>{table();$('ov-animal').hidden=false};
+$('an-close').onclick=()=>{$('ov-animal').hidden=true;intro()};
+$('an-forget').onclick=()=>{learned={};put('animal-appris',learned);$('an-forget').textContent='Mémoire effacée'};
+$('an-sound').onclick=()=>{sound=!sound;put('animal-voix',sound);soundIcon();if(!sound)hush();else if(curQ&&S)say(curQ[2])};
+$('an-home').onclick=()=>{hush();$('animal').hidden=true;$('ov-animal').hidden=true;$('home').hidden=false};
+$('go-animal').onclick=()=>{$('home').hidden=true;$('animal').hidden=false;soundIcon();intro()};
+try{window.speechSynthesis&&window.speechSynthesis.getVoices()}catch(e){}
+window.Animal={ANIMALS,QS,probs:()=>S&&probs(),newGame,_S:()=>S};
+})();
+</script>
+
 <script id="deep-link">
-// #robots, #verger or #chateau in the address opens that game straight away
-(()=>{const go={robots:'go-robots',verger:'go-farm',chateau:'go-castle',remparts:'go-battle',circuits:'go-circuit'}[location.hash.slice(1)];if(go)setTimeout(()=>document.getElementById(go).click(),0)})();
+// #robots, #verger, #chateau, #remparts, #circuits or #animal in the address opens that game straight away
+(()=>{const go={robots:'go-robots',verger:'go-farm',chateau:'go-castle',remparts:'go-battle',circuits:'go-circuit',animal:'go-animal'}[location.hash.slice(1)];if(go)setTimeout(()=>document.getElementById(go).click(),0)})();
 </script>
 
 </body>
