@@ -2494,7 +2494,7 @@ const QS=[
 ['pue','🤢',"Sent-il très mauvais ?",'sent mauvais',.7]];
 const QK={};QS.forEach(q=>QK[q[0]]=q);
 // emoji | article | nom | oui | parfois   (tout ce qui n'est pas listé = non).
-// Groupes : 35 animaux de base, puis 50 ajoutés (actifs aussi), puis 50 proposés (désactivés par défaut).
+// Groupes : 35 animaux de base, 50 ajoutés, puis 50 de plus (tous actifs par défaut sauf ceux de OFF).
 const DATA=`🐶|le|chien|poils p4 queue maison griffes|ferme moustaches rapide fort marron noir blanc taches nb crocs grand oreilles viande saute gros
 🐱|le|chat|poils p4 queue maison moustaches griffes grimpe viande|ferme nuit saute rayures taches nb gris orange noir blanc marron crocs rapide
 🐮|la|vache|poils p4 queue ferme grand sabots plantes donne gros|cornes taches nb marron noir blanc fort lourd
@@ -2642,9 +2642,15 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 // ---- préférences et mémoire (sur cet appareil) ----
 const get=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
 const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let sel=new Set(get('animal-choix',null)||ANIMALS.filter(a=>a.g<2).map(a=>a.id));
-// version 2 : les 50 animaux ajoutés sont actifs par défaut, même pour un choix déjà enregistré
-if(get('animal-choix-v',1)<2){ANIMALS.filter(a=>a.g===1).forEach(a=>sel.add(a.id));put('animal-choix',[...sel]);put('animal-choix-v',2)}
+// animaux du 3e groupe laissés de côté par défaut
+const OFF=new Set(['poney']);
+const isDefault=a=>!OFF.has(a.id);
+let sel=new Set(get('animal-choix',null)||ANIMALS.filter(isDefault).map(a=>a.id));
+// mises à jour : de nouveaux animaux deviennent actifs par défaut, même pour un choix déjà enregistré
+{const v=get('animal-choix-v',1);
+ if(v<2)ANIMALS.filter(a=>a.g===1).forEach(a=>sel.add(a.id));
+ if(v<3)ANIMALS.filter(a=>a.g===2&&isDefault(a)).forEach(a=>sel.add(a.id));
+ if(v<3){put('animal-choix',[...sel]);put('animal-choix-v',3)}}
 let learned=get('animal-appris',{});
 let sound=get('animal-voix',true);
 const enabled=()=>ANIMALS.filter(a=>sel.has(a.id));
@@ -2827,7 +2833,7 @@ function table(){
   const sec=(title,g)=>`<div class="an-sec"><h3>${title}</h3><span><button class="an-mini" data-all="${g}" data-v="1">tout oui</button> <button class="an-mini" data-all="${g}" data-v="0">tout non</button></span></div>`+
     ANIMALS.filter(a=>a.g===g).map(a=>{const on=sel.has(a.id);return`<div class="an-row"><span class="em">${emo(a)}</span><b>${esc(cap(a.n))}</b>
     <span class="an-seg" role="group" aria-label="${esc(a.n)} dans le jeu"><button class="y${on?' on':''}" data-id="${esc(a.id)}" data-v="1" aria-pressed="${on}">Oui</button><button class="n${on?'':' on'}" data-id="${esc(a.id)}" data-v="0" aria-pressed="${!on}">Non</button></span></div>`}).join('');
-  $('an-table').innerHTML=sec('Animaux de base',0)+sec('50 animaux ajoutés',1)+sec('50 nouvelles propositions',2);
+  $('an-table').innerHTML=sec('Animaux de base',0)+sec('50 animaux ajoutés',1)+sec('50 animaux de plus',2);
   $('an-total').textContent=sel.size+' animaux dans le jeu'+(sel.size<2?' — il en faut au moins 2':'');
   $('an-table').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{b.dataset.v==='1'?sel.add(b.dataset.id):sel.delete(b.dataset.id);put('animal-choix',[...sel]);table()});
   $('an-table').querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{ANIMALS.filter(a=>a.g===+b.dataset.all).forEach(a=>b.dataset.v==='1'?sel.add(a.id):sel.delete(a.id));put('animal-choix',[...sel]);table()})}
