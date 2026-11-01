@@ -221,6 +221,18 @@
       .card80s.life-game {
         background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%);
       }
+      .card80s.fantomes {
+        background: linear-gradient(135deg, #2e2458 0%, #9b7bff 100%);
+      }
+      .card80s.chateauar {
+        background: linear-gradient(135deg, #c8a46a 0%, #3e8e41 100%);
+      }
+      .card80s.manoir {
+        background: linear-gradient(135deg, #1a1328 0%, #6b4fa8 100%);
+      }
+      .card80s.marqueurs {
+        background: linear-gradient(135deg, #444 0%, #111 100%);
+      }
       .card80s.robots {
         background: linear-gradient(135deg, #8e5cd9 0%, #f28c28 100%);
       }
@@ -927,6 +939,57 @@
                 style="text-decoration: none; display: inline-block"
                 >Deviner</a
               >
+            </div>
+            <div class="card80s fantomes">
+              <div class="card-img">
+                <!-- SVG Chasse aux fantômes : fantôme dans le viseur -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <path d="M28 52V26a12 12 0 0 1 24 0v26l-4-4-4 4-4-4-4 4-4-4-4 4z" fill="#f4f7ff" />
+                  <ellipse cx="35" cy="27" rx="2.6" ry="3.8" fill="#1a1328" /><ellipse cx="45" cy="27" rx="2.6" ry="3.8" fill="#1a1328" />
+                  <ellipse cx="40" cy="36" rx="2.4" ry="3" fill="#1a1328" />
+                  <path d="M12 16V6h10M68 16V6H58M12 44v10h10M68 44v10H58" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="card-title">CHASSE AUX FANTÔMES</div>
+              <a href="chasseFantomes/" class="card-btn" style="text-decoration: none; display: inline-block">Chasser</a>
+            </div>
+            <div class="card80s chateauar">
+              <div class="card-img">
+                <!-- SVG Défense du château : château sur un marqueur -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <path d="M6 50l14-10h40l14 10-14 9H20z" fill="#fff" /><path d="M14 50l9-6h34l9 6-9 6H23z" fill="#1f1a2e" />
+                  <ellipse cx="40" cy="48" rx="18" ry="6" fill="#6ba539" />
+                  <rect x="31" y="28" width="18" height="18" fill="#c9c1b1" /><rect x="27" y="22" width="6" height="24" fill="#b5ad9e" /><rect x="47" y="22" width="6" height="24" fill="#b5ad9e" />
+                  <path d="M26 23l4-7 4 7zM46 23l4-7 4 7z" fill="#b83a32" /><path d="M37 46v-6a3 3 0 0 1 6 0v6z" fill="#5a3e28" />
+                  <path d="M40 6v10" stroke="#fff" stroke-width="1.5" /><path d="M40 6l7 2.5-7 2.5z" fill="#ffc93c" />
+                </svg>
+              </div>
+              <div class="card-title">DÉFENSE DU CHÂTEAU (AR)</div>
+              <a href="chateauAR/" class="card-btn" style="text-decoration: none; display: inline-block">Défendre</a>
+            </div>
+            <div class="card80s manoir">
+              <div class="card-img">
+                <!-- SVG L'Évasion du manoir : manoir et clé -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <path d="M18 56V28l22-18 22 18v28z" fill="#4a3678" /><path d="M12 30l28-23 28 23" stroke="#c9b6ff" stroke-width="4" fill="none" stroke-linejoin="round" />
+                  <rect x="24" y="32" width="8" height="10" rx="4" fill="#ffc93c" /><path d="M34 56V44a6 6 0 0 1 12 0v12z" fill="#1a1328" />
+                  <circle cx="56" cy="40" r="4.5" fill="none" stroke="#ffc93c" stroke-width="2.5" /><path d="M60.5 40H70M67 40v4" stroke="#ffc93c" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="card-title">L'ÉVASION DU MANOIR</div>
+              <a href="escapeManoir/" class="card-btn" style="text-decoration: none; display: inline-block">S'évader</a>
+            </div>
+            <div class="card80s marqueurs">
+              <div class="card-img">
+                <!-- SVG Marqueurs à imprimer -->
+                <svg width="80" height="60" viewBox="0 0 80 60">
+                  <rect x="18" y="6" width="44" height="48" rx="3" fill="#fff" />
+                  <rect x="24" y="12" width="32" height="32" fill="#111" /><rect x="32" y="20" width="16" height="16" fill="#fff" />
+                  <path d="M35 32l4-8 4 8z" fill="#111" /><path d="M28 49h24" stroke="#999" stroke-width="2" />
+                </svg>
+              </div>
+              <div class="card-title">MARQUEURS À IMPRIMER</div>
+              <a href="marqueurs/" class="card-btn" style="text-decoration: none; display: inline-block">Imprimer</a>
             </div>
           </div>
         </div>
