@@ -254,6 +254,9 @@ button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-de
 .an-ptitle span{font-family:var(--body);font-weight:800;font-size:12px;color:var(--muted)}
 .an-chips{display:flex;flex-wrap:wrap;gap:5px}
 .an-chip.miss{box-shadow:0 0 0 1.5px #E5484D;background:#FFF1F0}
+.an-voicebox{display:flex;gap:8px;align-items:center}
+.an-voicebox select{flex:1;min-width:0;height:38px;border-radius:12px;border:2px solid var(--tray-deep);background:var(--card);color:var(--ink);font:inherit;font-size:14px;font-weight:700;padding:0 8px}
+.an-voicebox .pill{flex:none}
 .an-legend{font-size:11.5px;color:var(--muted);margin:6px 0 0}
 .an-chip{display:inline-flex;align-items:center;gap:4px;background:var(--card);border-radius:999px;padding:3px 9px;font-size:12.5px;font-weight:700;color:var(--ink);box-shadow:0 1px 0 var(--tray-deep)}
 .an-ideas{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
@@ -2400,6 +2403,9 @@ $('go-circuit').onclick=()=>{$('home').hidden=true;window.Circuit.enter()};
     <h2>Les animaux du jeu</h2>
     <p class="an-total" id="an-total"></p>
     <div id="an-table"></div>
+    <div class="an-sec"><h3>La voix du hibou</h3></div>
+    <div class="an-voicebox"><select id="an-voice" aria-label="Voix du hibou"></select><button class="pill" id="an-voice-test">▶ Écouter</button></div>
+    <p class="an-legend">★ = la plus belle voix trouvée sur cet appareil. Pour une voix encore plus naturelle : sur iPhone/iPad, Réglages › Accessibilité › Contenu énoncé › Voix › Français, puis télécharge une voix « améliorée » ou « premium » (Amélie, Audrey, Thomas…) ; sur Android, Paramètres › Synthèse vocale › moteur Google › installer la voix française ; sur ordinateur, le navigateur Edge propose des voix « naturelles ».</p>
     <details><summary>Les questions du jeu (<span id="an-qn"></span>)</summary><ol class="an-qlist" id="an-qlist"></ol></details>
     <button class="ghost" id="an-forget">Oublier ce que le hibou a appris</button>
     <button class="big" id="an-close" style="display:block;margin:16px auto 0">C'est bon</button>
@@ -2430,6 +2436,7 @@ const QS=[
 ['grimpe','🌳',"Grimpe-t-il aux arbres ?",'grimpe',1],
 ['grand','📏',"Est-il plus grand que toi ?",'plus grand que toi',1.2],
 ['petit','✋',"Est-il plus petit que ta main ?",'tout petit',1.2],
+['gros','🐈',"Est-il plus gros qu'un chat ?",'plus gros qu\'un chat',1.1],
 ['lourd','🚗',"Est-il plus lourd qu'une voiture ?",'très lourd',1],
 ['p4','🐾',"Marche-t-il sur 4 pattes ?",'4 pattes',1.1],
 ['p2','🦶',"Marche-t-il sur 2 pattes ?",'2 pattes',1],
@@ -2482,68 +2489,71 @@ const QS=[
 ['yeux','👀',"A-t-il de très gros yeux ?",'gros yeux',.8],
 ['couleur','🎨',"Peut-il changer de couleur ?",'change de couleur',.7],
 ['tentacules','🪢',"A-t-il des tentacules ?",'tentacules',.8],
-['parle','💬',"Peut-il répéter des mots ?",'répète des mots',.7]];
+['parle','💬',"Peut-il répéter des mots ?",'répète des mots',.7],
+['crete','🔴',"A-t-il une crête rouge sur la tête ?",'crête',.7],
+['pue','🤢',"Sent-il très mauvais ?",'sent mauvais',.7]];
 const QK={};QS.forEach(q=>QK[q[0]]=q);
-// emoji | article | nom | oui | parfois   (tout ce qui n'est pas listé = non). Les 35 premiers = animaux de base.
-const DATA=`🐶|le|chien|poils p4 queue maison griffes|ferme moustaches rapide fort marron noir blanc taches nb crocs grand oreilles viande saute
+// emoji | article | nom | oui | parfois   (tout ce qui n'est pas listé = non).
+// Groupes : 35 animaux de base, puis 50 ajoutés (actifs aussi), puis 50 proposés (désactivés par défaut).
+const DATA=`🐶|le|chien|poils p4 queue maison griffes|ferme moustaches rapide fort marron noir blanc taches nb crocs grand oreilles viande saute gros
 🐱|le|chat|poils p4 queue maison moustaches griffes grimpe viande|ferme nuit saute rayures taches nb gris orange noir blanc marron crocs rapide
-🐮|la|vache|poils p4 queue ferme grand sabots plantes donne|cornes taches nb marron noir blanc fort lourd
-🐷|le|cochon|p4 queue ferme rose sabots|poils grand fort plantes viande oreilles taches noir
-🐴|le|cheval|poils p4 queue ferme grand sabots criniere rapide plantes|marron noir blanc gris taches donne saute fort maison
-🫏|l'|âne|poils p4 queue ferme sabots plantes oreilles gris fort|grand criniere marron donne
-🐑|le|mouton|poils p4 ferme sabots plantes donne blanc|queue cornes noir
-🐐|la|chèvre|poils p4 queue ferme sabots plantes cornes donne|blanc marron noir gris saute grimpe
-🐔|la|poule|plumes ailes p2 bec ferme oeufs donne|vole queue marron blanc rouge plantes viande fort
+🐮|la|vache|poils p4 queue ferme grand sabots plantes donne gros|cornes taches nb marron noir blanc fort lourd
+🐷|le|cochon|p4 queue ferme rose sabots gros|poils grand fort plantes viande oreilles taches noir pue
+🐴|le|cheval|poils p4 queue ferme grand sabots criniere rapide plantes gros|marron noir blanc gris taches donne saute fort maison
+🫏|l'|âne|poils p4 queue ferme sabots plantes oreilles gris fort gros|grand criniere marron donne
+🐑|le|mouton|poils p4 ferme sabots plantes donne blanc gros|queue cornes noir
+🐐|la|chèvre|poils p4 queue ferme sabots plantes cornes donne gros|blanc marron noir gris saute grimpe pue
+🐔|la|poule|plumes ailes p2 bec ferme oeufs donne|vole queue marron blanc rouge plantes viande fort gros crete
 🦆|le|canard|plumes ailes vole p2 bec oeufs|eau ferme jaune blanc marron vert donne plantes queue fort
 🐰|le|lapin|poils p4 oreilles moustaches plantes saute maison|ferme terrier queue blanc gris marron silence rapide
 🐭|la|souris|poils p4 queue moustaches petit gris|maison ferme terrier nuit plantes oreilles marron blanc rapide griffes grimpe
-🦁|le|lion|poils p4 queue afrique grand criniere viande crocs danger fort moustaches griffes|jaune marron orange rapide nuit
-🐯|le|tigre|poils p4 queue grand rayures orange viande crocs danger fort moustaches griffes|foret rapide nuit noir blanc grimpe eau
-🐘|l'|éléphant|p4 queue afrique grand lourd trompe oreilles gris plantes defenses fort|danger eau
-🦒|la|girafe|poils p4 queue afrique grand cou taches plantes sabots|jaune marron cornes silence lourd rapide orange
-🦓|le|zèbre|poils p4 queue afrique sabots rayures nb criniere plantes|grand rapide
-🐵|le|singe|poils grimpe queue|p4 p2 foret afrique marron saute fort plantes viande grand
-🐻|l'|ours|poils grand foret marron griffes hiver danger crocs fort|p4 p2 viande plantes grimpe noir froid lourd
-🐺|le|loup|poils p4 queue foret viande crocs|gris danger fort nuit rapide froid grand moustaches griffes noir blanc
-🦊|le|renard|poils p4 queue foret orange viande|terrier nuit moustaches crocs griffes rapide blanc oreilles
-🐊|le|crocodile|ecailles p4 queue grand eau viande crocs danger oeufs vert|afrique marron rapide silence
-🐍|le|serpent|ecailles p0 queue oeufs viande|vert marron jaune noir rouge danger grimpe foret desert terrier silence rayures taches eau hiver crocs pique grand afrique
-🐢|la|tortue|carapace p4 lent oeufs silence|ecailles queue maison eau mer vert marron plantes viande hiver bec nageoires grand
+🦁|le|lion|poils p4 queue afrique grand criniere viande crocs danger fort moustaches griffes gros|jaune marron orange rapide nuit
+🐯|le|tigre|poils p4 queue grand rayures orange viande crocs danger fort moustaches griffes gros|foret rapide nuit noir blanc grimpe eau
+🐘|l'|éléphant|p4 queue afrique grand lourd trompe oreilles gris plantes defenses fort gros|danger eau
+🦒|la|girafe|poils p4 queue afrique grand cou taches plantes sabots gros|jaune marron cornes silence lourd rapide orange
+🦓|le|zèbre|poils p4 queue afrique sabots rayures nb criniere plantes gros|grand rapide
+🐵|le|singe|poils grimpe queue|p4 p2 foret afrique marron saute fort plantes viande grand gros
+🐻|l'|ours|poils grand foret marron griffes hiver danger crocs fort gros|p4 p2 viande plantes grimpe noir froid lourd
+🐺|le|loup|poils p4 queue foret viande crocs gros|gris danger fort nuit rapide froid grand moustaches griffes noir blanc
+🦊|le|renard|poils p4 queue foret orange viande|terrier nuit moustaches crocs griffes rapide blanc oreilles gros
+🐊|le|crocodile|ecailles p4 queue grand eau viande crocs danger oeufs vert gros|afrique marron rapide silence
+🐍|le|serpent|ecailles p0 queue oeufs viande|vert marron jaune noir rouge danger grimpe foret desert terrier silence rayures taches eau hiver crocs pique grand afrique gros
+🐢|la|tortue|carapace p4 lent oeufs silence|ecailles queue maison eau mer vert marron plantes viande hiver bec nageoires grand gros
 🐸|la|grenouille|p4 saute vert oeufs yeux viande|eau petit nuit hiver fort taches
 🐠|le|poisson rouge|ecailles eau nageoires p0 queue maison orange petit silence oeufs|rouge jaune plantes
-🦈|le|requin|eau mer nageoires p0 queue grand viande crocs danger gris rapide|lourd silence oeufs ecailles bleu
-🐬|le|dauphin|eau mer nageoires p0 queue grand gris rapide saute viande|bleu fort
-🐳|la|baleine|eau mer nageoires p0 queue grand lourd|bleu gris froid chante fort viande bosse silence plantes
+🦈|le|requin|eau mer nageoires p0 queue grand viande crocs danger gris rapide gros|lourd silence oeufs ecailles bleu
+🐬|le|dauphin|eau mer nageoires p0 queue grand gris rapide saute viande gros|bleu fort
+🐳|la|baleine|eau mer nageoires p0 queue grand lourd gros|bleu gris froid chante fort viande bosse silence plantes
 🦋|le|papillon|ailes vole pplus antennes petit oeufs silence|plantes jaune orange bleu rouge noir blanc taches foret trompe
 🐝|l'|abeille|ailes vole pplus antennes petit pique rayures jaune noir bzz oeufs donne|plantes danger
 🐌|l'|escargot|carapace lent p0 petit plantes silence oeufs|tentacules antennes marron hiver cornes gris
 🦉|le|hibou|plumes ailes vole p2 bec nuit yeux viande foret griffes oeufs|marron gris fort chante oreilles
-🐧|le|pingouin|plumes ailes p2 bec nb froid viande oeufs|eau mer nageoires
+🐧|le|pingouin|plumes ailes p2 bec nb froid viande oeufs|eau mer nageoires gros
 🦜|le|perroquet|plumes ailes vole p2 bec parle fort oeufs|vert rouge bleu jaune maison foret grimpe plantes queue griffes
 🦔|le|hérisson|pique p4 nuit hiver marron viande|poils petit foret terrier griffes silence
 🐿️|l'|écureuil|poils p4 queue grimpe foret saute plantes|orange marron rapide hiver griffes moustaches petit
-🦘|le|kangourou|poils p2 queue saute poche plantes|grand marron gris rapide oreilles griffes
-🐨|le|koala|poils grimpe gris poche plantes|p4 lent nuit oreilles griffes foret
-🐼|le|panda|poils p4 nb plantes grand|foret grimpe lent griffes
-🦛|l'|hippopotame|p4 queue afrique grand lourd gris plantes danger|eau rose crocs defenses fort
-🦏|le|rhinocéros|p4 queue afrique grand lourd cornes gris plantes|danger sabots rapide fort
-🐫|le|chameau|poils p4 queue desert grand bosse plantes|marron jaune afrique donne cou sabots fort silence
-🦍|le|gorille|poils grand noir plantes foret|p4 p2 afrique grimpe fort danger crocs gris
-🐆|le|guépard|poils p4 queue afrique rapide taches viande jaune|crocs griffes moustaches grand danger orange
-🐻‍❄️|l'|ours polaire|poils grand blanc froid viande griffes danger crocs|p4 eau mer lourd fort hiver
-🦭|le|phoque|poils eau mer nageoires froid moustaches viande|gris grand p0 queue fort noir blanc taches
-🦭|le|morse|eau mer nageoires froid moustaches defenses grand viande|poils marron rose fort p0 crocs danger lourd
-🐙|la|pieuvre|eau mer tentacules pplus couleur viande oeufs silence|rose rouge bec yeux grand p0
-🪼|la|méduse|eau mer tentacules p0 pique silence|danger rose bleu blanc petit lent grand viande
+🦘|le|kangourou|poils p2 queue saute poche plantes gros|grand marron gris rapide oreilles griffes
+🐨|le|koala|poils grimpe gris poche plantes|p4 lent nuit oreilles griffes foret gros
+🐼|le|panda|poils p4 nb plantes grand gros|foret grimpe lent griffes
+🦛|l'|hippopotame|p4 queue afrique grand lourd gris plantes danger gros|eau rose crocs defenses fort
+🦏|le|rhinocéros|p4 queue afrique grand lourd cornes gris plantes gros|danger sabots rapide fort
+🐫|le|chameau|poils p4 queue desert grand bosse plantes gros|marron jaune afrique donne cou sabots fort silence
+🦍|le|gorille|poils grand noir plantes foret gros|p4 p2 afrique grimpe fort danger crocs gris
+🐆|le|guépard|poils p4 queue afrique rapide taches viande jaune gros|crocs griffes moustaches grand danger orange
+🐻‍❄️|l'|ours polaire|poils grand blanc froid viande griffes danger crocs gros|p4 eau mer lourd fort hiver
+🦭|le|phoque|poils eau mer nageoires froid moustaches viande gros|gris grand p0 queue fort noir blanc taches
+🦭|le|morse|eau mer nageoires froid moustaches defenses grand viande gros|poils marron rose fort p0 crocs danger lourd
+🐙|la|pieuvre|eau mer tentacules pplus couleur viande oeufs silence|rose rouge bec yeux grand p0 gros
+🪼|la|méduse|eau mer tentacules p0 pique silence|danger rose bleu blanc petit lent grand viande gros
 ⭐|l'|étoile de mer|eau mer lent silence|p0 pplus orange rouge rose jaune petit viande oeufs pique
 🦀|le|crabe|pinces pplus carapace mer oeufs silence|eau rouge orange antennes petit viande
 🦐|la|crevette|eau mer pplus antennes petit oeufs silence|rose orange carapace pinces queue
-🐋|l'|orque|eau mer nageoires p0 queue grand lourd nb viande crocs rapide|danger froid saute fort taches
-🦩|le|flamant rose|plumes ailes vole p2 bec rose cou oeufs|eau grand viande plantes afrique
-🦅|l'|aigle|plumes ailes vole p2 bec viande griffes rapide oeufs|marron blanc fort grand
-🦢|le|cygne|plumes ailes vole p2 bec cou blanc oeufs|eau noir fort plantes grand
-🦚|le|paon|plumes ailes p2 bec bleu queue fort vert oeufs|vole ferme taches grand
-*|l'|autruche|plumes ailes p2 bec cou grand rapide afrique oeufs|noir blanc marron plantes danger
+🐋|l'|orque|eau mer nageoires p0 queue grand lourd nb viande crocs rapide gros|danger froid saute fort taches
+🦩|le|flamant rose|plumes ailes vole p2 bec rose cou oeufs|eau grand viande plantes afrique gros
+🦅|l'|aigle|plumes ailes vole p2 bec viande griffes rapide oeufs|marron blanc fort grand gros
+🦢|le|cygne|plumes ailes vole p2 bec cou blanc oeufs gros|eau noir fort plantes grand
+🦚|le|paon|plumes ailes p2 bec bleu queue fort vert oeufs gros|vole ferme taches grand
+*|l'|autruche|plumes ailes p2 bec cou grand rapide afrique oeufs gros|noir blanc marron plantes danger
 🐦‍⬛|le|corbeau|plumes ailes vole p2 bec noir oeufs|fort parle viande plantes ferme
 🐦|le|pigeon|plumes ailes vole p2 bec gris oeufs|plantes blanc chante rapide
 🐞|la|coccinelle|ailes vole pplus petit rouge taches noir antennes oeufs viande silence|bzz hiver jaune
@@ -2559,21 +2569,71 @@ const DATA=`🐶|le|chien|poils p4 queue maison griffes|ferme moustaches rapide 
 🦎|le|caméléon|ecailles p4 queue grimpe couleur yeux viande vert oeufs|lent foret silence
 🐹|le|hamster|poils p4 petit maison moustaches plantes|marron orange blanc nuit terrier griffes
 🐹|le|cochon d'Inde|poils p4 maison moustaches plantes|marron orange blanc noir petit taches fort
-🦌|le|cerf|poils p4 queue foret cornes sabots marron plantes rapide grand|taches fort saute
-🐗|le|sanglier|poils p4 queue foret sabots marron defenses|noir grand danger plantes viande fort nuit rapide rayures crocs
-🦫|le|castor|poils p4 queue eau marron plantes|foret crocs griffes nuit moustaches hiver
+🦌|le|cerf|poils p4 queue foret cornes sabots marron plantes rapide grand gros|taches fort saute
+🐗|le|sanglier|poils p4 queue foret sabots marron defenses gros|noir grand danger plantes viande fort nuit rapide rayures crocs pue
+🦫|le|castor|poils p4 queue eau marron plantes|foret crocs griffes nuit moustaches hiver gros
 🦇|la|chauve-souris|poils ailes vole nuit hiver|noir marron gris petit oreilles griffes viande plantes silence
-🦦|la|loutre|poils p4 queue eau moustaches viande marron|mer froid griffes
-🦥|le|paresseux|poils lent grimpe foret plantes griffes|marron gris silence p4 nuit
-🦙|le|lama|poils p4 cou plantes|blanc marron grand donne froid queue sabots oreilles
-🦌|le|renne|poils p4 cornes froid sabots plantes grand|marron ferme donne rapide queue foret
-🦃|le|dindon|plumes ailes p2 bec ferme oeufs fort|marron noir rouge queue donne plantes grand vole
-🪿|l'|oie|plumes ailes vole p2 bec ferme oeufs plantes fort|blanc gris cou eau donne
-🦬|le|bison|poils p4 queue grand cornes sabots marron plantes|lourd froid bosse danger criniere noir foret rapide fort`;
+🦦|la|loutre|poils p4 queue eau moustaches viande marron|mer froid griffes gros
+🦥|le|paresseux|poils lent grimpe foret plantes griffes|marron gris silence p4 nuit gros
+🦙|le|lama|poils p4 cou plantes gros|blanc marron grand donne froid queue sabots oreilles
+🦌|le|renne|poils p4 cornes froid sabots plantes grand gros|marron ferme donne rapide queue foret
+🦃|le|dindon|plumes ailes p2 bec ferme oeufs fort gros|marron noir rouge queue donne plantes grand vole crete
+🪿|l'|oie|plumes ailes vole p2 bec ferme oeufs plantes fort|blanc gris cou eau donne gros
+🦬|le|bison|poils p4 queue grand cornes sabots marron plantes gros|lourd froid bosse danger criniere noir foret rapide fort
+🐇|le|lièvre|poils p4 oreilles moustaches plantes saute rapide|foret terrier marron gris queue silence nuit gros
+*|la|marmotte|poils p4 terrier hiver marron plantes froid|fort griffes queue gros moustaches
+*|la|taupe|poils p4 terrier noir petit griffes viande|silence gris
+🦡|le|blaireau|poils p4 terrier nb nuit foret griffes|viande plantes queue gris gros
+🦝|le|raton laveur|poils p4 queue rayures nuit foret griffes moustaches|gris noir viande plantes grimpe eau
+🦨|la|mouffette|poils p4 queue nb nuit pue|terrier foret viande plantes rayures
+🐀|le|rat|poils p4 queue moustaches gris|maison ferme terrier nuit plantes viande marron noir rapide griffes eau petit
+*|la|hyène|poils p4 queue afrique taches viande crocs fort nuit gros|danger marron jaune gris
+🐆|le|léopard|poils p4 queue afrique taches viande crocs griffes grimpe jaune moustaches gros|danger nuit foret orange rapide
+🫎|l'|élan|poils p4 cornes sabots foret froid marron plantes grand gros|eau fort queue lourd
+🐪|le|dromadaire|poils p4 queue desert grand bosse plantes afrique gros|marron jaune donne cou sabots fort
+*|la|gazelle|poils p4 queue afrique cornes sabots rapide plantes saute marron gros|jaune
+🐈|le|lynx|poils p4 foret oreilles taches viande griffes moustaches|grimpe gros froid gris marron nuit
+🦧|l'|orang-outan|poils grimpe orange foret plantes grand gros|p2 p4
+*|le|fourmilier|poils p4 queue griffes viande gros|trompe afrique foret marron gris lent
+*|l'|hippocampe|eau mer queue petit oeufs silence|jaune orange lent nageoires
+*|la|raie|eau mer nageoires queue silence viande|pique danger grand gris marron oeufs gros
+🐢|la|tortue marine|carapace eau mer nageoires oeufs silence gros|grand vert marron viande plantes lent
+🦞|le|homard|pinces pplus carapace eau mer antennes oeufs silence|bleu rouge viande
+🦑|le|calamar|eau mer tentacules pplus oeufs viande silence|couleur rose blanc rapide
+*|le|poisson-clown|ecailles eau mer nageoires p0 queue petit orange rayures oeufs silence|blanc maison
+🐡|le|poisson-globe|eau mer nageoires p0 queue petit pique oeufs silence|jaune danger
+*|l'|espadon|eau mer nageoires p0 queue grand rapide viande gros|gris bleu lourd
+*|le|narval|eau mer nageoires p0 queue grand froid defenses viande gros|gris blanc taches lourd
+🦭|l'|otarie|eau mer nageoires viande oreilles moustaches poils fort|marron gris saute grand gros
+*|la|limace|p0 lent petit plantes silence antennes|marron noir orange tentacules
+🐝|la|guêpe|ailes vole pplus antennes petit pique rayures jaune noir bzz oeufs|danger viande plantes
+🐝|le|bourdon|ailes vole pplus antennes petit pique poils rayures jaune noir bzz oeufs|plantes donne
+*|la|libellule|ailes vole pplus petit yeux viande oeufs|eau bleu vert rapide silence rouge
+🪲|le|scarabée|ailes pplus petit carapace antennes oeufs silence|vole noir vert marron bleu plantes viande bzz terrier
+🪳|le|cafard|pplus petit antennes marron nuit oeufs rapide maison|ailes vole silence plantes pue
+*|le|mille-pattes|pplus petit antennes oeufs terrier silence|marron noir pique viande rapide
+🐸|le|crapaud|p4 marron saute oeufs viande taches nuit|eau gros hiver fort yeux
+*|la|salamandre|p4 queue noir jaune taches oeufs silence|eau foret nuit petit viande
+🦎|l'|iguane|ecailles p4 queue vert grimpe oeufs plantes|gros pique silence
+*|le|colibri|plumes ailes vole p2 bec petit rapide oeufs|vert bleu rouge plantes chante bzz
+*|le|pélican|plumes ailes vole p2 bec eau mer blanc viande grand oeufs|gros cou
+*|la|cigogne|plumes ailes vole p2 bec blanc noir cou grand oeufs viande|ferme gros
+*|le|toucan|plumes ailes vole p2 bec noir orange foret oeufs|jaune plantes fort
+*|la|mouette|plumes ailes vole p2 bec blanc gris mer fort oeufs|viande plantes
+🐦|le|rouge-gorge|plumes ailes vole p2 bec petit orange chante oeufs viande|marron foret
+🐦|le|moineau|plumes ailes vole p2 bec petit marron chante oeufs plantes|gris ferme maison
+*|la|pie|plumes ailes vole p2 bec nb oeufs fort|queue parle viande plantes
+🐤|le|canari|plumes ailes vole p2 bec petit jaune chante maison oeufs plantes|
+🐓|le|coq|plumes ailes p2 bec ferme fort crete queue rouge|marron noir blanc vole plantes viande vert
+*|le|pic-vert|plumes ailes vole p2 bec vert rouge foret grimpe oeufs fort|viande
+*|le|vautour|plumes ailes vole p2 bec afrique viande grand oeufs gros|marron noir gris
+🐂|le|taureau|poils p4 queue ferme cornes sabots plantes grand gros|danger noir marron fort lourd
+*|le|poney|poils p4 queue ferme sabots criniere plantes gros|marron blanc noir gris taches maison rapide
+*|l'|ornithorynque|poils p4 queue bec eau oeufs marron|nageoires viande nuit pique`;
 // titre de la page Wikipédia d'où vient la photo (images libres de Wikimedia Commons)
-const WIKI={'chien':'Chien','chat':'Chat','vache':'Vache','cochon':'Cochon domestique','cheval':'Cheval','âne':'Âne','mouton':'Mouton','chèvre':'Chèvre','poule':'Poule domestique','canard':'Canard colvert','lapin':'Lapin de garenne','souris':'Souris grise','lion':'Lion','tigre':'Tigre','éléphant':"Éléphant de savane d'Afrique",'girafe':'Girafe','zèbre':'Zèbre des plaines','singe':'Chimpanzé','ours':'Ours brun','loup':'Loup gris','renard':'Renard roux','crocodile':'Crocodile du Nil','serpent':'Couleuvre verte et jaune','tortue':"Tortue d'Hermann",'grenouille':'Rainette verte','poisson rouge':'Poisson rouge','requin':'Grand requin blanc','dauphin':'Grand dauphin','baleine':'Baleine à bosse','papillon':'Machaon (papillon)','abeille':'Abeille domestique','escargot':'Escargot de Bourgogne','hibou':'Hibou moyen-duc','pingouin':'Manchot empereur','perroquet':'Ara macao','hérisson':"Hérisson d'Europe",'écureuil':'Écureuil roux','kangourou':'Kangourou roux','koala':'Koala','panda':'Panda géant','hippopotame':'Hippopotame amphibie','rhinocéros':'Rhinocéros blanc','chameau':'Chameau de Bactriane','gorille':"Gorille de l'Ouest",'guépard':'Guépard','ours polaire':'Ours blanc','phoque':'Phoque veau-marin','morse':'Morse (animal)','pieuvre':'Poulpe commun','méduse':'Méduse','étoile de mer':'Asterias rubens','crabe':'Crabe vert','crevette':'Crevette grise','orque':'Orque','flamant rose':'Flamant rose','aigle':'Aigle royal','cygne':'Cygne tuberculé','paon':'Paon bleu','autruche':"Autruche d'Afrique",'corbeau':'Grand Corbeau','pigeon':'Pigeon biset','coccinelle':'Coccinelle à sept points','fourmi':'Fourmi rousse des bois','araignée':'Épeire diadème','ver de terre':'Lombric terrestre','moustique':'Moustique tigre','mouche':'Mouche domestique','sauterelle':'Grande sauterelle verte','chenille':'Chenille','scorpion':'Scorpion','lézard':'Lézard des murailles','caméléon':'Caméléon panthère','hamster':'Hamster doré','cochon d\'Inde':"Cochon d'Inde",'cerf':'Cerf élaphe','sanglier':'Sanglier','castor':"Castor d'Europe",'chauve-souris':'Pipistrelle commune','loutre':"Loutre d'Europe",'paresseux':'Paresseux à trois doigts','lama':'Lama','renne':'Renne','dindon':'Dindon','oie':'Oie cendrée','bison':"Bison d'Amérique"};
+const WIKI={'chien':'Chien','chat':'Chat','vache':'Vache','cochon':'Cochon domestique','cheval':'Cheval','âne':'Âne','mouton':'Mouton','chèvre':'Chèvre','poule':'Poule domestique','canard':'Canard colvert','lapin':'Lapin de garenne','souris':'Souris grise','lion':'Lion','tigre':'Tigre','éléphant':"Éléphant de savane d'Afrique",'girafe':'Girafe','zèbre':'Zèbre des plaines','singe':'Chimpanzé','ours':'Ours brun','loup':'Loup gris','renard':'Renard roux','crocodile':'Crocodile du Nil','serpent':'Couleuvre verte et jaune','tortue':"Tortue d'Hermann",'grenouille':'Rainette verte','poisson rouge':'Poisson rouge','requin':'Grand requin blanc','dauphin':'Grand dauphin','baleine':'Baleine à bosse','papillon':'Machaon (papillon)','abeille':'Abeille domestique','escargot':'Escargot de Bourgogne','hibou':'Hibou moyen-duc','pingouin':'Manchot empereur','perroquet':'Ara macao','hérisson':"Hérisson d'Europe",'écureuil':'Écureuil roux','kangourou':'Kangourou roux','koala':'Koala','panda':'Panda géant','hippopotame':'Hippopotame amphibie','rhinocéros':'Rhinocéros blanc','chameau':'Chameau de Bactriane','gorille':"Gorille de l'Ouest",'guépard':'Guépard','ours polaire':'Ours blanc','phoque':'Phoque veau-marin','morse':'Morse (animal)','pieuvre':'Poulpe commun','méduse':'Méduse','étoile de mer':'Asterias rubens','crabe':'Crabe vert','crevette':'Crevette grise','orque':'Orque','flamant rose':'Flamant rose','aigle':'Aigle royal','cygne':'Cygne tuberculé','paon':'Paon bleu','autruche':"Autruche d'Afrique",'corbeau':'Grand Corbeau','pigeon':'Pigeon biset','coccinelle':'Coccinelle à sept points','fourmi':'Fourmi rousse des bois','araignée':'Épeire diadème','ver de terre':'Lombric terrestre','moustique':'Moustique tigre','mouche':'Mouche domestique','sauterelle':'Grande sauterelle verte','chenille':'Chenille','scorpion':'Scorpion','lézard':'Lézard des murailles','caméléon':'Caméléon panthère','hamster':'Hamster doré','cochon d\'Inde':"Cochon d'Inde",'cerf':'Cerf élaphe','sanglier':'Sanglier','castor':"Castor d'Europe",'chauve-souris':'Pipistrelle commune','loutre':"Loutre d'Europe",'paresseux':'Paresseux à trois doigts','lama':'Lama','renne':'Renne','dindon':'Dindon','oie':'Oie cendrée','bison':"Bison d'Amérique",'lièvre':"Lièvre d'Europe",'marmotte':"Marmotte des Alpes",'taupe':"Taupe d'Europe",'blaireau':"Blaireau européen",'raton laveur':"Raton laveur",'mouffette':"Mouffette rayée",'rat':"Rat brun",'hyène':"Hyène tachetée",'léopard':"Léopard",'élan':"Élan",'dromadaire':"Dromadaire",'gazelle':"Gazelle de Thomson",'lynx':"Lynx boréal",'orang-outan':"Orang-outan de Bornéo",'fourmilier':"Grand fourmilier",'hippocampe':"Hippocampe (poisson)",'raie':"Raie manta",'tortue marine':"Tortue verte",'homard':"Homard européen",'calamar':"Calmar",'poisson-clown':"Amphiprion ocellaris",'poisson-globe':"Tetraodontidae",'espadon':"Espadon",'narval':"Narval",'otarie':"Otarie de Californie",'limace':"Limace",'guêpe':"Guêpe commune",'bourdon':"Bourdon terrestre",'libellule':"Anax empereur",'scarabée':"Cétoine dorée",'cafard':"Blatte germanique",'mille-pattes':"Myriapoda",'crapaud':"Crapaud commun",'salamandre':"Salamandre tachetée",'iguane':"Iguane vert",'colibri':"Trochilidae",'pélican':"Pélican blanc",'cigogne':"Cigogne blanche",'toucan':"Toucan toco",'mouette':"Mouette rieuse",'rouge-gorge':"Rougegorge familier",'moineau':"Moineau domestique",'pie':"Pie bavarde",'canari':"Serin des Canaries",'coq':"Coq",'pic-vert':"Pic vert",'vautour':"Vautour fauve",'taureau':"Taureau",'poney':"Poney",'ornithorynque':"Ornithorynque"};
 const ANIMALS=DATA.trim().split('\n').map((l,i)=>{const p=l.split('|');const sp=s=>new Set((s||'').split(' ').filter(Boolean));
-  return{id:p[2],e:p[0],a:p[1],n:p[2],base:i<35,y:sp(p[3]),m:sp(p[4])}});
+  return{id:p[2],e:p[0],a:p[1],n:p[2],g:i<35?0:i<85?1:2,y:sp(p[3]),m:sp(p[4])}});
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const withArt=a=>a.a==="l'"?"l'"+a.n:a.a+' '+a.n;
 const emo=a=>a.e==='*'?`<i class="an-badge">${a.n[0].toUpperCase()}</i>`:a.e;
@@ -2582,7 +2642,9 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 // ---- préférences et mémoire (sur cet appareil) ----
 const get=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
 const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let sel=new Set(get('animal-choix',null)||ANIMALS.filter(a=>a.base).map(a=>a.id));
+let sel=new Set(get('animal-choix',null)||ANIMALS.filter(a=>a.g<2).map(a=>a.id));
+// version 2 : les 50 animaux ajoutés sont actifs par défaut, même pour un choix déjà enregistré
+if(get('animal-choix-v',1)<2){ANIMALS.filter(a=>a.g===1).forEach(a=>sel.add(a.id));put('animal-choix',[...sel]);put('animal-choix-v',2)}
 let learned=get('animal-appris',{});
 let sound=get('animal-voix',true);
 const enabled=()=>ANIMALS.filter(a=>sel.has(a.id));
@@ -2593,8 +2655,31 @@ const lik=(v,ans)=>ans===1?.06+.88*v:.94-.88*v;
 const ent=ps=>{let h=0;for(const p of ps)if(p>1e-12)h-=p*Math.log2(p);return h};
 
 // ---- voix ----
-function say(t){if(!sound)return;try{const s=window.speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(t.replace(/[«»]/g,''));u.lang='fr-FR';
-  const v=s.getVoices().find(v=>/^fr/i.test(v.lang));if(v)u.voice=v;u.rate=.95;s.speak(u)}catch(e){}}
+// On choisit la plus belle voix française de l'appareil : voix « naturelles » (Edge, Windows), « améliorées » / « premium » (iPhone, Mac), Google (Android, Chrome)…
+let voices=[],voiceName=get('animal-voix-nom','');
+function voiceScore(v){let sc=0;const n=v.name;
+  if(/^fr[-_]FR/i.test(v.lang))sc+=3;else if(/^fr/i.test(v.lang))sc+=1;
+  if(/natural|neural|online/i.test(n))sc+=8;
+  if(/premium|enhanced|amélior|siri/i.test(n))sc+=7;
+  if(/google/i.test(n))sc+=5;
+  if(/amélie|audrey|aurélie|marie|denise|eloise|vivienne|thomas|henri|remy|rémy/i.test(n))sc+=2;
+  if(/compact|espeak|robot|novelty|bad news|bells|whisper|grandma|grandpa|jester|organ|zarvox/i.test(n))sc-=10;
+  return sc}
+function loadVoices(){try{voices=window.speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang)).sort((a,b)=>voiceScore(b)-voiceScore(a))}catch(e){voices=[]}
+  voiceSelect()}
+const pickVoice=()=>voices.find(v=>v.name===voiceName)||voices[0]||null;
+function say(t,force){if(!sound&&!force)return;try{const s=window.speechSynthesis;s.cancel();
+  if(!voices.length)loadVoices();
+  // petites retouches pour que la phrase sonne mieux à l'oral
+  const txt=t.replace(/[«»]/g,'').replace(/A-t-il/g,'Est-ce qu\'il a').replace(/ \?/g,' ?').replace(/…/g,'...');
+  const u=new SpeechSynthesisUtterance(txt);const v=pickVoice();u.lang=v?v.lang:'fr-FR';if(v)u.voice=v;
+  const nice=v&&voiceScore(v)>=8;u.rate=nice?1:.92;u.pitch=nice?1:1.08;
+  setTimeout(()=>s.speak(u),40)}catch(e){}}
+function voiceSelect(){const el=$('an-voice');if(!el)return;
+  if(!voices.length){el.innerHTML='<option>Aucune voix française sur cet appareil</option>';el.disabled=true;return}
+  el.disabled=false;const cur=pickVoice();
+  el.innerHTML=voices.map((v,i)=>`<option value="${esc(v.name)}"${cur&&v.name===cur.name?' selected':''}>${i===0?'★ ':''}${esc(v.name.replace(/^(Microsoft|Google)\s+/,''))}${/^fr[-_]FR/i.test(v.lang)?'':' ('+esc(v.lang)+')'}</option>`).join('')}
+try{window.speechSynthesis.onvoiceschanged=loadVoices}catch(e){}
 const hush=()=>{try{window.speechSynthesis.cancel()}catch(e){}};
 function soundIcon(){$('an-sound').innerHTML=sound
   ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>'
@@ -2739,22 +2824,24 @@ function giveUp(){
 
 // ---- tableau oui / non des animaux ----
 function table(){
-  const sec=(title,list)=>`<div class="an-sec"><h3>${title}</h3><span><button class="an-mini" data-all="${list===0?'b':'x'}" data-v="1">tout oui</button> <button class="an-mini" data-all="${list===0?'b':'x'}" data-v="0">tout non</button></span></div>`+
-    ANIMALS.filter(a=>a.base===(list===0)).map(a=>{const on=sel.has(a.id);return`<div class="an-row"><span class="em">${emo(a)}</span><b>${esc(cap(a.n))}</b>
+  const sec=(title,g)=>`<div class="an-sec"><h3>${title}</h3><span><button class="an-mini" data-all="${g}" data-v="1">tout oui</button> <button class="an-mini" data-all="${g}" data-v="0">tout non</button></span></div>`+
+    ANIMALS.filter(a=>a.g===g).map(a=>{const on=sel.has(a.id);return`<div class="an-row"><span class="em">${emo(a)}</span><b>${esc(cap(a.n))}</b>
     <span class="an-seg" role="group" aria-label="${esc(a.n)} dans le jeu"><button class="y${on?' on':''}" data-id="${esc(a.id)}" data-v="1" aria-pressed="${on}">Oui</button><button class="n${on?'':' on'}" data-id="${esc(a.id)}" data-v="0" aria-pressed="${!on}">Non</button></span></div>`}).join('');
-  $('an-table').innerHTML=sec('Animaux de base',0)+sec('50 animaux en plus',1);
+  $('an-table').innerHTML=sec('Animaux de base',0)+sec('50 animaux ajoutés',1)+sec('50 nouvelles propositions',2);
   $('an-total').textContent=sel.size+' animaux dans le jeu'+(sel.size<2?' — il en faut au moins 2':'');
   $('an-table').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{b.dataset.v==='1'?sel.add(b.dataset.id):sel.delete(b.dataset.id);put('animal-choix',[...sel]);table()});
-  $('an-table').querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{ANIMALS.filter(a=>a.base===(b.dataset.all==='b')).forEach(a=>b.dataset.v==='1'?sel.add(a.id):sel.delete(a.id));put('animal-choix',[...sel]);table()})}
+  $('an-table').querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>{ANIMALS.filter(a=>a.g===+b.dataset.all).forEach(a=>b.dataset.v==='1'?sel.add(a.id):sel.delete(a.id));put('animal-choix',[...sel]);table()})}
 $('an-qn').textContent=QS.length;
 $('an-qlist').innerHTML=QS.map(q=>`<li>${q[1]} ${esc(q[2])}</li>`).join('');
-$('an-gear').onclick=()=>{table();$('ov-animal').hidden=false};
+$('an-gear').onclick=()=>{table();loadVoices();$('ov-animal').hidden=false};
+$('an-voice').onchange=e=>{voiceName=e.target.value;put('animal-voix-nom',voiceName);say("Bonjour ! Je suis le hibou devin. À quel animal penses-tu ?",true)};
+$('an-voice-test').onclick=()=>say("Bonjour ! Je suis le hibou devin. Est-ce qu'il a des plumes ?",true);
 $('an-close').onclick=()=>{$('ov-animal').hidden=true;intro()};
 $('an-forget').onclick=()=>{learned={};put('animal-appris',learned);$('an-forget').textContent='Mémoire effacée'};
 $('an-sound').onclick=()=>{sound=!sound;put('animal-voix',sound);soundIcon();if(!sound)hush();else if(curQ&&S)say(curQ[2])};
 $('an-home').onclick=()=>{hush();$('animal').hidden=true;$('ov-animal').hidden=true;$('home').hidden=false};
 $('go-animal').onclick=()=>{$('home').hidden=true;$('animal').hidden=false;soundIcon();intro()};
-try{window.speechSynthesis&&window.speechSynthesis.getVoices()}catch(e){}
+loadVoices();
 window.Animal={ANIMALS,QS,probs:()=>S&&probs(),newGame,_S:()=>S};
 })();
 </script>
