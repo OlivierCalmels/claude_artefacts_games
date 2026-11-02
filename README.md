@@ -1,6 +1,6 @@
 # claude_artefacts_games
 
-- Test de réalité augmentée sur image : `radeauViewer/` — Radeau Viewer. Le tableau imprimé *Le Radeau de la Méduse* sert de marqueur (MindAR, chargé depuis jsDelivr) : des vignettes photo apparaissent dans son ciel et s'agrandissent quand on les touche. Sans caméra, les mêmes vignettes s'affichent sur l'image à l'écran.
+- Test de réalité augmentée sur image : `radeauViewer/` — Radeau Viewer. Le tableau imprimé *Le Radeau de la Méduse* sert de marqueur (MindAR, chargé depuis jsDelivr) : des petits champignons blancs au chapeau rouge à points blancs dansent dans son ciel et s'agrandissent quand on les touche. Sans caméra, les mêmes champignons dansent sur l'image à l'écran.
 - Nouveau jeu : Roulette (roue de la fortune avec acronymes)
 - Nouveaux jeux en réalité augmentée avec marqueurs imprimés (page `marqueurs/` à imprimer ou à afficher sur un autre écran) :
   - `chateauAR/` — Défense du château : une île et son château apparaissent sur le marqueur Hiro posé sur la table. Des gobelins, loups, ogres et dragons arrivent par quatre chemins ; on touche les dalles de pierre pour construire des tours (archers, canon, glace qui ralentit), on les améliore jusqu'au niveau 3 et on tient 10 vagues. Jouable aussi sans marqueur (l'île s'affiche devant soi et tourne au doigt).

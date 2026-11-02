@@ -18,26 +18,23 @@ body{background:var(--wall);color:var(--ink);font-family:var(--serif);
   padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box;overflow:hidden}
 #stage{position:relative;aspect-ratio:1648/1125;width:min(100%,calc((100vh - 76px)*1.4649));max-width:100%;box-shadow:0 0 0 1px #000,0 14px 50px rgba(0,0,0,.7);flex:none}
 #stage>img{display:block;width:100%;height:100%}
-.vig{position:absolute;width:15%;aspect-ratio:4/3;padding:0;border:2px solid var(--gilt);background:#000;cursor:pointer;
-  box-shadow:0 3px 12px rgba(0,0,0,.65);animation:arrive 1.4s ease-out both,drift 7s ease-in-out infinite alternate;animation-delay:calc(var(--i)*.35s),calc(1.4s + var(--i)*.35s);transition:scale .2s}
-.vig img{display:block;width:100%;height:100%;object-fit:cover}
-.vig:hover{scale:1.12}
+.vig{position:absolute;width:8%;aspect-ratio:1;padding:0;border:0;background:none;cursor:pointer;touch-action:manipulation}
+.vig img{display:block;width:100%;height:100%}
+.vig:hover{scale:1.15}
+.dance{transform-origin:50% 100%;animation:dance 1.1s ease-in-out infinite;animation-delay:calc(var(--i,0)*-.27s)}
+@keyframes dance{0%,100%{transform:rotate(-13deg) scale(1.05,.93)}25%{transform:translateY(-16%) rotate(0) scale(.95,1.07)}50%{transform:rotate(13deg) scale(1.05,.93)}75%{transform:translateY(-16%) rotate(0) scale(.95,1.07)}}
 .vig:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-@keyframes arrive{from{opacity:0;transform:translateY(-14px) scale(.7);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
-@keyframes drift{from{transform:translateY(0)}to{transform:translateY(-5px) rotate(.8deg)}}
 #hint{margin:0;color:var(--muted);font-style:italic;font-size:15px;text-align:center}
 dialog{border:0;padding:0;background:transparent;color:var(--ink);max-width:none;max-height:none;width:100%;height:100%;font-family:var(--serif)}
 dialog::backdrop{background:var(--veil)}
 #box{box-sizing:border-box;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
   padding:max(52px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-#big{flex:0 1 auto;min-height:0;max-width:100%;object-fit:contain;border:3px solid var(--gilt);box-sizing:border-box}
+#big{width:min(64vh,82vw);height:auto}
 #cap{margin:0;font-size:17px;text-align:center}
 .ctl{position:absolute;min-width:44px;height:44px;background:rgba(20,17,13,.8);color:var(--ink);border:1px solid var(--gilt);font:inherit;font-size:18px;cursor:pointer}
 .ctl:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 #close{top:max(8px,env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));padding:0 14px;font-size:15px}
-#prev{left:max(16px,env(safe-area-inset-left,0px));top:50%}
-#next{right:max(16px,env(safe-area-inset-right,0px));top:50%}
-@media (prefers-reduced-motion:reduce){.vig{animation:none}.vig:hover{scale:1}}
+@media (prefers-reduced-motion:reduce){.dance{animation:none}.vig:hover{scale:1}}
 #hint{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:center}
 #go{min-height:44px;padding:0 16px;background:var(--gilt);color:#1b140a;border:0;font:inherit;font-style:normal;font-size:16px;cursor:pointer}
 #go:disabled{opacity:.6;cursor:wait}
@@ -51,54 +48,53 @@ dialog{z-index:30}
 </head>
 <body>
 <main id="stage"><img src="radeau.jpg" alt="Le Radeau de la Méduse de Géricault, avec un personnage contemporain en t-shirt ajouté sur le radeau"></main>
-<p id="hint"><span id="hintText">Touche une vignette dans le ciel, ou vise ton tableau.</span> <button id="go" type="button">Viser le tableau</button></p>
+<p id="hint"><span id="hintText">Touche un champignon dans le ciel, ou vise ton tableau.</span> <button id="go" type="button">Viser le tableau</button></p>
 <div id="ar" hidden></div>
 <p id="arMsg" hidden></p>
 <button class="ctl" id="quit" type="button" hidden>Quitter</button>
-<dialog id="dlg" aria-label="Photo agrandie">
-  <div id="box"><img id="big" alt=""><p id="cap"></p></div>
+<dialog id="dlg" aria-label="Champignon agrandi">
+  <div id="box"><img id="big" class="dance" alt="Champignon blanc au chapeau rouge à points blancs, qui danse"><p id="cap"></p></div>
   <button class="ctl" id="close" type="button">Fermer</button>
-  <button class="ctl" id="prev" type="button" aria-label="Photo précédente">‹</button>
-  <button class="ctl" id="next" type="button" aria-label="Photo suivante">›</button>
 </dialog>
 <script type="module">
-const PHOTOS=[
-  {src:'photo1.jpg',title:'Exemple : le drapeau',alt:'Détail du tableau : le drapeau'},
-  {src:'photo2.jpg',title:'Exemple : la voile',alt:'Détail du tableau : la voile'},
-  {src:'photo3.jpg',title:'Exemple : la mer',alt:'Détail du tableau : la mer'}
-];
-/* Open sky only, in % of the painting: away from the sail, the mast and the flag. */
-const SPOTS=[[4,5],[47,4],[79,4],[85,23],[20,3],[60,20],[3,20],[49,20]];
-const stage=document.getElementById('stage'),dlg=document.getElementById('dlg'),big=document.getElementById('big'),cap=document.getElementById('cap');
+/* Six champignons dans le ciel : position du coin haut gauche, en % du tableau. */
+const SPOTS=[[4,7],[14,12],[48,5],[56,14],[80,6],[89,16]];
+const SIZE=.08, RATIO=1125/1648;
+const $=id=>document.getElementById(id);
+const stage=$('stage'),dlg=$('dlg'),cap=$('cap');
 const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
-let cur=0,opener=null;
-const btns=PHOTOS.slice(0,SPOTS.length).map((p,i)=>{
-  const b=document.createElement('button');b.type='button';b.className='vig';
-  b.style.cssText=`left:${SPOTS[i][0]}%;top:${SPOTS[i][1]}%;--i:${i}`;
-  b.setAttribute('aria-label','Agrandir : '+p.alt);
-  const im=document.createElement('img');im.src=p.src;im.alt='';b.append(im);
-  b.onclick=()=>open_(i,b);stage.append(b);return b;
-});
-function fit(){big.style.maxHeight=(innerHeight-130)+'px'}
-function show(i){cur=(i+PHOTOS.length)%PHOTOS.length;big.src=PHOTOS[cur].src;big.alt=PHOTOS[cur].alt;cap.textContent=PHOTOS[cur].title}
-function open_(i,b){opener=b;show(i);fit();dlg.showModal();
-  if(still)return;
-  const r=b.getBoundingClientRect();
-  big.decode().catch(()=>{}).then(()=>{const t=big.getBoundingClientRect();if(!t.width)return;
-    big.animate([{transform:`translate(${r.left+r.width/2-t.left-t.width/2}px,${r.top+r.height/2-t.top-t.height/2}px) scale(${r.width/t.width})`,opacity:.4},{transform:'none',opacity:1}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'})});
+let opener=null;
+
+/* Le champignon est dessiné une fois, puis sert à l'écran comme sur le tableau filmé. */
+function drawMushroom(){
+  const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');
+  g.lineWidth=12;g.strokeStyle='#2a1a12';g.lineJoin='round';
+  g.beginPath();g.moveTo(196,270);g.bezierCurveTo(190,360,172,440,186,478);g.quadraticCurveTo(256,506,326,478);g.bezierCurveTo(340,440,322,360,316,270);g.closePath();
+  g.fillStyle='#fbf7ec';g.fill();g.stroke();
+  const cap=()=>{g.beginPath();g.moveTo(44,276);g.bezierCurveTo(50,110,160,28,256,28);g.bezierCurveTo(352,28,462,110,468,276);g.quadraticCurveTo(256,330,44,276);g.closePath()};
+  cap();g.fillStyle='#d3201f';g.fill();
+  g.save();cap();g.clip();g.fillStyle='#fff';
+  [[256,92,46],[136,150,38],[376,150,38],[256,216,40],[88,246,28],[424,246,28],[176,256,22],[338,256,22]].forEach(([x,y,r])=>{g.beginPath();g.arc(x,y,r,0,7);g.fill()});
+  g.restore();cap();g.stroke();
+  return c;
 }
-document.getElementById('close').onclick=()=>dlg.close();
-document.getElementById('prev').onclick=()=>show(cur-1);
-document.getElementById('next').onclick=()=>show(cur+1);
+const canvas=drawMushroom(),URLIMG=canvas.toDataURL('image/png');
+$('big').src=URLIMG;
+
+const open_=(i,b)=>{opener=b;cap.textContent='Champignon '+(i+1)+' sur '+SPOTS.length;dlg.showModal()};
+SPOTS.forEach(([l,t],i)=>{
+  const b=document.createElement('button');b.type='button';b.className='vig';
+  b.style.cssText=`left:${l}%;top:${t}%`;
+  b.setAttribute('aria-label','Agrandir le champignon '+(i+1));
+  const im=document.createElement('img');im.src=URLIMG;im.alt='';im.className='dance';im.style.setProperty('--i',i);
+  b.append(im);b.onclick=()=>open_(i,b);stage.append(b);
+});
+$('close').onclick=()=>dlg.close();
 dlg.addEventListener('click',e=>{if(e.target===dlg||e.target.id==='box')dlg.close()});
-dlg.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')show(cur-1);if(e.key==='ArrowRight')show(cur+1)});
 dlg.addEventListener('close',()=>opener&&opener.focus());
-addEventListener('resize',fit);
 
 /* ---------- Réalité augmentée : le tableau imprimé sert de marqueur (MindAR) ---------- */
 const VERSION='radeau-1'; // à changer si radeau.jpg change
-const RATIO=1125/1648, VW=.15, VH=VW*.75;
-const $=id=>document.getElementById(id);
 const say=t=>{$('arMsg').textContent=t};
 
 function cache(mode,val){return new Promise(res=>{try{
@@ -134,22 +130,16 @@ async function startAR(){
     const mind=new MindARThree({container:$('ar'),imageTargetSrc:url,uiLoading:'no',uiScanning:'no',uiError:'no'});
     const {renderer,scene,camera}=mind;
     const anchor=mind.addAnchor(0);
-    const loader=new THREE.TextureLoader(),thumbs=[];
-    const gilt=new THREE.MeshBasicMaterial({color:0xc9a564});
-    PHOTOS.slice(0,SPOTS.length).forEach((p,i)=>{
-      const g=new THREE.Group();
-      g.position.set(SPOTS[i][0]/100+VW/2-.5,RATIO/2-SPOTS[i][1]/100*RATIO-VH/2,.002);
-      const edge=new THREE.Mesh(new THREE.PlaneGeometry(VW+.006,VH+.006),gilt);
-      const tex=loader.load(p.src,t=>{ /* recadrage « cover » en 4:3 */
-        const r=t.image.width/t.image.height,a=4/3;
-        if(r>a){t.repeat.set(a/r,1);t.offset.set((1-a/r)/2,0)}else{t.repeat.set(1,r/a);t.offset.set(0,(1-r/a)/2)}
-      });
-      tex.colorSpace=THREE.SRGBColorSpace;
-      const m=new THREE.Mesh(new THREE.PlaneGeometry(VW,VH),new THREE.MeshBasicMaterial({map:tex}));
-      m.position.z=.001;m.userData.i=i;g.add(edge,m);anchor.group.add(g);thumbs.push({g,m,y:g.position.y,i});
+    const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
+    const geo=new THREE.PlaneGeometry(SIZE,SIZE);geo.translate(0,SIZE/2,0); // pivot au pied, pour danser
+    const thumbs=SPOTS.map(([l,t],i)=>{
+      const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.1,side:THREE.DoubleSide}));
+      const x=l/100+SIZE/2-.5,y=RATIO/2-t/100*RATIO-SIZE;
+      m.position.set(x,y,.002+i*.0001);m.userData.i=i;anchor.group.add(m);
+      return {m,y,i};
     });
     const LOST='Vise tout le tableau, à environ un mètre.';
-    anchor.onTargetFound=()=>say('Touche une photo dans le ciel.');
+    anchor.onTargetFound=()=>say('Touche un champignon dans le ciel.');
     anchor.onTargetLost=()=>say(LOST);
     const ray=new THREE.Raycaster();
     renderer.domElement.style.touchAction='manipulation';
@@ -164,7 +154,12 @@ async function startAR(){
     const t0=performance.now();
     renderer.setAnimationLoop(()=>{
       const t=(performance.now()-t0)/1000;
-      if(!still)thumbs.forEach(o=>{o.g.position.y=o.y+Math.sin(t*.8+o.i)*.004;});
+      if(!still)thumbs.forEach(o=>{
+        const w=t*5.7+o.i*1.5,hop=Math.abs(Math.sin(w));
+        o.m.rotation.z=Math.cos(w)*.23;
+        o.m.position.y=o.y+hop*SIZE*.16;
+        o.m.scale.set(1.05-hop*.1,.93+hop*.14,1);
+      });
       renderer.render(scene,camera);
     });
   }catch(e){
