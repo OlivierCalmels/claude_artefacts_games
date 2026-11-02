@@ -1,5 +1,6 @@
 # claude_artefacts_games
 
+- `coeursViewer/` — Cœurs Viewer : on choisit sur son téléphone une photo de son cadre, puis des petits cœurs tournent autour quand on le filme (MindAR, 1 tour en 4 secondes). La photo reste sur l'appareil : elle n'est ni envoyée ni publiée, et seule son empreinte est gardée dans le navigateur.
 - Test de réalité augmentée sur image : `radeauViewer/` — Radeau Viewer. Le tableau imprimé *Le Radeau de la Méduse* sert de marqueur (MindAR, chargé depuis jsDelivr) : des petits champignons blancs au chapeau rouge à points blancs dansent dans son ciel et s'agrandissent quand on les touche. Sans caméra, les mêmes champignons dansent sur l'image à l'écran.
 - Nouveau jeu : Roulette (roue de la fortune avec acronymes)
 - Nouveaux jeux en réalité augmentée avec marqueurs imprimés (page `marqueurs/` à imprimer ou à afficher sur un autre écran) :

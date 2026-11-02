@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cœurs Viewer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;1,400&display=swap">
+<style>
+/* Mise en page : un cadre vide sur un mur sombre, où les cœurs tournent déjà avant même de filmer. */
+:root{color-scheme:dark;--wall:#15120f;--ink:#efe8dc;--muted:#ab9f8e;--rose:#e8435a;--paper:#d9d2c5;--serif:"Spectral",Georgia,"Times New Roman",serif}
+html,body{height:100%;margin:0}
+body{background:var(--wall);color:var(--ink);font-family:var(--serif);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+[hidden]{display:none!important}
+#home{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+h1{margin:0;font-size:26px;font-weight:400;text-wrap:balance}
+#demo{display:block;width:min(100%,520px,60vh);aspect-ratio:1}
+p{margin:0;max-width:34em;color:var(--muted);font-size:16px;line-height:1.45}
+#actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;background:var(--rose);color:#1b0a0d;border:0;font:inherit;font-size:16px;cursor:pointer}
+.btn.alt{background:none;color:var(--ink);border:1px solid var(--muted)}
+.btn:focus-visible,label.btn:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+#file{position:absolute;width:1px;height:1px;opacity:0}
+#ar{position:fixed;inset:0;overflow:hidden;background:#000}
+#arMsg{position:fixed;z-index:20;left:16px;right:16px;bottom:max(20px,env(safe-area-inset-bottom,0px));margin:0 auto;padding:10px 14px;background:rgba(21,18,15,.85);color:var(--ink);font-style:italic}
+#quit{position:fixed;z-index:20;top:max(8px,env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px))}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","mindar-image-three":"https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"}}</script>
+</head>
+<body>
+<div id="home">
+  <h1>Des cœurs autour de ton cadre</h1>
+  <canvas id="demo" width="800" height="800" aria-label="Aperçu : des cœurs tournent autour d'un cadre vide"></canvas>
+  <p id="info">Choisis une photo de ton cadre, prise bien de face. Elle reste sur ton téléphone : rien n’est envoyé ni publié.</p>
+  <div id="actions">
+    <button class="btn" id="go" type="button" hidden>Filmer le cadre</button>
+    <label class="btn" id="pickLabel"><input id="file" type="file" accept="image/*"><span id="pickText">Choisir la photo du cadre</span></label>
+  </div>
+</div>
+<div id="ar" hidden></div>
+<p id="arMsg" hidden></p>
+<button class="btn alt" id="quit" type="button" hidden>Quitter</button>
+<script type="module">
+const LAP=4,COUNT=10,HEART=.05,GAP=.05; // 1 tour en 4 secondes ; tailles en largeur de photo
+const $=id=>document.getElementById(id);
+const say=t=>{$('arMsg').textContent=t};
+
+function drawHeart(){
+  const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+  g.beginPath();g.moveTo(128,226);g.bezierCurveTo(30,160,14,108,22,78);g.bezierCurveTo(34,32,102,22,128,76);g.bezierCurveTo(154,22,222,32,234,78);g.bezierCurveTo(242,108,226,160,128,226);g.closePath();
+  g.fillStyle='#e8435a';g.fill();g.lineWidth=8;g.strokeStyle='#fff';g.stroke();
+  return c;
+}
+const heart=drawHeart();
+
+/* Position sur le contour d'un rectangle (centré), à vitesse constante. u = 0..1 pour un tour. */
+function around(u,a,b){
+  const per=4*(a+b);let d=((u%1)+1)%1*per;
+  if(d<2*a)return[-a+d,b];d-=2*a;
+  if(d<2*b)return[a,b-d];d-=2*b;
+  if(d<2*a)return[a-d,-b];d-=2*a;
+  return[-a,-b+d];
+}
+
+/* Aperçu sans caméra */
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const dc=$('demo'),dg=dc.getContext('2d');
+function demo(ms){
+  const S=dc.width,w=S*.68,h=w*.72,cx=S/2,cy=S/2,t=still?0:ms/1000;
+  dg.clearRect(0,0,S,S);
+  dg.fillStyle='#d9d2c5';dg.fillRect(cx-w/2,cy-h/2,w,h);
+  dg.strokeStyle='#000';dg.lineWidth=8;dg.strokeRect(cx-w/2,cy-h/2,w,h);
+  dg.fillStyle='#3c352b';dg.font='italic 34px Georgia,serif';dg.textAlign='center';dg.fillText('ta photo',cx,cy+10);
+  const a=w/2+w*GAP,b=h/2+w*GAP,s=w*HEART*1.2;
+  for(let i=0;i<COUNT;i++){const[x,y]=around(t/LAP+i/COUNT,a,b);dg.drawImage(heart,cx+x-s/2,cy-y-s/2,s,s)}
+  if(!$('home').hidden)requestAnimationFrame(demo);
+}
+requestAnimationFrame(demo);
+
+/* La photo reste sur l'appareil : seule l'empreinte calculée est gardée, dans ce navigateur. */
+function store(val){return new Promise(res=>{try{
+  const o=indexedDB.open('coeursViewer',1);
+  o.onupgradeneeded=()=>o.result.createObjectStore('c');
+  o.onerror=()=>res(null);
+  o.onsuccess=()=>{const st=o.result.transaction('c',val?'readwrite':'readonly').objectStore('c');
+    const r=val?st.put(val,'cible'):st.get('cible');r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)};
+}catch(e){res(null)}})}
+
+async function compile(file){
+  const src=await createImageBitmap(file);
+  const k=Math.min(1,1200/Math.max(src.width,src.height));
+  const c=document.createElement('canvas');c.width=Math.round(src.width*k);c.height=Math.round(src.height*k);
+  c.getContext('2d').drawImage(src,0,0,c.width,c.height);
+  const img=new Image();img.src=c.toDataURL('image/jpeg',.9);await img.decode();
+  say('Analyse de la photo : 0 %');
+  await import('https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js');
+  const comp=new window.MINDAR.IMAGE.Compiler();
+  await comp.compileImageTargets([img],p=>say('Analyse de la photo : '+Math.round(p)+' %'));
+  const cible={buf:await comp.exportData(),ratio:c.height/c.width};
+  await store(cible);
+  return cible;
+}
+
+function showAR(on){$('home').hidden=on;$('ar').hidden=!on;$('quit').hidden=!on;$('arMsg').hidden=!on;if(!on)requestAnimationFrame(demo)}
+
+async function start(cible,file){
+  showAR(true);
+  try{
+    if(!cible)cible=await compile(file);
+    say('Ouverture de la caméra…');
+    const THREE=await import('three');
+    const {MindARThree}=await import('mindar-image-three');
+    const mind=new MindARThree({container:$('ar'),imageTargetSrc:URL.createObjectURL(new Blob([cible.buf])),uiLoading:'no',uiScanning:'no',uiError:'no'});
+    const {renderer,scene,camera}=mind,anchor=mind.addAnchor(0);
+    const tex=new THREE.CanvasTexture(heart);tex.colorSpace=THREE.SRGBColorSpace;
+    const geo=new THREE.PlaneGeometry(HEART,HEART),mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.1});
+    const hearts=[...Array(COUNT)].map(()=>{const m=new THREE.Mesh(geo,mat);m.position.z=.002;anchor.group.add(m);return m});
+    const a=.5+GAP,b=cible.ratio/2+GAP;
+    const place=t=>hearts.forEach((m,i)=>{const[x,y]=around(t/LAP+i/COUNT,a,b);m.position.x=x;m.position.y=y});
+    place(0);
+    const LOST='Vise tout le cadre, de face.';
+    anchor.onTargetFound=()=>say('Le cadre est reconnu.');
+    anchor.onTargetLost=()=>say(LOST);
+    await mind.start();say(LOST);
+    const t0=performance.now();
+    renderer.setAnimationLoop(()=>{if(!still)place((performance.now()-t0)/1000);renderer.render(scene,camera)});
+  }catch(e){
+    console.warn(e);showAR(false);
+    $('info').textContent='La réalité augmentée n’a pas démarré. Vérifie la connexion et l’accès à la caméra, puis réessaie.';
+  }
+}
+
+$('quit').onclick=()=>location.reload();
+$('file').onchange=e=>{const f=e.target.files[0];if(f)start(null,f)};
+store().then(c=>{if(c){$('go').hidden=false;$('pickLabel').classList.add('alt');$('pickText').textContent='Changer de photo';$('info').textContent='Ta photo est déjà analysée sur ce téléphone.';$('go').onclick=()=>start(c)}});
+</script>
+</body>
+</html>
