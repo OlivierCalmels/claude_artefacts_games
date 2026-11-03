@@ -1,5 +1,6 @@
 # claude_artefacts_games
 
+- `trouGourmand/` — Trou Gourmand : jeu 3D façon hole.io (WebGL2, sans bibliothèque). On déplace un trou au sol dans une chambre d'enfant en désordre : briques, jouets, puis meubles. Plus on avale, plus on grossit, et un objet trop gros tangue sans tomber. Ce qui est posé sur un meuble dégringole quand on avale le meuble. La partie se termine quand la chambre est vide, avec un record de temps. Se joue au doigt ou au clavier. Accessible depuis `mesJeux/`.
 - `coeursViewer/` — Cœurs Viewer : on choisit sur son téléphone une photo de son cadre, puis des petits cœurs tournent autour quand on le filme (MindAR, 1 tour en 4 secondes). La photo reste sur l'appareil : elle n'est ni envoyée ni publiée, et seule son empreinte est gardée dans le navigateur.
 - Test de réalité augmentée sur image : `radeauViewer/` — Radeau Viewer. Le tableau imprimé *Le Radeau de la Méduse* sert de marqueur (MindAR, chargé depuis jsDelivr) : des petits champignons blancs au chapeau rouge à points blancs dansent dans son ciel et s'agrandissent quand on les touche. Sans caméra, les mêmes champignons dansent sur l'image à l'écran.
 - Nouveau jeu : Roulette (roue de la fortune avec acronymes)
