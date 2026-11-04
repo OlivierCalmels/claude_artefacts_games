@@ -17,7 +17,7 @@ html,body{height:100%;margin:0}
 body{background:var(--wall);color:var(--ink);font-family:var(--serif);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
   padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box;overflow:hidden}
-#stage{position:relative;aspect-ratio:1648/1125;width:min(100%,calc((100vh - 76px)*1.4649));max-width:100%;box-shadow:0 0 0 1px #000,0 14px 50px rgba(0,0,0,.7);flex:none}
+#stage{position:relative;aspect-ratio:1648/1125;width:min(100%,calc((100vh - 110px)*1.4649));max-width:100%;box-shadow:0 0 0 1px #000,0 14px 50px rgba(0,0,0,.7);flex:none}
 #stage>img{display:block;width:100%;height:100%}
 .vig{position:absolute;width:8%;aspect-ratio:1;padding:0;border:0;background:none;cursor:pointer;touch-action:manipulation}
 .vig img{display:block;width:100%;height:100%}
@@ -119,6 +119,23 @@ async function target(){
   return buf;
 }
 
+/* MindAR fixe la taille de l'image analysée au démarrage : quand le téléphone tourne, on relance donc la caméra. */
+let session=null,turnTimer=0;
+const landscape=()=>innerWidth>innerHeight;
+function stopAR(){
+  const s=session;session=null;if(!s)return;
+  try{s.renderer.setAnimationLoop(null)}catch(e){}
+  try{s.mind.stop()}catch(e){}
+  try{s.renderer.dispose();s.renderer.forceContextLoss()}catch(e){}
+  $('ar').textContent='';
+}
+function checkTurn(){
+  if(!session||!session.ready||session.landscape===landscape())return;
+  const again=session.again;
+  stopAR();say('Le téléphone a tourné, je relance la caméra…');again();
+}
+addEventListener('resize',()=>{clearTimeout(turnTimer);turnTimer=setTimeout(checkTurn,500)});
+
 async function startAR(){
   const go=$('go');go.disabled=true;
   $('ar').hidden=false;$('quit').hidden=false;$('arMsg').hidden=false;stage.hidden=true;$('hint').hidden=true;
@@ -131,6 +148,7 @@ async function startAR(){
     const mind=new MindARThree({container:$('ar'),imageTargetSrc:url,uiLoading:'no',uiScanning:'no',uiError:'no'});
     const {renderer,scene,camera}=mind;
     const anchor=mind.addAnchor(0);
+    const me=session={mind,renderer,ready:false,landscape:landscape(),again:startAR};
     const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
     const geo=new THREE.PlaneGeometry(SIZE,SIZE);geo.translate(0,SIZE/2,0); // pivot au pied, pour danser
     const thumbs=SPOTS.map(([l,t],i)=>{
@@ -151,7 +169,7 @@ async function startAR(){
       if(hit)open_(hit.object.userData.i,$('quit'));
     });
     await mind.start();
-    say(LOST);
+    say(LOST);me.ready=true;
     const t0=performance.now();
     renderer.setAnimationLoop(()=>{
       const t=(performance.now()-t0)/1000;
@@ -163,8 +181,9 @@ async function startAR(){
       });
       renderer.render(scene,camera);
     });
+    checkTurn();
   }catch(e){
-    console.warn(e);
+    console.warn(e);session=null;$('ar').textContent='';
     $('ar').hidden=true;$('quit').hidden=true;$('arMsg').hidden=true;stage.hidden=false;$('hint').hidden=false;go.disabled=false;
     $('hintText').textContent='La réalité augmentée n’a pas démarré. Vérifie la connexion et l’accès à la caméra, puis réessaie.';
   }

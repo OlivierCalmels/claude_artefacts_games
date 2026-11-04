@@ -8,10 +8,11 @@
 <style>
 /* Mise en page : un cadre vide sur un mur sombre, où les cœurs tournent déjà avant même de filmer. */
 :root{color-scheme:dark;--wall:#15120f;--ink:#efe8dc;--muted:#ab9f8e;--rose:#e8435a;--paper:#d9d2c5;--serif:"Spectral",Georgia,"Times New Roman",serif}
-html,body{height:100%;margin:0}
-body{background:var(--wall);color:var(--ink);font-family:var(--serif);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+html,body{min-height:100%;margin:0}
+html{height:100%}
+body{background:var(--wall);color:var(--ink);font-family:var(--serif);box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 [hidden]{display:none!important}
-#home{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+#home{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;margin-block:auto}
 h1{margin:0;font-size:26px;font-weight:400;text-wrap:balance}
 #demo{display:block;width:min(100%,520px,60vh);aspect-ratio:1}
 p{margin:0;max-width:34em;color:var(--muted);font-size:16px;line-height:1.45}
@@ -19,6 +20,19 @@ p{margin:0;max-width:34em;color:var(--muted);font-size:16px;line-height:1.45}
 .btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;background:var(--rose);color:#1b0a0d;border:0;font:inherit;font-size:16px;cursor:pointer}
 .btn.alt{background:none;color:var(--ink);border:1px solid var(--muted)}
 .btn:focus-visible,label.btn:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+@media (orientation:landscape){#demo{width:min(100%,46vh)}}
+#home.has #demo{width:min(100%,380px,38vh)}
+#mine{width:100%;max-width:560px}
+#mine h2{margin:0 0 8px;font-size:17px;font-weight:400;font-style:italic;color:var(--muted)}
+#list{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;list-style:none;margin:0;padding:0}
+.tile{position:relative;min-width:0}
+.pick{display:block;width:100%;padding:0;background:#2a251f;border:2px solid transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.tile.cur .pick{border-color:var(--rose)}
+.pick img,.pick .none{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.pick .none{display:flex;align-items:center;justify-content:center;color:var(--muted);font-style:italic}
+.pick span.d{display:block;padding:4px 2px}
+.del{position:absolute;top:0;right:0;width:44px;height:44px;padding:0;background:rgba(21,18,15,.72);color:var(--ink);border:0;font-size:20px;cursor:pointer}
+.pick:focus-visible,.del:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 #file{position:absolute;width:1px;height:1px;opacity:0}
 #ar{position:fixed;inset:0;overflow:hidden;background:#000}
 #arMsg{position:fixed;z-index:20;left:16px;right:16px;bottom:max(20px,env(safe-area-inset-bottom,0px));margin:0 auto;padding:10px 14px;background:rgba(21,18,15,.85);color:var(--ink);font-style:italic}
@@ -35,6 +49,10 @@ p{margin:0;max-width:34em;color:var(--muted);font-size:16px;line-height:1.45}
     <button class="btn" id="go" type="button" hidden>Filmer le cadre</button>
     <label class="btn" id="pickLabel"><input id="file" type="file" accept="image/*"><span id="pickText">Choisir la photo du cadre</span></label>
   </div>
+  <section id="mine" hidden>
+    <h2>Mes photos, gardées sur ce téléphone</h2>
+    <ul id="list"></ul>
+  </section>
 </div>
 <div id="ar" hidden></div>
 <p id="arMsg" hidden></p>
@@ -76,41 +94,88 @@ function demo(ms){
 }
 requestAnimationFrame(demo);
 
-/* La photo reste sur l'appareil : seule l'empreinte calculée est gardée, dans ce navigateur. */
-function store(val){return new Promise(res=>{try{
-  const o=indexedDB.open('coeursViewer',1);
-  o.onupgradeneeded=()=>o.result.createObjectStore('c');
-  o.onerror=()=>res(null);
-  o.onsuccess=()=>{const st=o.result.transaction('c',val?'readwrite':'readonly').objectStore('c');
-    const r=val?st.put(val,'cible'):st.get('cible');r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null)};
-}catch(e){res(null)}})}
+/* Les photos restent sur l'appareil, dans ce navigateur : elles ne sont jamais envoyées ni publiées. */
+const openDB=()=>new Promise((res,rej)=>{
+  const o=indexedDB.open('coeursViewer',2);
+  o.onupgradeneeded=()=>{const d=o.result;
+    if(!d.objectStoreNames.contains('c'))d.createObjectStore('c');
+    if(!d.objectStoreNames.contains('photos'))d.createObjectStore('photos',{keyPath:'id'})};
+  o.onerror=()=>rej(o.error);o.onsuccess=()=>res(o.result);
+});
+const req=(store,mode,fn)=>openDB().then(d=>new Promise((res,rej)=>{
+  const t=d.transaction(store,mode),r=fn(t.objectStore(store));
+  t.oncomplete=()=>{d.close();res(r.result)};t.onerror=t.onabort=()=>{d.close();rej(t.error)};
+}));
+const allPhotos=()=>req('photos','readonly',s=>s.getAll()).catch(()=>[]);
+const savePhoto=e=>req('photos','readwrite',s=>s.put(e)).then(()=>true,()=>false);
+const dropPhoto=id=>req('photos','readwrite',s=>s.delete(id)).catch(()=>{});
+/* L'ancienne version ne gardait que l'analyse, sans l'image. */
+async function migrate(){try{
+  const old=await req('c','readonly',s=>s.get('cible'));
+  if(old&&old.buf){await savePhoto({id:'ancienne',date:Date.now(),used:0,bytes:null,ratio:old.ratio,buf:old.buf})}
+  if(old)await req('c','readwrite',s=>s.delete('cible'));
+}catch(e){console.warn(e)}}
 
-async function compile(file){
+const same=(a,b)=>{if(!a||a.byteLength!==b.byteLength)return false;const x=new Uint8Array(a),y=new Uint8Array(b);for(let i=0;i<x.length;i++)if(x[i]!==y[i])return false;return true};
+
+/* Réduit la photo et la garde tout de suite, avant même l'analyse. */
+async function addPhoto(file){
   const src=await createImageBitmap(file);
   const k=Math.min(1,1200/Math.max(src.width,src.height));
   const c=document.createElement('canvas');c.width=Math.round(src.width*k);c.height=Math.round(src.height*k);
   c.getContext('2d').drawImage(src,0,0,c.width,c.height);
-  const img=new Image();img.src=c.toDataURL('image/jpeg',.9);await img.decode();
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.9));
+  const bytes=await blob.arrayBuffer();
+  const known=(await allPhotos()).find(p=>same(p.bytes,bytes));
+  if(known)return known;
+  const id='p'+Date.now();
+  const e={id,date:Date.now(),used:Date.now(),bytes,ratio:c.height/c.width,buf:null};
+  await savePhoto(e);
+  return e;
+}
+
+async function analyse(e){
+  const img=new Image(),url=URL.createObjectURL(new Blob([e.bytes],{type:'image/jpeg'}));
+  img.src=url;await img.decode();
   say('Analyse de la photo : 0 %');
   await import('https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js');
   const comp=new window.MINDAR.IMAGE.Compiler();
   await comp.compileImageTargets([img],p=>say('Analyse de la photo : '+Math.round(p)+' %'));
-  const cible={buf:await comp.exportData(),ratio:c.height/c.width};
-  await store(cible);
-  return cible;
+  e.buf=await comp.exportData();
+  URL.revokeObjectURL(url);
+  await savePhoto(e);
 }
 
 function showAR(on){$('home').hidden=on;$('ar').hidden=!on;$('quit').hidden=!on;$('arMsg').hidden=!on;if(!on)requestAnimationFrame(demo)}
 
-async function start(cible,file){
+/* MindAR fixe la taille de l'image analysée au démarrage : quand le téléphone tourne, on relance donc la caméra. */
+let session=null,turnTimer=0;
+const landscape=()=>innerWidth>innerHeight;
+function stopAR(){
+  const s=session;session=null;if(!s)return;
+  try{s.renderer.setAnimationLoop(null)}catch(e){}
+  try{s.mind.stop()}catch(e){}
+  try{s.renderer.dispose();s.renderer.forceContextLoss()}catch(e){}
+  $('ar').textContent='';
+}
+function checkTurn(){
+  if(!session||!session.ready||session.landscape===landscape())return;
+  const again=session.again;
+  stopAR();say('Le téléphone a tourné, je relance la caméra…');again();
+}
+addEventListener('resize',()=>{clearTimeout(turnTimer);turnTimer=setTimeout(checkTurn,500)});
+
+async function start(cible){
   showAR(true);
   try{
-    if(!cible)cible=await compile(file);
+    cible.used=Date.now();
+    if(!cible.buf)await analyse(cible);else await savePhoto(cible);
     say('Ouverture de la caméra…');
     const THREE=await import('three');
     const {MindARThree}=await import('mindar-image-three');
     const mind=new MindARThree({container:$('ar'),imageTargetSrc:URL.createObjectURL(new Blob([cible.buf])),uiLoading:'no',uiScanning:'no',uiError:'no'});
     const {renderer,scene,camera}=mind,anchor=mind.addAnchor(0);
+    const me=session={mind,renderer,ready:false,landscape:landscape(),again:()=>start(cible)};
     const tex=new THREE.CanvasTexture(heart);tex.colorSpace=THREE.SRGBColorSpace;
     const geo=new THREE.PlaneGeometry(HEART,HEART),mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.1});
     const hearts=[...Array(COUNT)].map(()=>{const m=new THREE.Mesh(geo,mat);m.position.z=.002;anchor.group.add(m);return m});
@@ -120,18 +185,50 @@ async function start(cible,file){
     const LOST='Vise tout le cadre, de face.';
     anchor.onTargetFound=()=>say('Le cadre est reconnu.');
     anchor.onTargetLost=()=>say(LOST);
-    await mind.start();say(LOST);
+    await mind.start();say(LOST);me.ready=true;
     const t0=performance.now();
     renderer.setAnimationLoop(()=>{if(!still)place((performance.now()-t0)/1000);renderer.render(scene,camera)});
+    checkTurn();
   }catch(e){
-    console.warn(e);showAR(false);
+    console.warn(e);session=null;$('ar').textContent='';showAR(false);render();
     $('info').textContent='La réalité augmentée n’a pas démarré. Vérifie la connexion et l’accès à la caméra, puis réessaie.';
   }
 }
 
 $('quit').onclick=()=>location.reload();
-$('file').onchange=e=>{const f=e.target.files[0];if(f)start(null,f)};
-store().then(c=>{if(c){$('go').hidden=false;$('pickLabel').classList.add('alt');$('pickText').textContent='Changer de photo';$('info').textContent='Ta photo est déjà analysée sur ce téléphone.';$('go').onclick=()=>start(c)}});
+$('file').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{start(await addPhoto(f))}
+  catch(err){console.warn(err);$('info').textContent='Cette photo n’a pas pu être ouverte. Essaie avec une autre.'}
+};
+
+const fmt=new Intl.DateTimeFormat('fr-FR',{day:'numeric',month:'short'});
+async function render(){
+  const ph=(await allPhotos()).sort((a,b)=>b.used-a.used),list=$('list');
+  list.querySelectorAll('img').forEach(i=>URL.revokeObjectURL(i.src));list.textContent='';
+  const has=ph.length>0;
+  $('mine').hidden=!has;$('home').classList.toggle('has',has);$('go').hidden=!has;
+  $('pickLabel').classList.toggle('alt',has);
+  $('pickText').textContent=has?'Ajouter une photo':'Choisir la photo du cadre';
+  if(has){$('go').onclick=()=>start(ph[0]);$('info').textContent='Touche une photo pour filmer ce cadre. Elles restent sur ce téléphone : rien n’est envoyé ni publié.'}
+  ph.forEach((p,i)=>{
+    const li=document.createElement('li');li.className='tile'+(i?'':' cur');
+    const b=document.createElement('button');b.type='button';b.className='pick';
+    const label=p.bytes?'Photo du '+fmt.format(p.date):'Ancienne photo';
+    b.setAttribute('aria-label','Filmer avec : '+label);
+    let th;
+    if(p.bytes){th=document.createElement('img');th.alt='';th.src=URL.createObjectURL(new Blob([p.bytes],{type:'image/jpeg'}))}
+    else{th=document.createElement('span');th.className='none';th.textContent='sans aperçu'}
+    const d=document.createElement('span');d.className='d';d.textContent=p.bytes?fmt.format(p.date):'Ancienne';
+    b.append(th,d);b.onclick=()=>start(p);
+    const x=document.createElement('button');x.type='button';x.className='del';x.textContent='×';
+    x.setAttribute('aria-label','Retirer : '+label);
+    x.onclick=async()=>{await dropPhoto(p.id);render()};
+    li.append(b,x);list.append(li);
+  });
+}
+navigator.storage?.persist?.().catch(()=>{});
+migrate().then(render);
 </script>
 </body>
 </html>
