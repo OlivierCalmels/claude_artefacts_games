@@ -281,6 +281,7 @@ button.an-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--tray-de
 
 <div id="home" class="screen">
   <div class="home-in">
+    <a href="../" style="color:var(--muted);font-weight:800;text-decoration:none">← Tous les jeux</a>
     <h1 class="home-title">Mes jeux</h1>
     <p class="home-sub">Choisis une partie</p>
     <button class="game-card" id="go-robots">
@@ -2917,6 +2918,12 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-share]');i
 <script id="deep-link">
 // #robots, #verger, #chateau, #remparts, #circuits or #animal in the address opens that game straight away
 (()=>{const go={robots:'go-robots',verger:'go-farm',chateau:'go-castle',remparts:'go-battle',circuits:'go-circuit',animal:'go-animal'}[location.hash.slice(1)];if(go)setTimeout(()=>document.getElementById(go).click(),0)})();
+</script>
+
+<script id="home-global">
+// Le bouton Accueil de chaque jeu ramène au menu global de Claude Artefact Games (après avoir sauvegardé la partie)
+(()=>{for(const id of ['btn-home','farm-home','ca-home','ba-home','ci-home','an-home']){const b=document.getElementById(id);if(!b)continue;const f=b.onclick;
+  b.onclick=e=>{try{f&&f.call(b,e)}catch(err){}location.href='../'}}})();
 </script>
 
 </body>
