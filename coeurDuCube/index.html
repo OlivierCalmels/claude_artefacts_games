@@ -107,6 +107,7 @@ const P={
   diag:cs=>(x,y,z,N)=>cs[Math.min(cs.length-1,Math.floor((x+y+z)*cs.length/(3*N-2)))],
   checker:(t,inner,a='w',b='d')=>(x,y,z,N,q)=>depth(x,y,z,N)<t?((x+y+z)%2?b:a):inner(x,y,z,N,q),
   shell:(t,col,inner)=>(x,y,z,N,q)=>depth(x,y,z,N)<t?col:inner(x,y,z,N,q),
+  faces:cs=>(x,y,z,N)=>{const c=(N-1)/2,a=[x-c,y-c,z-c],m=a.map(Math.abs),k=m.indexOf(Math.max(...m));return cs[k*2+(a[k]>0?0:1)]},
   voronoi:(cs,k)=>(x,y,z,N,q)=>{if(!q.seeds)q.seeds=Array.from({length:k},(_,i)=>({x:q.r()*N,y:q.r()*N,z:q.r()*N,c:cs[i%cs.length]}));
     let b=q.seeds[0],bd=1e9;for(const s of q.seeds){const d=(s.x-x)**2+(s.y-y)**2+(s.z-z)**2;if(d<bd){bd=d;b=s}}return b.c},
 };
@@ -123,6 +124,16 @@ const LEVELS=[
   {name:'Planète',N:10,cols:5,len:[45,80],mix:3.5,pat:P.shell(1,'d',P.sphere(['y','o','g','l','b','c']))},
   {name:'Mosaïque',N:12,cols:5,len:[50,85],mix:3.5,pat:P.voronoi(['r','o','y','g','b','p','k','c','w','n'],22)},
   {name:'Le grand cube',N:12,cols:5,len:[50,85],mix:4,pat:P.checker(2,P.shell(1,'n',P.stripes(RB)))},
+  {name:'Tour de Babel',N:12,cols:5,len:[55,90],mix:4,pat:P.shell(1,'d',P.layers(['r','o','y','l','g','c','b','p','k']))},
+  {name:'Géode',N:12,cols:5,len:[55,90],mix:4,pat:P.shell(2,'n',P.sphere(['p','k','c','w','p']))},
+  {name:'Rubik',N:14,cols:5,len:[70,110],mix:4,pat:P.faces(['r','o','w','y','b','g'])},
+  {name:'Pastèque',N:14,cols:5,len:[70,110],mix:4.5,pat:P.onion(['G','l','w','r'])},
+  {name:'Aurore',N:14,cols:5,len:[70,110],mix:4.5,pat:P.checker(1,P.diag(['p','b','c','g','l','y','o','r','k']))},
+  {name:'Labyrinthe',N:16,cols:5,len:[90,130],mix:5,pat:P.shell(1,'w',P.blocks(['d','b','c'],2))},
+  {name:'Galaxie',N:16,cols:5,len:[90,130],mix:5,pat:P.voronoi(['p','b','d','k','c','w','p','b'],34)},
+  {name:'Arc-en-ciel géant',N:16,cols:5,len:[90,130],mix:5,pat:P.checker(2,P.stripes(RB))},
+  {name:'Planète géante',N:18,cols:5,len:[110,150],mix:5.5,pat:P.shell(1,'d',P.sphere(['y','o','r','g','l','b','c','w']))},
+  {name:'Le cube ultime',N:18,cols:5,len:[110,150],mix:6,pat:P.checker(2,P.shell(1,'n',P.voronoi(['r','o','y','g','b','p','k','c'],40)))},
 ];
 const SLOTS=5;
 const DX=[1,-1,0,0,0,0],DY=[0,0,1,-1,0,0],DZ=[0,0,0,0,1,-1];
@@ -232,7 +243,7 @@ function drawCube(t){if(dirty)rebuild();setCam();const N=G.N,M=N+1,h=N/2,cnt=M*M
     ctx.closePath();ctx.fill();ctx.stroke()}}
 
 // ---------- shooting ----------
-const FIRE=()=>.5/G.N,FLIGHT=.24;
+const FIRE=()=>Math.max(.075,.75/G.N),FLIGHT=.24;
 /* A cannon only hits a cube it can see: one of the cube's open faces must face the viewer and the line
    from that face to the viewer must not pass through any other cube. */
 function seen(i){const N=G.N,h=N/2,cx=D*R[6]+h,cy=D*R[7]+h,cz=D*R[8]+h,x0=G.X[i],y0=G.Y[i],z0=G.Z[i];
@@ -285,7 +296,7 @@ function shooter(x,y,s,c,n,o={}){const col=COL[c];ctx.save();ctx.globalAlpha=o.a
   ctx.fillStyle=tint(col,.12);rr(-s*.2,-s*.46+k,s*.4,s*.3,s*.1);ctx.fill();
   ctx.fillStyle='rgba(255,255,255,.35)';rr(-s*.3,-s*.1,s*.16,s*.08,s*.04);ctx.fill();
   if(c==='h'){ctx.fillStyle='#E8383D';heart(0,-s*.3+k,s*.2)}
-  ctx.font=`${Math.round(s*.4)}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
+  ctx.font=`${Math.round(s*(n>99?.32:.4))}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
   ctx.lineWidth=Math.max(3,s*.09);ctx.strokeStyle='rgba(20,16,36,.85)';ctx.strokeText(String(n),0,s*.12);ctx.fillStyle='#fff';ctx.fillText(String(n),0,s*.12);
   ctx.restore()}
 function draw(){
@@ -315,7 +326,7 @@ function draw(){
 // ---------- end of level ----------
 function win(){if(!save.done.includes(li))save.done.push(li);const nxt=li+1<LEVELS.length;if(nxt)save.cur=li+1;store();
   $('cu-end-t').textContent=nxt?'Cœur atteint !':'Tous les cubes sont finis !';
-  $('cu-end-p').textContent=nxt?`Niveau ${li+1} réussi.`:'Tu as atteint le cœur des 12 cubes. Bravo !';
+  $('cu-end-p').textContent=nxt?`Niveau ${li+1} réussi.`:`Tu as atteint le cœur des ${LEVELS.length} cubes. Bravo !`;
   $('cu-end-b').textContent=nxt?'Niveau suivant':'Rejouer le dernier';$('cu-end-b').onclick=()=>start(nxt?li+1:li);$('ov-cu-end').hidden=false}
 function lose(){$('cu-end-t').textContent='Bloqué !';$('cu-end-p').textContent='Les 5 emplacements sont pleins et aucun canon ne trouve de cube de sa couleur à toucher.';
   $('cu-end-b').textContent='Recommencer';$('cu-end-b').onclick=()=>start(li);$('ov-cu-end').hidden=false}
